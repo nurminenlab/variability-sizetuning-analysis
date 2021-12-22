@@ -232,3 +232,5 @@ D_max = IG_params['diam'].max()
 FF_RF = IG_params[IG_params['diam'] == D]
 FF_LAR = IG_params[IG_params['diam'] == D_max]
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
+
+# just some garbage
