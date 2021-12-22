@@ -23,7 +23,7 @@ with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
 with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
 
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-MU-v2.pkl','rb') as f:
     diams_data = pkl.load(f)
 
 diams = np.array(list(diams_data.keys()))
