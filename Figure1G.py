@@ -5,7 +5,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 
 # to generate quencher_DF run generate_quencher_DF.py
-quencher_DF = pd.read_csv('C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/ver8-December2021/quencher_DF.csv')
+quencher_DF = pd.read_csv('C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/quencher_DF.csv')
 
 # bar graph of the proportion of quenchers in each layer
 ax = plt.subplot(111)
