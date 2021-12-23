@@ -91,8 +91,8 @@ for stim in range(mn_mtrx.shape[0]):
 
     if stim == 2 or stim == 18:
         for boot_num in range(mean_PSTH_booted.shape[0]):
-            fano_PSTH_RF[boot_num,stim] = sm.OLS(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window],
-                                                mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+            fano_PSTH_RF[boot_num,:] = sm.OLS(vari_PSTH_booted[boot_num,fano_PSTH_first_tp:][0:-1:count_window],
+                                            mean_PSTH_booted[boot_num,fano_PSTH_first_tp:][0:-1:count_window]).fit().params[0]
 
         fano_PSTH_RF_SD = np.std(fano_PSTH_RF,axis=0)
 
