@@ -106,7 +106,7 @@ for stim in range(mn_mtrx.shape[0]):
         # plot fano-PSTH
         ax.fill_between(t,np.mean(fano_PSTH_RF,axis=0) - fano_PSTH_RF_SD, np.mean(fano_PSTH_RF,axis=0) + fano_PSTH_RF_SD,color='red',alpha=0.3)
         ax.plot(t,np.mean(fano_PSTH_RF,axis=0), 'r-')
-        ax.set_ylim(0,12)
+        ax.set_ylim(0,4)
         ax.tick_params(axis='y',color='red')
         ax.spines['left'].set_color('red')
         ax.tick_params(axis='y',colors='red',labelsize=8)
@@ -121,7 +121,7 @@ for stim in range(mn_mtrx.shape[0]):
         # plot PSTH
         axb.fill_between(t,np.mean(PSTH_RF,axis=0) - PSTH_RF_SD, np.mean(PSTH_RF,axis=0) + PSTH_RF_SD,color='gray')
         axb.plot(t,np.mean(PSTH_RF,axis=0), 'k-')
-        axb.set_ylim(0,25)
+        axb.set_ylim(0,15)
         axb.spines['left'].set_color('red')
         axb.spines['top'].set_visible(False)
         axb.tick_params(axis='y',labelsize=8)
