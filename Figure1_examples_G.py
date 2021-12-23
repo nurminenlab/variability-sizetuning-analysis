@@ -68,7 +68,7 @@ a = 0
 for stim in range(mn_mtrx.shape[0]):
 
     fano[stim] = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]        
-    FR[stim]   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)
+    FR[stim]   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)/(count_window/1000)
         
     if mn_mtrx.shape[0] == 18:
         diam = diams[stim+1]
@@ -87,14 +87,15 @@ for stim in range(mn_mtrx.shape[0]):
                                         mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]).fit().params[0]
     
     # Firing-rate time-course
-    FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)
+    FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)/(count_window/1000)
 
     if stim == 2 or stim == 18:
 
         fano_PSTH_RF = np.divide(vari_PSTH_booted[:,fano_PSTH_first_tp:], (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:]))
         fano_PSTH_RF_SD = np.std(fano_PSTH_RF,axis=0)
 
-        PSTH_RF = mean_PSTH_booted[:,fano_PSTH_first_tp:]
+        # convert to Hz
+        PSTH_RF = mean_PSTH_booted[:,fano_PSTH_first_tp:]/(count_window/1000)
         PSTH_RF_SD = np.std(PSTH_RF,axis=0)
         
         plt.figure(1,figsize=(1.335, 1.115))
@@ -103,7 +104,7 @@ for stim in range(mn_mtrx.shape[0]):
         t = np.arange(-100,600,1)
         # plot fano-PSTH
         ax.fill_between(t,np.mean(fano_PSTH_RF,axis=0) - fano_PSTH_RF_SD, np.mean(fano_PSTH_RF,axis=0) + fano_PSTH_RF_SD,color='red',alpha=0.3)
-        ax.plot(t,np.mean(fano_PSTH_RF,axis=0), 'r-')
+        ax.plot(t,np.mean(fano_PSTH_RF,axis=0), 'k-')
         ax.set_ylim(0,4)
         ax.tick_params(axis='y',color='red')
         ax.spines['left'].set_color('red')
@@ -119,7 +120,7 @@ for stim in range(mn_mtrx.shape[0]):
         # plot PSTH
         axb.fill_between(t,np.mean(PSTH_RF,axis=0) - PSTH_RF_SD, np.mean(PSTH_RF,axis=0) + PSTH_RF_SD,color='gray')
         axb.plot(t,np.mean(PSTH_RF,axis=0), 'k-')
-        axb.set_ylim(0,15)
+        axb.set_ylim(0,150)
         axb.spines['left'].set_color('red')
         axb.spines['top'].set_visible(False)
         axb.tick_params(axis='y',labelsize=8)
@@ -130,7 +131,7 @@ for stim in range(mn_mtrx.shape[0]):
         t = np.arange(50,350,1)
         # plot fano-PSTH
         ax.fill_between(t,np.mean(fano_PSTH_RF[:,150:450],axis=0) - fano_PSTH_RF_SD[150:450], np.mean(fano_PSTH_RF[:,150:450],axis=0) + fano_PSTH_RF_SD[150:450],color='red',alpha=0.3)
-        ax.plot(t,np.mean(fano_PSTH_RF[:,150:450],axis=0), 'r-')
+        ax.plot(t,np.mean(fano_PSTH_RF[:,150:450],axis=0), 'k-')
         ax.set_ylabel('Fano-factor')
         ax.set_xlabel('Peri-stimulus time (ms)')
         ax.spines['left'].set_color('red')
@@ -145,7 +146,7 @@ for stim in range(mn_mtrx.shape[0]):
         spkR = data[unit][cont]['spkR_NoL'][:,stim,fano_PSTH_first_tp:] > 0
         ax = plt.subplot(2,1,a+1)
         for tr in range(spkR.shape[0]):
-            ax.vlines(t[spkR[tr,:]],ymin=0+tr,ymax=1+tr,linewidth=0.1)
+            ax.vlines(t[spkR[tr,:]],ymin=0+tr,ymax=1+tr,linewidth=0.1,color='k')
             #ax.plot(t[spkR[tr,:]],np.ones(t[spkR[tr,:]].shape[0])+tr,'k.',markersize=0.1)
 
         ax.spines['top'].set_visible(False)
