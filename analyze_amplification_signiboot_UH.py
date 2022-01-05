@@ -16,7 +16,7 @@ F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
 # analysis done between these timepoints
-anal_duration = 400
+anal_duration = 300
 first_tp  = 450
 last_tp   = first_tp + anal_duration
 bsl_begin = 120
@@ -117,8 +117,8 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
     bsl_FR     = np.nan * np.ones((mn_mtrx.shape[0]))
     signi_all  = np.nan * np.ones((mn_mtrx.shape[0]),dtype=object)
     for stim in range(mn_mtrx.shape[0]):
-        fano = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]
-        bsl[stim]  = sm.OLS(vr_mtrx[stim,bsl_begin:bsl_end], mn_mtrx[stim,bsl_begin:bsl_end]).fit().params[0]
+        fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],axis=0) / (eps + np.mean(mn_mtrx[stim,first_tp:last_tp][0:-1:count_window],axis=0))
+        bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end],axis=0) / (eps + np.mean(mn_mtrx[stim,bsl_begin:bsl_end]))
         bsl_FR[stim] = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
         delta_fano[stim] = fano - bsl[stim]
         
@@ -245,8 +245,8 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
     bsl_FR     = np.nan * np.ones((mn_mtrx.shape[0]))
     signi_all  = np.nan * np.ones((mn_mtrx.shape[0]),dtype=object)
     for stim in range(mn_mtrx.shape[0]):
-        fano = np.mean(vr_mtrx[stim,first_tp:last_tp],axis=0) / (eps + np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0))
-        bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end],axis=0) / (eps + np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0))
+        fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],axis=0) / (eps + np.mean(mn_mtrx[stim,first_tp:last_tp][0:-1:count_window],axis=0))
+        bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end], axis=0) / (eps + np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0))
         bsl_FR[stim] = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
         delta_fano[stim] = fano - bsl[stim]
         
@@ -260,7 +260,7 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
                                                                                                 count_window,
                                                                                                 style='same',
                                                                                                 return_bootdstrs=True,
-                                                                                                nboots=3000)
+                                                                                                nboots=nboots)
 
         fano_boot = np.mean(vari_PSTH_booted[:,first_tp:last_tp],axis=1) / (eps + np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1))
         fano_boot = fano_boot - np.mean(fano_boot)
@@ -373,7 +373,7 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
     bsl_FR     = np.nan * np.ones((mn_mtrx.shape[0]))
     signi_all  = np.nan * np.ones((mn_mtrx.shape[0]),dtype=object)
     for stim in range(mn_mtrx.shape[0]):
-        fano = np.mean(vr_mtrx[stim,first_tp:last_tp],axis=0) / (eps + np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0))
+        fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],axis=0) / ( eps + np.mean(mn_mtrx[stim,first_tp:last_tp][0:-1:count_window],axis=0))
         bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end],axis=0) / (eps + np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0))
         bsl_FR[stim] = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
         delta_fano[stim] = fano - bsl[stim]
