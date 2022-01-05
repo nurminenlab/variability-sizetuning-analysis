@@ -96,6 +96,7 @@ indx  = 0
 qindx = 0
 cont  = 100.0
 count_window = 100
+nboots = 3000
 
 SG_perc_amplif = np.zeros((len(list(SG_mn_data.keys())),19))
 SG_perc_quench = np.zeros((len(list(SG_mn_data.keys())),19))
@@ -116,8 +117,8 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
     bsl_FR     = np.nan * np.ones((mn_mtrx.shape[0]))
     signi_all  = np.nan * np.ones((mn_mtrx.shape[0]),dtype=object)
     for stim in range(mn_mtrx.shape[0]):
-        fano = np.mean(vr_mtrx[stim,first_tp:last_tp],axis=0) / (eps + np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0))
-        bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end],axis=0) / (eps + np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0))
+        fano = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+        bsl[stim]  = sm.OLS(vr_mtrx[stim,bsl_begin:bsl_end], mn_mtrx[stim,bsl_begin:bsl_end]).fit().params[0]
         bsl_FR[stim] = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
         delta_fano[stim] = fano - bsl[stim]
         
@@ -131,7 +132,7 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
                                                                                                 count_window,
                                                                                                 style='same',
                                                                                                 return_bootdstrs=True,
-                                                                                                nboots=3000)
+                                                                                                nboots=nboots)
 
         fano_boot = np.mean(vari_PSTH_booted[:,first_tp:last_tp],axis=1) / (eps + np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1))
         fano_boot = fano_boot - np.mean(fano_boot)
@@ -196,7 +197,7 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
         maxquench_diam = diams_all[np.argmin(delta_fano)]
         maxquench      = np.min(delta_fano)
         maxquench_perc = np.min(delta_fano) / bsl_signi[np.argmin(delta_fano)]
-    else:
+    else: # no significant quenching
         maxquench_diam = np.nan
         maxquench      = np.nan
         maxquench_perc = np.nan
@@ -205,7 +206,7 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
         maxamplif_diam = diams_all[np.argmax(delta_fano)]
         maxamplif      = np.max(delta_fano)
         maxamplif_perc = np.max(delta_fano) / bsl_signi[np.argmax(delta_fano)]
-    else:
+    else: # no significant amplification
         maxamplif_diam = np.nan
         maxamplif      = np.nan
         maxamplif_perc = np.nan
