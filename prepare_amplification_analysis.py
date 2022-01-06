@@ -496,3 +496,7 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
     qindx =+ 1
+
+
+# save results
+quencher_DF.to_csv('amplification_DF.csv')
