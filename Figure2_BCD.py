@@ -497,46 +497,11 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
     qindx =+ 1
 
-my_palette = sns.color_palette(['gray','black'])        
-plt.figure(1, figsize=(4.5, 1.5))
-ax = plt.subplot(1,3,1)
-sns.scatterplot(x='diam',y='delta_fano',data=SG_params,s=4,hue='signi',palette=my_palette,ax=ax)
-
-ax.set_xscale('log')
-ax.set_xticks([0.1, 1., 10])
-ax.set_ylabel('')
-ax.set_xlabel('')
-ax.set_ylim(-8,6)
-
-ax = plt.subplot(1,3,2)
-sns.scatterplot(x='diam',y='delta_fano',data=G_params,s=4,hue='signi',palette=my_palette,ax=ax)
-ax.set_xscale('log')
-ax.set_xticks([0.1, 1., 10])
-ax.set_yticklabels([])
-ax.set_ylabel('')
-ax.set_xlabel('')
-ax.set_ylim(-8,6)
-
-ax = plt.subplot(1,3,3)
-my_palette = sns.color_palette(['black','gray'])
-sns.scatterplot(x='diam',y='delta_fano',data=IG_params,s=4,hue='signi',palette=my_palette,ax=ax)
-ax.set_xscale('log')
-ax.set_xticks([0.1, 1., 10])
-ax.set_yticklabels([])
-ax.set_ylabel('')
-ax.set_xlabel('')
-ax.set_ylim(-8,6)
-
 
 plt.figure(2, figsize=(4.5, 1.5))
-ax = plt.subplot(1,2,1)
-quencher_DF.groupby(['layer','qtype_signi']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()).unstack().plot(kind='bar', stacked=True, ax=ax,color=['red','grey'])
-
 ax = plt.subplot(1,2,2)
 SEM = quencher_DF.groupby(['layer','qtype_signi'])['bsl'].sem()
 quencher_DF.groupby(['layer','qtype_signi'])['bsl'].mean().plot(kind='bar',yerr=SEM,ax=ax)
-
-quencher_DF.to_csv('quencher_DF.csv')
 
 lm = ols('bsl ~ C(qtype_signi) + C(layer)',data=quencher_DF).fit()
 table = sm.stats.anova_lm(lm,typ=1)
@@ -544,97 +509,9 @@ table = sm.stats.anova_lm(lm,typ=1)
 SEM = quencher_DF.groupby('layer')['maxquench_diam','maxamplif_diam'].sem()
 quencher_DF.groupby('layer')['maxquench_diam','maxamplif_diam'].mean().plot(kind='bar',yerr=SEM)
 
-SEM = quencher_DF.groupby('layer')['maxquench_perc','maxamplif_perc'].sem()
-quencher_DF.groupby('layer')['maxquench_perc','maxamplif_perc'].mean().plot(kind='bar',yerr=SEM)
-
-quencher_DF['maxquench_diam'].hist(ec='black',fc='gray',bins=np.arange(0.1,4,0.2),grid=False)
-quencher_DF['maxamplif_diam'].hist(ec='black',fc='gray',bins=np.arange(0.1,4,0.2),grid=False)
-
-SG_perc_amplif = SG_perc_amplif * 100
-SG_perc_quench = SG_perc_quench * 100
-
-SG_perc_amplif_mn = np.mean(SG_perc_amplif,axis=0)
-SG_perc_amplif_se = np.std(SG_perc_amplif,axis=0) / np.sqrt(SG_perc_amplif.shape[0])
-SG_perc_amplif_ub = SG_perc_amplif_mn + SG_perc_amplif_se
-SG_perc_amplif_lb = SG_perc_amplif_mn - SG_perc_amplif_se
-
-SG_perc_quench_mn = np.mean(SG_perc_quench,axis=0)
-SG_perc_quench_se = np.std(SG_perc_quench,axis=0) / np.sqrt(SG_perc_quench.shape[0])
-SG_perc_quench_ub = SG_perc_quench_mn + SG_perc_quench_se
-SG_perc_quench_lb = SG_perc_quench_mn - SG_perc_quench_se
-
-G_perc_amplif = G_perc_amplif * 100
-G_perc_quench = G_perc_quench * 100
-
-G_perc_amplif_mn = np.mean(G_perc_amplif,axis=0)
-G_perc_amplif_se = np.std(G_perc_amplif,axis=0) / np.sqrt(G_perc_amplif.shape[0])
-G_perc_amplif_ub = G_perc_amplif_mn + G_perc_amplif_se
-G_perc_amplif_lb = G_perc_amplif_mn - G_perc_amplif_se
-
-G_perc_quench_mn = np.mean(G_perc_quench,axis=0)
-G_perc_quench_se = np.std(G_perc_quench,axis=0) / np.sqrt(G_perc_quench.shape[0])
-G_perc_quench_ub = G_perc_quench_mn + G_perc_quench_se
-G_perc_quench_lb = G_perc_quench_mn - G_perc_quench_se
-
-IG_perc_amplif = IG_perc_amplif * 100
-IG_perc_quench = IG_perc_quench * 100
-
-IG_perc_amplif_mn = np.mean(IG_perc_amplif,axis=0)
-IG_perc_amplif_se = np.std(IG_perc_amplif,axis=0) / np.sqrt(IG_perc_amplif.shape[0])
-IG_perc_amplif_ub = IG_perc_amplif_mn + IG_perc_amplif_se
-IG_perc_amplif_lb = IG_perc_amplif_mn - IG_perc_amplif_se
-
-IG_perc_quench_mn = np.mean(IG_perc_quench,axis=0)
-IG_perc_quench_se = np.std(IG_perc_quench,axis=0) / np.sqrt(IG_perc_quench.shape[0])
-IG_perc_quench_ub = IG_perc_quench_mn + IG_perc_quench_se
-IG_perc_quench_lb = IG_perc_quench_mn - IG_perc_quench_se
-
-# SG 
-plt.figure(figsize=(4.5, 0.93))
-plt.subplot(1,3,1)
-plt.fill_between(diams,SG_perc_amplif_lb, SG_perc_amplif_ub,color='r')
-plt.plot(diams,SG_perc_amplif_mn,'k--')
-plt.fill_between(diams,SG_perc_quench_lb, SG_perc_quench_ub,color='b')
-plt.plot(diams,SG_perc_quench_mn,'k--')
-plt.ylim(-50, 50)
-plt.xscale('log')
-plt.xticks([0.1, 1, 10])
-
-# G
-plt.subplot(1,3,2)
-plt.fill_between(diams,G_perc_amplif_lb, G_perc_amplif_ub,color='r')
-plt.plot(diams,G_perc_amplif_mn,'k--')
-plt.fill_between(diams,G_perc_quench_lb, G_perc_quench_ub,color='b')
-plt.plot(diams,G_perc_quench_mn,'k--')
-plt.ylim(-50, 50)
-plt.xscale('log')
-plt.xticks([0.1, 1, 10])
-
-# IG
-plt.subplot(1,3,3)
-plt.fill_between(diams,IG_perc_amplif_lb, IG_perc_amplif_ub,color='r')
-plt.plot(diams,IG_perc_amplif_mn,'k--')
-plt.fill_between(diams,IG_perc_quench_lb, IG_perc_quench_ub,color='b')
-plt.plot(diams,IG_perc_quench_mn,'k--')
-plt.ylim(-50, 50)
-plt.xscale('log')
-plt.xticks([0.1, 1, 10])
-
-# nboots = 10000
-# boot_inds = np.random.choice(tmp.shape[0],(tmp.shape[0],nboots))
-
-SG_maxquench_diam = quencher_DF[quencher_DF['layer'] == 'SG']['maxquench_diam'].values
-SG_maxamplif_diam = quencher_DF[quencher_DF['layer'] == 'SG']['maxamplif_diam'].values
-
-G_maxquench_diam = quencher_DF[quencher_DF['layer'] == 'G']['maxquench_diam'].values
-G_maxamplif_diam = quencher_DF[quencher_DF['layer'] == 'G']['maxamplif_diam'].values
-
-IG_maxquench_diam = quencher_DF[quencher_DF['layer'] == 'IG']['maxquench_diam'].values
-IG_maxamplif_diam = quencher_DF[quencher_DF['layer'] == 'IG']['maxamplif_diam'].values
-
 plt.figure(figsize=(1.481, 1.128))
 ax = plt.subplot(1,1,1)
 SEM = quencher_DF.groupby('layer')['maxquench','maxamplif'].sem()
 quencher_DF.groupby('layer')['maxquench','maxamplif'].mean().plot(kind='bar',yerr=SEM,ax=ax)
 
-plt.show()
+
