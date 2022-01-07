@@ -56,6 +56,7 @@ contrast = [100.0]
 SI_crit = 0.05
 bins = np.arange(-100,600,1)
 virgin = True
+eps = 0.0000001
 
 # this dataframe holds params for each unit
 params_df = pd.DataFrame(columns=['RFdiam','maxResponse','SI','baseline',
@@ -161,27 +162,24 @@ for unit in range(len(data)):
                     # collect FPSTHs
                     for stim_diam in range(data[unit][cont]['spkR_NoL'].shape[1]):
                         mean_PSTH, vari_PSTH,binned_data,mean_PSTH_booted, vari_PSTH_booted = dalib.meanvar_PSTH(data[unit][cont]['spkR_NoL'][:,stim_diam,:],
-                                                                                                                 count_window,style='same',return_bootdstrs=True,nboots=1000)
+                                                                                                                 count_window,
+                                                                                                                 style='same',
+                                                                                                                 return_bootdstrs=True,
+                                                                                                                 nboots=1000)
                         # use indexing to get rid of redundancy caused by sliding spike-count window
                         mean_SE[stim_diam] = np.std(np.mean(binned_data[:,first_tp:last_tp][:,0:-1:count_window]/(count_window/1000.0),axis=1)) / np.sqrt(binned_data.shape[0])
-                        fano_results = sm.OLS(vari_PSTH[first_tp:last_tp][0:-1:count_window],mean_PSTH[first_tp:last_tp][0:-1:count_window]).fit()
+                        fano_container[stim_diam] = np.mean(vari_PSTH[first_tp:last_tp][0:-1:count_window] / (eps + mean_PSTH[first_tp:last_tp][0:-1:count_window]))
                         
-                        fano_booted  = np.nan * np.ones(mean_PSTH_booted.shape[0])
+                        fano_booted  = np.mean(np.division(vari_PSTH_booted[:,first_tp:last_tp][0:-1:count_window], (eps + mean_PSTH_booted[:,first_tp:last_tp][0:-1:count_window])),axis=1)
 
                         mean_PSTH_allstim[stim_diam,:] = mean_PSTH
                         vari_PSTH_allstim[stim_diam,:] = vari_PSTH
-                        # compute bootstrapped fano time-course
-                        for boot_num in range(mean_PSTH_booted.shape[0]):
-                            fano_booted[boot_num] = sm.OLS(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window],
-                                                           mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]).fit().params[0]
-                            
-                        
-                        fano_container[stim_diam] = fano_results.params[0]                        
+
                         CI = np.percentile(fano_booted,[16,84])
                         fano_ERR_container[0,stim_diam] = fano_container[stim_diam] - CI[0]
                         fano_ERR_container[1,stim_diam] = CI[1] - fano_container[stim_diam]
                         mean_container[stim_diam] = np.mean(binned_data[:,first_tp:last_tp][:,0:-1:count_window]/(count_window/1000.0))
-                        bsl_container[stim_diam] = sm.OLS(vari_PSTH[bsl_begin:bsl_end][0:-1:count_window],mean_PSTH[bsl_begin:bsl_end][0:-1:count_window]).fit().params[0]
+                        bsl_container[stim_diam]  = np.mean(vari_PSTH[bsl_begin:bsl_end][0:-1:count_window] / (eps + mean_PSTH[bsl_begin:bsl_end][0:-1:count_window]))
                         
                         if data[unit]['info']['diam'][stim_diam] in mean_PSTHs.keys():
                             mean_PSTHs[unit] = np.concatenate((mean_PSTHs[data[unit]['info']['diam'][stim_diam]],
