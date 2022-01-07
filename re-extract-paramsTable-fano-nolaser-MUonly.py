@@ -170,7 +170,7 @@ for unit in range(len(data)):
                         mean_SE[stim_diam] = np.std(np.mean(binned_data[:,first_tp:last_tp][:,0:-1:count_window]/(count_window/1000.0),axis=1)) / np.sqrt(binned_data.shape[0])
                         fano_container[stim_diam] = np.mean(vari_PSTH[first_tp:last_tp][0:-1:count_window] / (eps + mean_PSTH[first_tp:last_tp][0:-1:count_window]))
                         
-                        fano_booted  = np.mean(np.division(vari_PSTH_booted[:,first_tp:last_tp][0:-1:count_window], (eps + mean_PSTH_booted[:,first_tp:last_tp][0:-1:count_window])),axis=1)
+                        fano_booted  = np.mean(np.divide(vari_PSTH_booted[:,first_tp:last_tp][0:-1:count_window], (eps + mean_PSTH_booted[:,first_tp:last_tp][0:-1:count_window])),axis=1)
 
                         mean_PSTH_allstim[stim_diam,:] = mean_PSTH
                         vari_PSTH_allstim[stim_diam,:] = vari_PSTH
