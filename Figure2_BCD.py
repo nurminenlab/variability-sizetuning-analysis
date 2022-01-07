@@ -10,6 +10,7 @@ plt.figure()
 SEM = amplification_DF.groupby(['layer','qtype_signi'])['bsl'].sem()
 amplification_DF.groupby(['layer','qtype_signi'])['bsl'].mean().plot(kind='bar',yerr=SEM)
 
+plt.figure()
 sns.swarmplot(x='layer',y='bsl',data=amplification_DF,hue='qtype_signi')
 
 lm = ols('bsl ~ C(qtype_signi) + C(layer)',data=amplification_DF).fit()
@@ -18,6 +19,8 @@ table = sm.stats.anova_lm(lm,typ=1)
 plt.figure()
 SEM = amplification_DF.groupby('layer')[['maxquench_diam','maxamplif_diam']].sem()
 amplification_DF.groupby('layer')[['maxquench_diam','maxamplif_diam']].mean().plot(kind='bar',yerr=SEM)
+
+plt.figure()
 ax = plt.subplot(111)
 sns.swarmplot(x='layer',y='maxquench_diam',data=amplification_DF,color='blue',ax=ax)
 sns.swarmplot(x='layer',y='maxamplif_diam',data=amplification_DF,color='orange',ax=ax)
