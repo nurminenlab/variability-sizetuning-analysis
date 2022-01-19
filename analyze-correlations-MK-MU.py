@@ -18,7 +18,7 @@ def cost_response(params,xdata,ydata):
     err  = np.sum(np.power(Rhat - ydata,2))
     return err
 
-F_dir   = '/home/lauri/projects/CorrelatedVariability/results/paper_v8/MK-MU-July2020/'
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 params_df = pd.read_csv(F_dir + 'extracted_correlation_params.csv')
 corrBSL = np.nanmean(params_df['gm_fit_correlation_BSL'].values)
 params_df['utype'] = ['multi'] * len(params_df.index)
