@@ -23,12 +23,7 @@ params_df = pd.read_csv(F_dir + 'extracted_correlation_params.csv')
 corrBSL = np.nanmean(params_df['gm_fit_correlation_BSL'].values)
 params_df['utype'] = ['multi'] * len(params_df.index)
 
-SU_F_dir   = '/home/lauri/projects/CorrelatedVariability/results/paper_v8/MK-SU/'
-SU_params_df = pd.read_csv(SU_F_dir + 'extracted_correlation_params.csv')
-SU_params_df = SU_params_df.dropna()
-SU_params_df['utype'] = ['single'] * len(SU_params_df.index)
-
-paramsas = pd.concat([params_df,SU_params_df], axis=0)
+paramsas = params_df
 
 # correlations for all pairs
 with open(F_dir + 'correlations_all.pkl','rb') as f:
@@ -231,8 +226,6 @@ ax4b.tick_params(axis='y',colors='red')
 ax4b.yaxis.label.set_color('red')
 
 #plt.tight_layout()
-
-
 
 plt.figure(22)
 ax = plt.subplot(2,2,1)
