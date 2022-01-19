@@ -4,7 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-os.sys.path.append('/home/lauri/code/DataAnalysis')
+
+sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
 import data_analysislib as dalib
 from scipy.optimize import basinhopping
 
@@ -104,8 +105,9 @@ for d in range(diams_GG.shape[0]):
     gm_SE_GG[d] = np.std(means_GG[diams_GG[d]]) / np.sqrt(means_GG[diams_GG[d]].shape[0])    
 
 
-plt.figure(num='Grand Average',figsize=(1.887, 0.9),frameon=False)
+plt.figure(num='Grand Average',frameon=False)
 ax2 = plt.subplot(1,1,1)
+ax2.title.set_text('Grand Average')
 args = (diams_all,rSC_mn_all)
 bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
 res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
@@ -133,8 +135,9 @@ ax2b.spines['right'].set_color('red')
 ax2b.tick_params(axis='y',colors='red')
 ax2b.yaxis.label.set_color('red')
 
-plt.figure(num='SG',figsize=(1.887, 0.9))
+plt.figure(num='SG')
 ax2 = plt.subplot(1,1,1)
+ax2.title.set_text('SG')
 args = (diams_SGSG,rSC_mn_SGSG)
 bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
 res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
@@ -163,7 +166,8 @@ ax2b.spines['right'].set_color('red')
 ax2b.tick_params(axis='y',colors='red')
 ax2b.yaxis.label.set_color('red')
 
-plt.figure(num='IG',figsize=(1.887, 0.9))
+plt.figure(num='IG')
+ax2.title.set_text('IG')
 corrBSL_IGIG = params_df.groupby('layer_type')['gm_fit_correlation_BSL'].mean()['IGIG']
 ax3 = plt.subplot(1,1,1)
 ax3b = ax3.twinx()
@@ -195,7 +199,8 @@ ax3b.spines['right'].set_color('red')
 ax3b.tick_params(axis='y',colors='red')
 ax3b.yaxis.label.set_color('red')
 
-plt.figure(num='G',figsize=(1.887, 0.9))
+plt.figure(num='G')
+ax2.title.set_text('G')
 corrBSL_GG = params_df.groupby('layer_type')['gm_fit_correlation_BSL'].mean()['GG']
 ax4 = plt.subplot(1,1,1)
 ax4b = ax4.twinx()
@@ -256,11 +261,10 @@ ax.set_xlim(-0.2,1)
 ax.set_ylim(-0.2,1)
 ax.set_aspect('equal')
 
-plt.figure(23,figsize=(3.708,1.707))
+plt.figure(23)
 SEM = params_df.groupby('layer_type')['gm_fit_correlation_MAX','gm_fit_correlation_RF','gm_fit_correlation_SUR','gm_fit_correlation_LAR'].sem()
 ax = plt.subplot(1,1,1)
 params_df.groupby('layer_type')['gm_fit_correlation_MAX','gm_fit_correlation_RF','gm_fit_correlation_SUR','gm_fit_correlation_LAR'].mean().plot(ax=ax,kind='bar',yerr=SEM)
-
 
 rSCsuppression = 100 * (params_df['gm_fit_correlation_MAX'] - params_df['gm_fit_correlation_LAR']) / params_df['gm_fit_correlation_MAX']
 peak_difference = params_df['gm_fit_RF'].values - params_df['gm_fit_correlation_MAX_diam'].values
@@ -269,44 +273,22 @@ params_df.insert(2,'rSCsuppression',rSCsuppression.values)
 params_df.insert(3,'peak_difference',peak_difference)
 params_df.insert(4,'through_difference',through_difference)
 
-plt.figure(222,figsize=(2.3,0.785))
+plt.figure(222)
 ax = plt.subplot(1,1,1)
 sns.barplot(x='layer_type',y='rSCsuppression',ci=68,data=params_df,ax=ax)
 
+plt.figure(223)
 params_df['peak_difference'].hist(by=params_df['layer_type'],ec='black',fc='grey',bins=np.arange(-2,2,0.1),layout=(1,4), figsize=(3.45,1.02))
 
+plt.figure(224)
 params_df['through_difference'].hist(by=params_df['layer_type'],ec='black',fc='grey',bins=np.arange(-2,2,0.1),layout=(1,4), figsize=(3.45,1.02))
 
-plt.figure(23,figsize=(6.203, 1.924))
+plt.figure(225)
 max_corr = 1
 min_corr = -1
-my_palette = sns.color_palette(['gray','red'])
+my_palette = sns.color_palette(['gray'])
 
-ax1 = plt.subplot(1,3,1)
-sns.scatterplot(x='gm_fit_correlation_SML',y='gm_fit_correlation_RF',hue='utype',data=paramsas,ax=ax1,
-                palette=my_palette,s=20)
-ax1.plot([min_corr,max_corr],[min_corr,max_corr],'k-')
-ax1.set_xlim(min_corr,max_corr)
-ax1.set_ylim(min_corr,max_corr)
-ax1.set_aspect('equal','box')
-
-ax2 = plt.subplot(1,3,2)
-sns.scatterplot(x='gm_fit_correlation_RF',y='gm_fit_correlation_SUR',hue='utype',data=paramsas,ax=ax2,
-                palette=my_palette,s=20)
-ax2.plot([min_corr,max_corr],[min_corr,max_corr],'k-')
-ax2.set_xlim(min_corr,max_corr)
-ax2.set_ylim(min_corr,max_corr)
-ax2.set_aspect('equal','box')
-
-ax3 = plt.subplot(1,3,3)
-sns.scatterplot(x='gm_fit_correlation_SUR',y='gm_fit_correlation_LAR',hue='utype',data=paramsas,ax=ax3,
-                palette=my_palette,s=20)
-ax3.plot([min_corr,max_corr],[min_corr,max_corr],'k-')
-ax3.set_xlim(min_corr,max_corr)
-ax3.set_ylim(min_corr,max_corr)
-ax3.set_aspect('equal','box')
-
-plt.figure(100)
+plt.figure(226)
 SEM = params_df.groupby('layer_type')['gm_fit_correlation_MAX','gm_fit_correlation_RF','gm_fit_correlation_SUR','gm_fit_correlation_LAR'].sem()
 ax = plt.subplot(1,1,1)
 params_df.groupby('layer_type')['gm_fit_correlation_MAX','gm_fit_correlation_RF','gm_fit_correlation_SUR','gm_fit_correlation_LAR'].mean().plot(ax=ax,kind='bar',yerr=SEM)
