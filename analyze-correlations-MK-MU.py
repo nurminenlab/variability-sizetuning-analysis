@@ -274,13 +274,33 @@ SEM = params_df[['gm_fit_correlation_BSL','gm_fit_correlation_RF','gm_fit_correl
 ax = plt.subplot(1,1,1)
 params_df[['gm_fit_correlation_BSL','gm_fit_correlation_RF','gm_fit_correlation_SUR','gm_fit_correlation_LAR']].mean().plot(ax=ax,kind='bar',yerr=SEM)
 
-SWARMPLOT
-
-rSCsuppression = 100 * (params_df['gm_fit_correlation_MAX'] - params_df['gm_fit_correlation_LAR']) / params_df['gm_fit_correlation_MAX']
-params_df.insert(2,'rSCsuppression',rSCsuppression.values)
 plt.figure(25)
 ax = plt.subplot(1,1,1)
+sns.histplot(x='gm_fit_correlation_BSL',data=params_df,ax=ax,bins=np.arange(-0.6,0.9,0.1))
+
+plt.figure(26)
+ax = plt.subplot(1,1,1)
+sns.histplot(x='gm_fit_correlation_RF',data=params_df,ax=ax,bins=np.arange(-0.6,0.9,0.1))
+
+plt.figure(27)
+ax = plt.subplot(1,1,1)
+sns.histplot(x='gm_fit_correlation_MIN',data=params_df,ax=ax,bins=np.arange(-0.6,0.9,0.1))
+
+plt.figure(28)
+ax = plt.subplot(1,1,1)
+sns.histplot(x='gm_fit_correlation_SUR',data=params_df,ax=ax,bins=np.arange(-0.6,0.9,0.1))
+
+plt.figure(29)
+rSCsuppression = 100 * (params_df['gm_fit_correlation_MAX'] - params_df['gm_fit_correlation_LAR']) / params_df['gm_fit_correlation_MAX']
+params_df.insert(2,'rSCsuppression',rSCsuppression.values)
+ax = plt.subplot(1,1,1)
 sns.barplot(x='layer_type',y='rSCsuppression',ci=68,data=params_df,ax=ax)
+
+plt.figure(30)
+ax = plt.subplot(1,1,1)
+dsd = params_df['gm_fit_correlation_MAX_diam'] - params_df['gm_fit_RF']
+params_df.insert(3,'dsd',dsd.values)
+sns.histplot(x='dsd',data=params_df,ax=ax,bins=np.arange(-2,2,0.1))
 
 
 
