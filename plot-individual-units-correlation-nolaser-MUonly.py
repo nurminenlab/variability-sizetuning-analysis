@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as sts
 import statsmodels.api as sm
 from matplotlib.backends.backend_pdf import PdfPages
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
 from matplotlib import gridspec
 from statsmodels.formula.api import ols
@@ -52,7 +52,7 @@ def cost_response(params,xdata,ydata):
 # unit loop
 contrast = [100.0]
 SI_crit = 0.05
-bins = np.arange(-100,600,1)
+bins = np.arange(-400,600,1)
 peani = 'pylly'
 virgin = True
 
@@ -161,8 +161,7 @@ for pair in range(2):#range(len(data)):
 
                 # plot rasters, correlation data and fit, spike-count scatter plots, 
                 f, ax = plt.subplots(3,5)
-                
-                
+                dalib.rasters(np.squeeze(data[pair][100.0]['spkR_NoL_pair1'][:,np.argmax(gm_response),:]), bins, ax[0,0])
 
                 # collect parameters from the fits and set bg to gray for shitty fits
                 if pair in excluded_fits:
