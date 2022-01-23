@@ -27,6 +27,12 @@ anal_type = 'MU'
 
 SUdatfile = 'correlationData_selectedUnits_lenient_macaque-MUA-July2020.pkl'
 
+examples_SG = PdfPages(S_dir + 'correlations-individualunits-SUPRAGRANULAR.pdf')
+examples_G  = PdfPages(S_dir + 'correlations-individualunits-GRANULAR.pdf')
+examples_IG = PdfPages(S_dir + 'correlations-individualunits-INFRAGRANULAR.pdf')
+examples_MX = PdfPages(S_dir + 'correlations-individualunits-MX.pdf')
+
+
 shitty_fits = [666]
 excluded_fits = [666]
                 
@@ -79,7 +85,7 @@ bsl_end   = bsl_begin + anal_duration
 count_window = np.array([100])
 
 print('N pairs total ',len(data))
-for pair in range(2):#range(len(data)):
+for pair in range(len(data)):
 
     for cont in contrast:
         if cont in data[pair].keys():
@@ -147,12 +153,12 @@ for pair in range(2):#range(len(data)):
                     gm_surr_narrow_new  = diams_tight[gm_surr_ind_narrow_new]
                     
                 # Fit correlation data 
-                a0 = data[pair][100.0]['corr_bin_NoL'].shape[0]
-                a1 = data[pair][100.0]['corr_bin_NoL'].shape[1]
-                a2 = data[pair][100.0]['corr_bin_NoL_booted'].shape[1]
+                a0 = data[pair][cont]['corr_bin_NoL'].shape[0]
+                a1 = data[pair][cont]['corr_bin_NoL'].shape[1]
+                a2 = data[pair][cont]['corr_bin_NoL_booted'].shape[1]
                 
-                corrs_mean = np.reshape(data[pair][100.0]['corr_bin_NoL'],(a0,a1))
-                corrs_err = np.mean(np.percentile(np.reshape(data[pair][100.0]['corr_bin_NoL_booted'],(a0,a2)),[16,85],axis=1).T,axis=1)
+                corrs_mean = np.reshape(data[pair][cont]['corr_bin_NoL'],(a0,a1))
+                corrs_err = np.mean(np.percentile(np.reshape(data[pair][cont]['corr_bin_NoL_booted'],(a0,a2)),[16,85],axis=1).T,axis=1)
                 args = (data[pair]['info']['diam'],corrs_mean[:,0])
                 
                 bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,-1,-1],[1,30,30,30,100,100,100,100,1,1]]).T
@@ -160,49 +166,163 @@ for pair in range(2):#range(len(data)):
                 Corr_hat = dalib.doubleROG(diams_tight,*res.x)
 
                 # plot rasters, correlation data and fit, spike-count scatter plots, 
-                f, ax = plt.subplots(3,5)
-                dalib.rasters(np.squeeze(data[pair][100.0]['spkR_NoL_pair1'][:,np.argmax(gm_response),:]), bins, ax[0,0])
+                f, ax = plt.subplots(4,4,figsize=(14,12))
 
-                # collect parameters from the fits and set bg to gray for shitty fits
-                if pair in excluded_fits:
-                    gm_fit_correlation_SML = np.nan
-                    gm_fit_correlation_RF  = np.nan
-                    gm_fit_correlation_SUR = np.nan
-                    gm_fit_correlation_LAR = np.nan
-                    gm_fit_correlation_BSL = np.nan
-                    gm_fit_correlation_MIN = np.nan
-                    gm_fit_correlation_MAX = np.nan
-                    gm_fit_correlation_MAX_diam = np.nan
-                    gm_fit_correlation_MIN_diam = np.nan
-                    gm_fit_RF            = np.nan
-                    gm_fit_surr          = np.nan
+                # plot data for peak correlation
+                # --------------------------------------------------
+                plot_diam = np.argmin(np.abs(data[pair]['info']['diam'] - diams_tight[np.argmax(Corr_hat)]))
+                plot_diam_ind_Cmax = plot_diam
+                plot_colm = 0
+                dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,:]), bins, ax[0,plot_colm],color='red')
+                dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,:]), bins, ax[1,plot_colm],color='blue')
+                
+                # get PSTHs for both units
+                mean_PSTH_u1, vari_PSTH,binned_data,mean_PSTH_booted_u1, vari_PSTH_booted = dalib.meanvar_PSTH(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,bsl_begin:],
+                                                                                                                 count_window,
+                                                                                                                 style='same',
+                                                                                                                 return_bootdstrs=True,
+                                                                                                                 nboots=1000)
 
-                    gm_fit_response_SML = np.nan
-                    gm_fit_response_RF = np.nan
-                    gm_fit_response_SUR = np.nan
-                    gm_fit_response_LAR = np.nan
-                    gm_fit_response_BSL = np.nan
-                    gm_fit_response_atcMAX = np.nan
-                    gm_fit_response_atcMIN = np.nan
-                    pair_num            = np.nan
-                    
+                mean_PSTH_u2, vari_PSTH,binned_data,mean_PSTH_booted_u2, vari_PSTH_booted = dalib.meanvar_PSTH(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,bsl_begin:],
+                                                                                                                 count_window,
+                                                                                                                 style='same',
+                                                                                                                 return_bootdstrs=True,
+                                                                                                                 nboots=1000)
+                # plot PSTHs
+                ax[2,plot_colm].fill_between(bins[bsl_begin:],mean_PSTH_u1 - np.std(mean_PSTH_booted_u1,axis=0), 
+                                    mean_PSTH_u1 + np.std(mean_PSTH_booted_u1,axis=0),color='red',alpha=0.5)
+                ax[2,plot_colm].plot(bins[bsl_begin:],mean_PSTH_u1,'k-')
+                ax[2,plot_colm].fill_between(bins[bsl_begin:],mean_PSTH_u2 - np.std(mean_PSTH_booted_u2,axis=0), 
+                                    mean_PSTH_u2 + np.std(mean_PSTH_booted_u2,axis=0),color='blue',alpha=0.5)
+                ax[2,plot_colm].plot(bins[bsl_begin:],mean_PSTH_u2,'b-')
+
+                # get z-scored spike-counts
+                z_sc1 = dalib.z_score(data[pair][100.0]['spkC_NoL_pair1'][:,plot_diam])
+                z_sc2 = dalib.z_score(data[pair][100.0]['spkC_NoL_pair2'][:,plot_diam])
+                # plot z-scored spike-counts
+                ax[3,plot_colm].scatter(z_sc1,z_sc2,color='k',s=5)
+                ax[3,plot_colm].set_xlim([-3,3])
+                ax[3,plot_colm].set_ylim([-3,3])
+                ax[3,plot_colm].set_aspect('equal',adjustable='box')
+                # --------------------------------------------------
+
+                # plot data for RF
+                # --------------------------------------------------
+                plot_diam = np.argmax(gm_response)                
+                plot_colm = 1
+                dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,:]), bins, ax[0,plot_colm],color='red')
+                dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,:]), bins, ax[1,plot_colm],color='blue')
+                
+                # get PSTHs for both units
+                mean_PSTH_u1, vari_PSTH,binned_data,mean_PSTH_booted_u1, vari_PSTH_booted = dalib.meanvar_PSTH(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,bsl_begin:],
+                                                                                                                 count_window,
+                                                                                                                 style='same',
+                                                                                                                 return_bootdstrs=True,
+                                                                                                                 nboots=1000)
+
+                mean_PSTH_u2, vari_PSTH,binned_data,mean_PSTH_booted_u2, vari_PSTH_booted = dalib.meanvar_PSTH(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,bsl_begin:],
+                                                                                                                 count_window,
+                                                                                                                 style='same',
+                                                                                                                 return_bootdstrs=True,
+                                                                                                                 nboots=1000)
+                # plot PSTHs
+                ax[2,plot_colm].fill_between(bins[bsl_begin:],mean_PSTH_u1 - np.std(mean_PSTH_booted_u1,axis=0), 
+                                    mean_PSTH_u1 + np.std(mean_PSTH_booted_u1,axis=0),color='red',alpha=0.5)
+                ax[2,plot_colm].plot(bins[bsl_begin:],mean_PSTH_u1,'k-')
+                ax[2,plot_colm].fill_between(bins[bsl_begin:],mean_PSTH_u2 - np.std(mean_PSTH_booted_u2,axis=0), 
+                                    mean_PSTH_u2 + np.std(mean_PSTH_booted_u2,axis=0),color='blue',alpha=0.5)
+                ax[2,plot_colm].plot(bins[bsl_begin:],mean_PSTH_u2,'b-')
+
+                # get z-scored spike-counts
+                z_sc1 = dalib.z_score(data[pair][100.0]['spkC_NoL_pair1'][:,plot_diam])
+                z_sc2 = dalib.z_score(data[pair][100.0]['spkC_NoL_pair2'][:,plot_diam])
+                # plot z-scored spike-counts
+                ax[3,plot_colm].scatter(z_sc1,z_sc2,color='k',s=5)
+                ax[3,plot_colm].set_xlim([-3,3])
+                ax[3,plot_colm].set_ylim([-3,3])
+                ax[3,plot_colm].set_aspect('equal',adjustable='box')
+                # --------------------------------------------------
+
+                # plot data for Largest diameter
+                # --------------------------------------------------
+                plot_diam = -1
+                plot_colm = 2
+                dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,:]), bins, ax[0,plot_colm],color='red')
+                dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,:]), bins, ax[1,plot_colm],color='blue')
+                
+                # get PSTHs for both units
+                mean_PSTH_u1, vari_PSTH,binned_data,mean_PSTH_booted_u1, vari_PSTH_booted = dalib.meanvar_PSTH(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,bsl_begin:],
+                                                                                                                 count_window,
+                                                                                                                 style='same',
+                                                                                                                 return_bootdstrs=True,
+                                                                                                                 nboots=1000)
+
+                mean_PSTH_u2, vari_PSTH,binned_data,mean_PSTH_booted_u2, vari_PSTH_booted = dalib.meanvar_PSTH(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,bsl_begin:],
+                                                                                                                 count_window,
+                                                                                                                 style='same',
+                                                                                                                 return_bootdstrs=True,
+                                                                                                                 nboots=1000)
+                # plot PSTHs
+                ax[2,plot_colm].fill_between(bins[bsl_begin:],mean_PSTH_u1 - np.std(mean_PSTH_booted_u1,axis=0), 
+                                    mean_PSTH_u1 + np.std(mean_PSTH_booted_u1,axis=0),color='red',alpha=0.5)
+                ax[2,plot_colm].plot(bins[bsl_begin:],mean_PSTH_u1,'k-')
+                ax[2,plot_colm].fill_between(bins[bsl_begin:],mean_PSTH_u2 - np.std(mean_PSTH_booted_u2,axis=0), 
+                                    mean_PSTH_u2 + np.std(mean_PSTH_booted_u2,axis=0),color='blue',alpha=0.5)
+                ax[2,plot_colm].plot(bins[bsl_begin:],mean_PSTH_u2,'b-')
+
+                # get z-scored spike-counts
+                z_sc1 = dalib.z_score(data[pair][100.0]['spkC_NoL_pair1'][:,plot_diam])
+                z_sc2 = dalib.z_score(data[pair][100.0]['spkC_NoL_pair2'][:,plot_diam])
+                # plot z-scored spike-counts
+                ax[3,plot_colm].scatter(z_sc1,z_sc2,color='k',s=5)
+                ax[3,plot_colm].set_xlim([-3,3])
+                ax[3,plot_colm].set_ylim([-3,3])
+                ax[3,plot_colm].set_aspect('equal',adjustable='box')
+                # --------------------------------------------------
+
+                
+                # plot geometric mean response and correlations + fits
+                # --------------------------------------------------
+                plot_colm = 3                 
+                ax1b = ax[0,plot_colm].twinx()
+                ax[0,plot_colm].errorbar(data[pair]['info']['diam'],gm_response,yerr=gm_response_SE,fmt='ko',label='spike-count',ms=5)
+                ax[0,plot_colm].plot([data[pair]['info']['diam'][0],data[pair]['info']['diam'][-1]],[gm_baseline, gm_baseline],'ko--') 
+                # fitted curve
+                ax[0,plot_colm].plot(diams_tight,gm_Rhat,'k-')
+
+                ax1b.set_xscale('log')
+                ax1b.errorbar(data[pair]['info']['diam'], corrs_mean, yerr=corrs_err, fmt=c_corr, label='corr',ms=5)
+                ax1b.plot([data[pair]['info']['diam'][0], data[pair]['info']['diam'][-1]],[np.mean(bsl_container), np.mean(bsl_container)],c_bsl)
+                ax1b.plot(diams_tight, Corr_hat, c_corr_model)
+                ax1b.plot(data[pair]['info']['diam'][plot_diam_ind_Cmax],corrs_mean[plot_diam_ind_Cmax],'k*',ms=5,zorder=10)
+                ax1b.tick_params(axis='y',color='green')
+                ax1b.spines['left'].set_color('green')
+                ax1b.tick_params(axis='y',colors='green')
+                ax1b.set_ylabel('rSC')
+
+                ax[0,plot_colm].set_xscale('log')
+                ax[0,plot_colm].set_xlabel('Diameter (deg)')
+                ax[0,plot_colm].set_ylabel('Spike-count')
+                # --------------------------------------------------
+
+                # extract correlations from the fits at certain diameters, as done in the paper
+                # --------------------------------------------------
+                plot_colm = 3
+                C = np.array([np.mean(bsl_container),np.max(Corr_hat),Corr_hat[np.argmax(gm_Rhat)],Corr_hat[-1]])
+                ax[1,plot_colm].bar([1,2,3,4],C,ec='black',fc='gray',width=1)
+                
+                # determine layer type and save to PDF accordinly
+                if data[pair]['info']['L1'] == 'LSG' and data[pair]['info']['L2'] == 'LSG':
+                    examples_SG.savefig()
+                elif data[pair]['info']['L1'] == 'L4C' and data[pair]['info']['L2'] == 'L4C':
+                    examples_G.savefig()
+                elif data[pair]['info']['L1'] == 'LIG' and data[pair]['info']['L2'] == 'LIG':
+                    examples_IG.savefig()
                 else:
-                    gm_fit_correlation_SML = Corr_hat[0]
-                    gm_fit_correlation_RF  = Corr_hat[np.argmax(gm_Rhat)]
-                    gm_fit_correlation_SUR = Corr_hat[gm_surr_ind_narrow_new]
-                    gm_fit_correlation_LAR = Corr_hat[-1]
-                    gm_fit_correlation_BSL = np.mean(bsl_container)
-                    gm_fit_correlation_MIN = np.min(Corr_hat)
-                    gm_fit_correlation_MAX = np.max(Corr_hat)
-                    gm_fit_correlation_MAX_diam = diams_tight[np.argmax(Corr_hat)]
-                    gm_fit_correlation_MIN_diam = diams_tight[np.argmin(Corr_hat)]
-                    gm_fit_RF            = diams_tight[np.argmax(gm_Rhat)]
-                    gm_fit_surr          = diams_tight[gm_surr_ind_narrow_new]
+                    examples_MX.savefig()
 
-                    gm_fit_response_SML = dalib.ROG(0.2,*gm_popt)
-                    gm_fit_response_RF = dalib.ROG(diams_tight[np.argmax(gm_Rhat)],*gm_popt)
-                    gm_fit_response_SUR = dalib.ROG(diams_tight[gm_surr_ind_narrow_new],*gm_popt)
-                    gm_fit_response_LAR = dalib.ROG(25,*gm_popt)
-                    gm_fit_response_atcMAX = dalib.ROG(diams_tight[np.argmax(Corr_hat)],*gm_popt)
-                    gm_fit_response_atcMIN = dalib.ROG(diams_tight[np.argmin(Corr_hat)],*gm_popt)
-                    pair_num            = pair
+#
+examples_SG.close()
+examples_G.close()
+examples_IG.close()
+examples_MX.close()
