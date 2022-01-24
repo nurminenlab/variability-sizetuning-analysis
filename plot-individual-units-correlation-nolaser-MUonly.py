@@ -132,7 +132,7 @@ for pair in range(len(data)):
                 wave_c = 'green'
                 c_corr_model = 'g-'
 
-                plt.figure(1)
+                plt.figure(1,figsize=(14,12))
                 args = (data[pair]['info']['diam'],gm_response)
                 bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
                 res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
@@ -166,7 +166,7 @@ for pair in range(len(data)):
                 Corr_hat = dalib.doubleROG(diams_tight,*res.x)
 
                 # plot rasters, correlation data and fit, spike-count scatter plots, 
-                f, ax = plt.subplots(4,4,figsize=(14,12))
+                f, ax = plt.subplots(4,4,num=1)
 
                 # plot data for peak correlation
                 # --------------------------------------------------
@@ -175,7 +175,7 @@ for pair in range(len(data)):
                 plot_colm = 0
                 dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,:]), bins, ax[0,plot_colm],color='red')
                 dalib.rasters(np.squeeze(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,:]), bins, ax[1,plot_colm],color='blue')
-                
+                ax[0,plot_colm].set_title(str(pair))
                 # get PSTHs for both units
                 mean_PSTH_u1, vari_PSTH,binned_data,mean_PSTH_booted_u1, vari_PSTH_booted = dalib.meanvar_PSTH(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,bsl_begin:],
                                                                                                                  count_window,
@@ -310,7 +310,7 @@ for pair in range(len(data)):
                 plot_colm = 3
                 C = np.array([np.mean(bsl_container),np.max(Corr_hat),Corr_hat[np.argmax(gm_Rhat)],Corr_hat[-1]])
                 ax[1,plot_colm].bar([1,2,3,4],C,ec='black',fc='gray',width=1)
-                
+
                 # determine layer type and save to PDF accordinly
                 if data[pair]['info']['L1'] == 'LSG' and data[pair]['info']['L2'] == 'LSG':
                     examples_SG.savefig()
@@ -320,6 +320,8 @@ for pair in range(len(data)):
                     examples_IG.savefig()
                 else:
                     examples_MX.savefig()
+                
+                plt.clf()
 
 #
 examples_SG.close()
