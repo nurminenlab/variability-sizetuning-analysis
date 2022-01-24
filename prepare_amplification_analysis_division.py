@@ -89,7 +89,8 @@ quencher_DF = pd.DataFrame(columns=['qtype',
                                     'maxquench',
                                     'maxamplif',
                                     'maxquench_perc',
-                                    'maxamplif_perc'])
+                                    'maxamplif_perc',
+                                    'RFdiam'])
 
 # loop SG units
 indx  = 0
@@ -116,7 +117,9 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
     bsl        = np.nan * np.ones((mn_mtrx.shape[0]))
     bsl_FR     = np.nan * np.ones((mn_mtrx.shape[0]))
     signi_all  = np.nan * np.ones((mn_mtrx.shape[0]),dtype=object)
+    Resp       = np.nan * np.ones((mn_mtrx.shape[0]))
     for stim in range(mn_mtrx.shape[0]):
+        Resp[stim] = np.mean(mn_mtrx[stim,first_tp:last_tp])
         fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end] / (eps + mn_mtrx[stim,bsl_begin:bsl_end]))
         bsl_FR[stim] = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
@@ -191,6 +194,8 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
     else:
         diams_all  = diams
 
+    RFdiam = diams_all[np.argmax(Resp)]
+    diams_all = diams_all[signi_all=='S']
 
     # 
     if np.min(delta_fano) < 0:
@@ -228,7 +233,8 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
                 'maxquench':maxquench,
                 'maxamplif':maxamplif,
                 'maxquench_perc':maxquench_perc,
-                'maxamplif_perc':maxamplif_perc}
+                'maxamplif_perc':maxamplif_perc,
+                'RFdiam':RFdiam}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
@@ -244,7 +250,9 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
     bsl        = np.nan * np.ones((mn_mtrx.shape[0]))
     bsl_FR     = np.nan * np.ones((mn_mtrx.shape[0]))
     signi_all  = np.nan * np.ones((mn_mtrx.shape[0]),dtype=object)
+    Resp       = np.nan * np.ones((mn_mtrx.shape[0]))         
     for stim in range(mn_mtrx.shape[0]):
+        Resp[stim] = np.mean(mn_mtrx[stim,first_tp:last_tp])
         fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end] / (eps + mn_mtrx[stim,bsl_begin:bsl_end]))
         bsl_FR[stim] = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
@@ -318,7 +326,8 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
     else:
         diams_all  = diams
 
-
+    RFdiam = diams_all[np.argmax(Resp)]
+    diams_all = diams_all[signi_all=='S']
     # 
     if np.min(delta_fano) < 0:
         maxquench_diam = diams_all[np.argmin(delta_fano)]
@@ -356,7 +365,8 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
                 'maxquench':maxquench,
                 'maxamplif':maxamplif,
                 'maxquench_perc':maxquench_perc,
-                'maxamplif_perc':maxamplif_perc}
+                'maxamplif_perc':maxamplif_perc,
+                'RFdiam':RFdiam}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
@@ -372,7 +382,9 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
     bsl        = np.nan * np.ones((mn_mtrx.shape[0]))
     bsl_FR     = np.nan * np.ones((mn_mtrx.shape[0]))
     signi_all  = np.nan * np.ones((mn_mtrx.shape[0]),dtype=object)
+    Resp       = np.nan * np.ones((mn_mtrx.shape[0]))
     for stim in range(mn_mtrx.shape[0]):
+        Resp[stim] = np.mean(mn_mtrx[stim,first_tp:last_tp])
         fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         bsl[stim]  = np.mean(vr_mtrx[stim,bsl_begin:bsl_end] / (eps + mn_mtrx[stim,bsl_begin:bsl_end]))
         bsl_FR[stim] = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
@@ -445,7 +457,8 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
     else:
         diams_all  = diams
 
-
+    RFdiam = diams_all[np.argmax(Resp)]
+    diams_all = diams_all[signi_all=='S']
     # 
     if np.min(delta_fano) < 0:
         maxquench_diam = diams_all[np.argmin(delta_fano)]
@@ -491,7 +504,8 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
                 'maxquench':maxquench,
                 'maxamplif':maxamplif,
                 'maxquench_perc':maxquench_perc,
-                'maxamplif_perc':maxamplif_perc}
+                'maxamplif_perc':maxamplif_perc,
+                'RFdiam':RFdiam}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
@@ -499,4 +513,4 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
 
 
 # save results
-quencher_DF.to_csv('amplification_DF.csv')
+quencher_DF.to_csv('amplification_DF_division.csv')
