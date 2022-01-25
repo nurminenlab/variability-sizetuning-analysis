@@ -5,7 +5,7 @@ from statsmodels.formula.api import ols
 import seaborn as sns
 import scipy.stats as sts
 
-amplification_DF = pd.read_csv('amplification_DF.csv') 
+amplification_DF = pd.read_csv('amplification_DF_division.csv')
 
 plt.figure()
 SEM = amplification_DF.groupby(['layer','qtype_signi'])['bsl'].sem()
