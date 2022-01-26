@@ -1,4 +1,4 @@
-from statistics import median
+from turtle import width
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
@@ -8,6 +8,7 @@ import scipy.stats as sts
 import numpy as np
 
 amplification_DF = pd.read_csv('amplification_DF_division.csv')
+n_boots = 1000
 
 plt.figure()
 SEM = amplification_DF.groupby(['layer','qtype_signi'])['bsl'].sem()
@@ -33,30 +34,46 @@ sns.swarmplot(x='layer',y='maxquench_diam',data=amplification_DF,color='blue',ax
 sns.swarmplot(x='layer',y='maxamplif_diam',data=amplification_DF,color='orange',ax=ax)
 ax.set_yscale('log')
 
-LAYERS = amplification_DF.groupby('layer')
-ind = 0
-SEM_diam = pd.DataFrame(columns=['maxquench_diam','maxamplif_diam'])
-for l in LAYERS.groups.keys():
-    L = LAYERS.get_group(l)
-    maxq_inds = np.random.choice(len(L),size=(len(L),1000),replace=True)
-    maxa_inds = np.random.choice(len(L),size=(len(L),1000),replace=True)
-    maxq_median_holder = np.nan * np.ones(1000)
-    maxa_median_holder = np.nan * np.ones(1000)
-    for i in range(maxq_median_holder.shape[0]):
-        maxq_median_holder[i] = np.nanmedian(L['maxquench_diam'].values[maxq_inds[:,i]])
-        maxa_median_holder[i] = np.nanmedian(L['maxamplif_diam'].values[maxa_inds[:,i]])
+# need to brute force this...
+SG = amplification_DF[amplification_DF['layer']=='SG']
+G = amplification_DF[amplification_DF['layer']=='G']
+IG = amplification_DF[amplification_DF['layer']=='IG']
 
-    maxq = np.std(maxq_median_holder)
-    maxa = np.std(maxa_median_holder)
-    tmp_df = pd.DataFrame(data={'maxquench_diam': maxq,'maxamplif_diam': maxa},index=[l])
-    SEM_diam = SEM_diam.append(tmp_df,sort=True)
-    ind += 1
+maxquench_diam_bootstrap_SG = np.nan * np.ones(n_boots)
+maxquench_diam_bootstrap_G  = np.nan * np.ones(n_boots)
+maxquench_diam_bootstrap_IG = np.nan * np.ones(n_boots)
 
-plt.figure()
+maxamplif_diam_bootstrap_SG = np.nan * np.ones(n_boots)
+maxamplif_diam_bootstrap_G  = np.nan * np.ones(n_boots)
+maxamplif_diam_bootstrap_IG = np.nan * np.ones(n_boots)
+
+for i in range(n_boots):
+    maxquench_diam_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['maxquench_diam'],size=len(SG),replace=True))
+    maxquench_diam_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['maxquench_diam'],size=len(G),replace=True))
+    maxquench_diam_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['maxquench_diam'],size=len(IG),replace=True))
+
+    maxamplif_diam_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['maxamplif_diam'],size=len(SG),replace=True))
+    maxamplif_diam_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['maxamplif_diam'],size=len(G),replace=True))
+    maxamplif_diam_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['maxamplif_diam'],size=len(IG),replace=True))
+
+
+
+
+
+maxquench_diam_SD = np.array([np.nanstd(maxquench_diam_bootstrap_SG),np.nanstd(maxquench_diam_bootstrap_G),np.nanstd(maxquench_diam_bootstrap_IG)])
+maxquench_diam = np.array([np.nanmedian(SG['maxquench_diam']),np.nanmedian(G['maxquench_diam']),np.nanmedian(IG['maxquench_diam'])])
+
+maxamplif_diam_SD = np.array([np.nanstd(maxquench_diam_bootstrap_SG),np.nanstd(maxquench_diam_bootstrap_G),np.nanstd(maxquench_diam_bootstrap_IG)])
+maxamplif_diam = np.array([np.nanmedian(SG['maxamplif_diam']),np.nanmedian(G['maxamplif_diam']),np.nanmedian(IG['maxamplif_diam'])])
+
+
+plt.figure(1)
 ax = plt.subplot(111)
-amplification_DF.groupby('layer')[['maxquench_diam','maxamplif_diam']].mean().plot(kind='bar',yerr=SEM_diam,ax=ax)
-ax.set_ylim([0,4])
-
+ax.bar([0.75,2.75,4.75],maxquench_diam,yerr=maxquench_diam_SD,fc='blue',ec='black',width=0.5)
+ax.bar(np.array([0.75,2.75,4.75])+0.5,maxamplif_diam,yerr=maxamplif_diam_SD,fc='orange',ec='black',width=0.5)
+ax.set_ylim([0,4.0])
+ax.set_xticks([1,3,5])
+ax.set_xlabels(['SG','G','IG'])
 
 plt.figure()
 SEM = amplification_DF.groupby('layer')[['maxquench','maxamplif']].sem()
