@@ -19,7 +19,6 @@ sns.swarmplot(x='layer',y='bsl',data=amplification_DF,hue='qtype_signi')
 lm = ols('bsl ~ C(qtype_signi) + C(layer)',data=amplification_DF).fit()
 table = sm.stats.anova_lm(lm,typ=1)
 
-
 plt.figure()
 sns.barplot(y='bsl',x='layer',data=amplification_DF,alpha=0.5)
 sns.swarmplot(y='bsl',x='layer',data=amplification_DF)
