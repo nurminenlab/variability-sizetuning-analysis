@@ -20,8 +20,8 @@ FF_size = FF_size.append(FF_LAR)
 
 plt.figure()
 ax = plt.subplot(111)
-SEM = params.groupby('layer')['fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR'].sem()
-params.groupby('layer')['fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR'].mean().plot(ax=ax,kind='bar',yerr=SEM)
+SEM = params.groupby('layer')[['fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR']].sem()
+params.groupby('layer')[['fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR']].mean().plot(ax=ax,kind='bar',yerr=SEM)
 
 plt.figure()
 ax = plt.subplot(111)
