@@ -111,12 +111,12 @@ ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
 
 plt.figure()
-ax = plt.subplot(111)
+ax = plt.subplot(1,2,2)
 SEM = amplification_DF.groupby('layer')[['maxquench','maxamplif']].sem()
 amplification_DF.groupby('layer')[['maxquench','maxamplif']].mean().plot(kind='bar',yerr=SEM)
 
-plt.figure()
-ax = plt.subplot(111)
+
+ax = plt.subplot(1,2,1)
 sns.swarmplot(x='layer',y='maxquench',data=amplification_DF,color='blue',ax=ax)
 sns.swarmplot(x='layer',y='maxamplif',data=amplification_DF,color='orange',ax=ax)
 #ax.set_yscale('log')
