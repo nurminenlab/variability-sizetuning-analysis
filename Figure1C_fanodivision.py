@@ -83,9 +83,9 @@ for unit in list(SG_mn_data.keys()):
     vr_mtrx = SG_vr_data[unit]
 
     for stim in range(mn_mtrx.shape[0]):        
-        fano = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]       
+        fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         FR   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)    
-        bsl_FF = sm.OLS(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window],mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]).fit().params[0]       
+        bsl_FF = np.mean(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window] / (eps + mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]))
         bsl_FR = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
                 
         if mn_mtrx.shape[0] == 18:
@@ -111,9 +111,9 @@ for unit in list(G_mn_data.keys()):
     vr_mtrx = G_vr_data[unit]
 
     for stim in range(mn_mtrx.shape[0]):
-        fano = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]       
+        fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / ( eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         FR   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)    
-        bsl_FF = sm.OLS(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window],mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]).fit().params[0]       
+        bsl_FF = np.mean(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window] / (eps  + mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]))
         bsl_FR = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
                 
         if mn_mtrx.shape[0] == 18:
@@ -140,9 +140,9 @@ for unit in list(IG_mn_data.keys()):
     vr_mtrx = IG_vr_data[unit]
 
     for stim in range(mn_mtrx.shape[0]):
-        fano = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]       
+        fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         FR   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)    
-        bsl_FF = sm.OLS(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window],mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]).fit().params[0]       
+        bsl_FF = np.mean(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window] / (eps + mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]))
         bsl_FR = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
 
         if mn_mtrx.shape[0] == 18:
