@@ -44,9 +44,7 @@ table = sm.stats.anova_lm(lm,typ=1)
 print(table)
 
 print('\n t-test for fano-factor in SML vs RF across layers')
-print(params.groupby('layer').apply(lambda df: sts.ttest_ind(df['fit_fano_SML'],df['fit_fano_RF'],nan_policy='omit')))
+print(params.groupby('layer').apply(lambda df: sts.ttest_rel(df['fit_fano_SML'],df['fit_fano_RF'],nan_policy='omit')))
 
 print('\n t-test for fano-factor in RF vs LAR across layers')
-print(params.groupby('layer').apply(lambda df: sts.ttest_ind(df['fit_fano_LAR'],df['fit_fano_RF'],nan_policy='omit')))
-
-sts.f_oneway()
+print(params.groupby('layer').apply(lambda df: sts.ttest_rel(df['fit_fano_LAR'],df['fit_fano_RF'],nan_policy='omit')))
