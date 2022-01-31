@@ -70,7 +70,7 @@ for unit in list(SG_mn_data.keys()):
     fano_boot  = np.nan * np.ones((nboots,mn_mtrx.shape[0]))
 
     for stim in range(mn_mtrx.shape[0]):
-        fano[stim] = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+        fano[stim] = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         FR[stim]   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)
         
         if mn_mtrx.shape[0] == 18:
@@ -87,8 +87,8 @@ for unit in list(SG_mn_data.keys()):
 
         # compute bootstrapped fano time-course
         for boot_num in range(mean_PSTH_booted.shape[0]):
-            fano_boot[boot_num,stim] = sm.OLS(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window],
-                                            mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+            fano_boot[boot_num,stim] = np.mean(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window] / (eps + mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]))
+
 
         
     # get FF @ RF size
@@ -132,7 +132,7 @@ for unit in list(G_mn_data.keys()):
     fano_boot  = np.nan * np.ones((nboots,mn_mtrx.shape[0]))
 
     for stim in range(mn_mtrx.shape[0]):
-        fano[stim] = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+        fano[stim] = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         FR[stim]   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)        
         
         if mn_mtrx.shape[0] == 18:
@@ -149,8 +149,8 @@ for unit in list(G_mn_data.keys()):
 
         # compute bootstrapped fano time-course
         for boot_num in range(mean_PSTH_booted.shape[0]):
-            fano_boot[boot_num,stim] = sm.OLS(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window],
-                                            mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+            fano_boot[boot_num,stim] = np.mean(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window] / (eps + mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]))
+            
 
 
 
@@ -196,7 +196,7 @@ for unit in list(IG_mn_data.keys()):
     fano_boot  = np.nan * np.ones((nboots,mn_mtrx.shape[0]))
 
     for stim in range(mn_mtrx.shape[0]):
-        fano[stim] = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+        fano[stim] = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
         FR[stim]   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)                
         
         if mn_mtrx.shape[0] == 18:
@@ -212,8 +212,7 @@ for unit in list(IG_mn_data.keys()):
                                                                                                 nboots=3000)
         # compute bootstrapped fano time-course
         for boot_num in range(mean_PSTH_booted.shape[0]):
-            fano_boot[boot_num,stim] = sm.OLS(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window],
-                                            mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]).fit().params[0]
+            fano_boot[boot_num,stim] = np.mean(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window] / (eps + mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]))
 
 
     # get FF @ RF size
