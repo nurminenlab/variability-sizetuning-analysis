@@ -7,6 +7,7 @@ sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
 import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+from scipy.optimize import basinhopping, curve_fit
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
@@ -30,6 +31,15 @@ with open(S_dir + 'mean_PSTHs_IG-MK-MU.pkl','rb') as f:
 diams = np.array(list(diams_data.keys()))
 del(diams_data)
 
+def cost_response(params,xdata,ydata):
+    Rhat = dalib.ROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
+
+def cost_fano(params,xdata,ydata):
+    Rhat = dalib.doubleROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
 
 eps = 0.0000001
 # analysis done between these timepoints
