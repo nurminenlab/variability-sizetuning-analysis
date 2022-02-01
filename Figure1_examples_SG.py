@@ -67,7 +67,7 @@ a = 0
 
 for stim in range(mn_mtrx.shape[0]):
 
-    fano[stim] = sm.OLS(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window],mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]).fit().params[0]        
+    fano[stim] = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
     FR[stim]   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)/(count_window/1000)
         
     if mn_mtrx.shape[0] == 18:
@@ -81,11 +81,8 @@ for stim in range(mn_mtrx.shape[0]):
                                                                                             return_bootdstrs=True,
                                                                                             nboots=nboots)
 
-    # compute bootstrapped fano time-course
-    for boot_num in range(mean_PSTH_booted.shape[0]):
-        fano_boot[boot_num,stim] = sm.OLS(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window],
-                                        mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]).fit().params[0]
-    
+    # bootstrapped fano time-course
+    fano_boot[:,stim] = np.divide(vari_PSTH_booted[:,fano_PSTH_first_tp:last_tp], (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:last_tp]))
     FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)/(count_window/1000)
 
     if stim == 2 or stim == 18:
