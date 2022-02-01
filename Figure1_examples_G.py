@@ -89,7 +89,7 @@ for stim in range(mn_mtrx.shape[0]):
     # Firing-rate time-course
     FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)/(count_window/1000)
 
-    if stim == 3 or stim == 18:
+    if stim == 4 or stim == 18:
 
         fano_PSTH_RF = np.divide(vari_PSTH_booted[:,fano_PSTH_first_tp:], (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:]))
         fano_PSTH_RF_SD = np.std(fano_PSTH_RF,axis=0)
@@ -105,7 +105,7 @@ for stim in range(mn_mtrx.shape[0]):
         # plot fano-PSTH
         ax.fill_between(t,np.mean(fano_PSTH_RF,axis=0) - fano_PSTH_RF_SD, np.mean(fano_PSTH_RF,axis=0) + fano_PSTH_RF_SD,color='red',alpha=0.3)
         ax.plot(t,np.mean(fano_PSTH_RF,axis=0), 'k-')
-        ax.set_ylim(0,4)
+        ax.set_ylim(0,5)
         ax.tick_params(axis='y',color='red')
         ax.spines['left'].set_color('red')
         ax.tick_params(axis='y',colors='red',labelsize=8)
