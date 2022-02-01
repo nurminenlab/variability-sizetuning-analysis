@@ -124,10 +124,10 @@ for stim in range(mn_mtrx.shape[0]):
         
         plt.figure(2)
         ax = plt.subplot(2,1,1)
-        t = np.arange(50,350,1)
+        t = np.arange(50,450,1)
         # plot fano-PSTH
-        ax.fill_between(t,np.mean(fano_PSTH_RF[:,150:450],axis=0) - fano_PSTH_RF_SD[150:450], np.mean(fano_PSTH_RF[:,150:450],axis=0) + fano_PSTH_RF_SD[150:450],color='red',alpha=0.3)
-        ax.plot(t,np.mean(fano_PSTH_RF[:,150:450],axis=0), 'k-')
+        ax.fill_between(t,np.mean(fano_PSTH_RF[:,150:550],axis=0) - fano_PSTH_RF_SD[150:550], np.mean(fano_PSTH_RF[:,150:550],axis=0) + fano_PSTH_RF_SD[150:550],color='red',alpha=0.3)
+        ax.plot(t,np.mean(fano_PSTH_RF[:,150:550],axis=0), 'k-')
         ax.set_ylabel('Fano-factor')
         ax.set_xlabel('Peri-stimulus time (ms)')
         ax.spines['left'].set_color('red')
