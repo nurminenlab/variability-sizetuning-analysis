@@ -190,7 +190,8 @@ except:
     popt = res.x
 
 args = (diamsa,fano)
-res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args},seed=1234,niter=1000)
+bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
 diams_tight = np.logspace(np.log10(diamsa[0]),np.log10(diamsa[-1]),1000)
 Rhat = dalib.ROG(diams_tight,*popt)
 Fhat = dalib.doubleROG(diams_tight,*res.x)
