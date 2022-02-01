@@ -7,6 +7,7 @@ sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
 import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+from scipy.optimize import basinhopping, curve_fit
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
@@ -30,6 +31,15 @@ with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
 diams = np.array(list(diams_data.keys()))
 del(diams_data)
 
+def cost_response(params,xdata,ydata):
+    Rhat = dalib.ROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
+
+def cost_fano(params,xdata,ydata):
+    Rhat = dalib.doubleROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
 
 eps = 0.0000001
 # analysis done between these timepoints
@@ -168,11 +178,30 @@ plt.savefig(fig_dir + 'F1_SG_rasters.eps',bbox_inches='tight',pad_inches=0)
 fano_E = 2 * np.std(fano_boot,axis=0)
 FR_E   = 2 * np.std(FR_boot,axis=0)
 
+# ROG fit spike-count data 
+try:
+    popt,pcov = curve_fit(dalib.ROG,diamsa,FR,bounds=(0,np.inf),maxfev=100000)
+except:
+    args = (diamsa,FR)
+    bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+    res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+    popt = res.x
+
+args = (diamsa,fano)
+bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
+diams_tight = np.logspace(np.log10(diamsa[0]),np.log10(diamsa[-1]),1000)
+Rhat = dalib.ROG(diams_tight,*popt)
+Fhat = dalib.doubleROG(diams_tight,*res.x)
+
 plt.figure(4,figsize=(1.335, 1.115))
 ax = plt.subplot(1,1,1)
 axb = ax.twinx()
 ax.errorbar(diamsa, fano, yerr=fano_E,fmt='ro-',markersize=4,mfc='None',lw=1)
 axb.errorbar(diamsa, FR, yerr=FR_E,fmt='ko-',markersize=4,mfc='None',lw=1)
+# fits
+ax.plot(diams_tight, Fhat, 'r-',lw=1)
+axb.plot(diams_tight, Rhat, 'k-',lw=1)
 ax.set_xscale('log')
 axb.set_xscale('log')
 
