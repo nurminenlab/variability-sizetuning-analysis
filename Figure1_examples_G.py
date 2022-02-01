@@ -18,10 +18,10 @@ with open(F_dir + MUdatfile,'rb') as f:
     data = pkl.load(f)
 
 with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
-    SG_mn_data = pkl.load(f)
+    G_mn_data = pkl.load(f)
 
 with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
-    SG_vr_data = pkl.load(f)
+    G_vr_data = pkl.load(f)
 
 with open(S_dir + 'mean_PSTHs_G-MK-MU.pkl','rb') as f:
     diams_data = pkl.load(f)
@@ -49,8 +49,8 @@ count_window = 100
 nboots = 3000
 
 unit = 51
-mn_mtrx = SG_mn_data[unit]
-vr_mtrx = SG_vr_data[unit]
+mn_mtrx = G_mn_data[unit]
+vr_mtrx = G_vr_data[unit]
 
 fano      = np.nan * np.ones((mn_mtrx.shape[0]))
 FR        = np.nan * np.ones((mn_mtrx.shape[0]))
