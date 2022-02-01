@@ -82,7 +82,8 @@ for stim in range(mn_mtrx.shape[0]):
                                                                                             nboots=nboots)
 
     # bootstrapped fano time-course
-    fano_boot[:,stim] = np.divide(vari_PSTH_booted[:,fano_PSTH_first_tp:last_tp], (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:last_tp]))
+    fano_boot[:,stim] = np.mean(np.divide(vari_PSTH_booted[:,fano_PSTH_first_tp:last_tp], 
+                                (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:last_tp])),axis=1)
     FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)/(count_window/1000)
 
     if stim == 2 or stim == 18:
