@@ -60,30 +60,6 @@ bins = np.arange(-100,600,1)
 virgin = True
 eps = 0.0000001
 
-# this dataframe holds params for each unit
-params_df = pd.DataFrame(columns=['RFdiam','maxResponse','SI','baseline',
-                                  'layer','anipe','center_slope','surround_slope','centerSIG',
-                                  'center_slope_fano','surround_slope_fano','ntrials','surroundSIG_fano',
-                                  'center_slope_narrow_window','surround_slope_narrow_window',
-                                  'fit_fano_SML','fit_fano_RF',
-                                  'fit_fano_SUR','fit_fano_LAR',
-                                  'fit_fano_BSL','fit_fano_MIN',
-                                  'fit_fano_MAX','fit_fano_MAX_diam',
-                                  'fit_fano_MIN_diam'])
-mean_PSTHs = {}
-vari_PSTHs = {}
-mean_PSTHs_SG = {}
-vari_PSTHs_SG = {}
-mean_PSTHs_G = {}
-vari_PSTHs_G = {}
-mean_PSTHs_IG = {}
-vari_PSTHs_IG = {}
-
-mean_PSTHs_narrow = {}
-vari_PSTHs_narrow = {}
-mean_PSTHs_broad = {}
-vari_PSTHs_broad = {}
-
 indx = 0
 
 # analysis done between these timepoints
@@ -183,44 +159,8 @@ for unit in range(len(data)):
                         mean_container[stim_diam] = np.mean(binned_data[:,first_tp:last_tp][:,0:-1:count_window]/(count_window/1000.0))
                         bsl_container[stim_diam]  = np.mean(vari_PSTH[bsl_begin:bsl_end][0:-1:count_window] / (eps + mean_PSTH[bsl_begin:bsl_end][0:-1:count_window]))
                         
-                        if data[unit]['info']['diam'][stim_diam] in mean_PSTHs.keys():
-                            mean_PSTHs[unit] = np.concatenate((mean_PSTHs[data[unit]['info']['diam'][stim_diam]],
-                                                                                                np.reshape(mean_PSTH,(1,mean_PSTH.shape[0]))), axis=0)
-                            vari_PSTHs[unit] = np.concatenate((vari_PSTHs[data[unit]['info']['diam'][stim_diam]],
-                                                                                                np.reshape(vari_PSTH,(1,vari_PSTH.shape[0]))), axis=0)
-                        else:
-                            mean_PSTHs[unit] = np.reshape(mean_PSTH,(1,mean_PSTH.shape[0]))
-                            vari_PSTHs[unit] = np.reshape(vari_PSTH,(1,vari_PSTH.shape[0]))
 
-                    # layer resolved data
-                    if L == 'LSG':                            
-                        mean_PSTHs_SG[unit] = mean_PSTH_allstim
-                        vari_PSTHs_SG[unit] = vari_PSTH_allstim
-
-                    elif L == 'L4C':
-                        mean_PSTHs_G[unit] = mean_PSTH_allstim
-                        vari_PSTHs_G[unit] = vari_PSTH_allstim
-
-                    elif L == 'LIG' :
-                        mean_PSTHs_IG[unit] = mean_PSTH_allstim
-                        vari_PSTHs_IG[unit] = vari_PSTH_allstim
-
-                    else:
-                        print('This should not happen')
-
-
-                    max_ind = np.argmax(mean_container)
-                    if max_ind == 0:
-                        center_slope_narrow_window = np.nan
-                    else:
-                        X = sm.add_constant(mean_container[0:max_ind+1])
-                        center_slope_narrow_window = sm.OLS(fano_container[0:max_ind+1], X).fit().params[1]
-
-                    if max_ind == data[unit]['info']['diam'].shape[0]-1:
-                        surround_slope_narrow_window = np.nan
-                    else:
-                        X = sm.add_constant(mean_container[max_ind:])
-                        surround_slope_narrow_window = sm.OLS(fano_container[max_ind:], X).fit().params[1]
+                    max_ind = np.argmax(mean_container)                    
                         
                     if virgin:
                         fano = np.reshape(fano, (1,fano.shape[0]))
@@ -300,87 +240,11 @@ for unit in range(len(data)):
 
                     Fhat = dalib.doubleROG(diams_tight,*res.x)                   
 
-                    # collect parameters from the fits and set bg to gray for shitty fits
-                    if unit in excluded_fits:                        
-                        fit_fano_SML = np.nan
-                        fit_fano_RF  = np.nan
-                        fit_fano_SUR = np.nan
-                        fit_fano_LAR = np.nan
-                        fit_fano_BSL = np.nan
-                        fit_fano_MIN = np.nan
-                        fit_fano_MAX = np.nan
-
-                        fit_fano_MAX_diam = np.nan
-                        fit_fano_MIN_diam = np.nan
-                        fit_RF            = np.nan
-                        fit_surr          = np.nan
-                    else:                        
-                        fit_fano_SML = Fhat[0]
-                        fit_fano_RF  = Fhat[np.argmax(Rhat)]
-                        fit_fano_SUR = Fhat[surr_ind_narrow_new]
-                        fit_fano_LAR = Fhat[-1]
-                        fit_fano_BSL = np.mean(bsl_container)
-                        fit_fano_MIN = np.max((np.min(Fhat),0)) # in case of negative values
-                        fit_fano_MAX = np.max(Fhat)
-
-                        fit_fano_MAX_diam = diams_tight[np.argmax(Fhat)]
-                        fit_fano_MIN_diam = diams_tight[np.argmin(Fhat)]
-                        fit_RF            = diams_tight[np.argmax(Rhat)]
-                        fit_surr          = diams_tight[surr_ind_narrow_new]
-
-
                     ##########################
                     surr,surr_ind = dalib.saturation_point(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1),data[unit]['info']['diam'],criteria=1.3)
                     ntrials = data[unit][cont]['spkC_NoL'].shape[0]
                     mx_ind = np.argmax(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1))
                     spkC = np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)                    
-
-                    # place unit parameters to a dataframe for later analysis
-                    para_tmp = np.ones((1,10),dtype=object)*np.nan
-                    para_tmp = {'RFdiam':data[unit]['info']['diam'][mx_ind],
-                                'maxResponse':np.max(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)),
-                                'SI':(np.max(spkC) - spkC[-1]) / np.max(spkC),
-                                'baseline':np.mean(data[unit][100.0]['baseline']),
-                                'layer':L,
-                                'anipe':anipe,
-                                'ntrials':ntrials,                                
-                                'fit_fano_SML':fit_fano_SML,
-                                'fit_fano_RF':fit_fano_RF,
-                                'fit_fano_SUR':fit_fano_SUR,
-                                'fit_fano_LAR':fit_fano_LAR,
-                                'fit_fano_BSL':fit_fano_BSL,
-                                'fit_fano_MIN':fit_fano_MIN,
-                                'fit_fano_MAX':fit_fano_MAX,
-                                'fit_fano_MIN_diam':fit_fano_MIN_diam,
-                                'fit_fano_MAX_diam':fit_fano_MAX_diam}
-
-                    tmp_df = pd.DataFrame(para_tmp, index=[indx])
-                    params_df = params_df.append(tmp_df,sort=True)
-                    indx = indx + 1
+                    
                     
 
-# save data
-params_df.to_csv(S_dir+'extracted_params-Dec-2021.csv')
-
-with open(S_dir + 'mean_PSTHs-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)
-
-with open(S_dir + 'vari_PSTHs-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(vari_PSTHs,f,pkl.HIGHEST_PROTOCOL)
-
-# layer resolved
-# SG
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(mean_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(vari_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-# G
-with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(mean_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(vari_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-# IG
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(mean_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','wb') as f:
-    pkl.dump(vari_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
