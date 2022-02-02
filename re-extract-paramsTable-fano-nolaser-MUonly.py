@@ -29,7 +29,9 @@ S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-M
 
 SUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
-shitty_fits = [2,5,6,7,13,19,35,58,53,57,59,68,70,71,72,77,79,90,92,98,105]
+# for these units we will use constrained optimization
+shitty_fits = [2,5,6,7,13,19,35,58,53,57,59,68,70,71,72,77,78,79,90,92,98,105]
+# we were not able to fit this units and excluded it from the analysis
 excluded_fits = [72]
 
 with open(F_dir + SUdatfile,'rb') as f:
