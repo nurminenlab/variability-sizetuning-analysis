@@ -262,6 +262,7 @@ for unit in range(len(data)):
                     axb.plot(diams_tight, Rhat, 'k-')
                     ax.plot(data[unit]['info']['diam'],fano_container,'ro')
                     ax.plot(diams_tight, Fhat, 'r-')
+                    ax.set_title(str(unit))
                     ax.set_xscale('log') 
 
                     # determine layer type and save to PDF accordinly
