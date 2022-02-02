@@ -8,14 +8,14 @@ import scipy.stats as sts
 import statsmodels.api as sm
 from matplotlib.backends.backend_pdf import PdfPages
 
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 
 #import pdb
 
 import data_analysislib as dalib
 import pandas as pd
 import scipy as sc
-from matplotlib import gridspec
+from matplotlib.backends.backend_pdf import PdfPages
 from scipy.optimize import basinhopping, curve_fit
 from statsmodels.formula.api import ols
 
@@ -29,9 +29,13 @@ S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-M
 
 SUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
+examples_SG = PdfPages(S_dir + 'fanofactors-individualunits-SUPRAGRANULAR.pdf')
+examples_G  = PdfPages(S_dir + 'fanofactors-individualunits-GRANULAR.pdf')
+examples_IG = PdfPages(S_dir + 'fanofactors-individualunits-INFRAGRANULAR.pdf')
+
 # for these units we will use constrained optimization
-shitty_fits = [2,5,6,7,13,19,35,58,53,57,59,68,70,71,72,77,78,79,90,92,98,105]
-# we were not able to fit this units and excluded it from the analysis
+shitty_fits = [0,2,5,6,7,13,19,35,58,53,57,59,68,70,71,72,77,78,79,90,92,98,105]
+# we were not able to fit this unit and excluded it from the analysis
 excluded_fits = [72]
 
 with open(F_dir + SUdatfile,'rb') as f:
@@ -59,6 +63,7 @@ SI_crit = 0.05
 bins = np.arange(-100,600,1)
 virgin = True
 eps = 0.0000001
+raster_start = 300
 
 indx = 0
 
@@ -250,12 +255,24 @@ for unit in range(len(data)):
                     response_SE = np.std(data[unit][cont]['spkC_NoL'].T, axis=1) / np.sqrt(data[unit][cont]['spkC_NoL'].T.shape[1])
 
                     # plot rasters, correlation data and fit, spike-count scatter plots, 
-                    f, ax = plt.subplots(4,4,num=1)
-                    axb = ax[0,0].twinx()
-                    axb.errorbar(data[unit][cont]['info']['diam'],response, response_SE, fmt='ko')
+                    f, ax = plt.subplots(1,1,num=1)
+                    
+                    axb = ax.twinx()
+                    axb.plot(data[unit]['info']['diam'],mean_container,'ko')
                     axb.plot(diams_tight, Rhat, 'k-')
-                    ax[0,0].errorbar(data[unit][cont]['info']['diam'],fano_container, yerr=fano_ERR_container, fmt='ro')
-                    ax[0,0].plot(diams_tight, Fhat, 'r-')
+                    ax.plot(data[unit]['info']['diam'],fano_container,'ro')
+                    ax.plot(diams_tight, Fhat, 'r-')
+                    ax.set_xscale('log') 
 
-                    #
-
+                    # determine layer type and save to PDF accordinly
+                    if data[unit]['info']['layer'].decode('utf-8') == 'LSG':
+                        examples_SG.savefig()
+                    elif data[unit]['info']['layer'].decode('utf-8') == 'L4C':
+                        examples_G.savefig()
+                    elif data[unit]['info']['utf-8'].decode('utf-8') == 'LIG':
+                        examples_IG.savefig()
+                    else:
+                        print('This should not happen!')
+                
+                    plt.clf()
+                    # blah
