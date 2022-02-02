@@ -320,7 +320,7 @@ for unit in range(len(data)):
                         fit_fano_SUR = Fhat[surr_ind_narrow_new]
                         fit_fano_LAR = Fhat[-1]
                         fit_fano_BSL = np.mean(bsl_container)
-                        fit_fano_MIN = np.max((np.min(Fhat),0)) # in case of negative values
+                        fit_fano_MIN = np.max((np.min(Fhat),0)) # in case of negative values resulting from bad fits
                         fit_fano_MAX = np.max(Fhat)
 
                         fit_fano_MAX_diam = diams_tight[np.argmax(Fhat)]
