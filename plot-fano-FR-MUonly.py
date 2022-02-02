@@ -29,6 +29,7 @@ S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-M
 
 SUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
+examples_AL = PdfPages(S_dir + 'fanofactors-individualunits-ALL.pdf')
 examples_SG = PdfPages(S_dir + 'fanofactors-individualunits-SUPRAGRANULAR.pdf')
 examples_G  = PdfPages(S_dir + 'fanofactors-individualunits-GRANULAR.pdf')
 examples_IG = PdfPages(S_dir + 'fanofactors-individualunits-INFRAGRANULAR.pdf')
@@ -265,6 +266,8 @@ for unit in range(len(data)):
                     ax.set_title(str(unit))
                     ax.set_xscale('log') 
 
+
+                    examples_AL.savefig()     
                     # determine layer type and save to PDF accordinly
                     if data[unit]['info']['layer'].decode('utf-8') == 'LSG':
                         examples_SG.savefig()
