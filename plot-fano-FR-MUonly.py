@@ -246,5 +246,16 @@ for unit in range(len(data)):
                     mx_ind = np.argmax(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1))
                     spkC = np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)                    
                     
-                    
+                    response    = np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)
+                    response_SE = np.std(data[unit][cont]['spkC_NoL'].T, axis=1) / np.sqrt(data[unit][cont]['spkC_NoL'].T.shape[1])
+
+                    # plot rasters, correlation data and fit, spike-count scatter plots, 
+                    f, ax = plt.subplots(4,4,num=1)
+                    axb = ax[0,0].twinx()
+                    axb.errorbar(data[unit][cont]['info']['diam'],response, response_SE, fmt='ko')
+                    axb.plot(diams_tight, Rhat, 'k-')
+                    ax[0,0].errorbar(data[unit][cont]['info']['diam'],fano_container, yerr=fano_ERR_container, fmt='ro')
+                    ax[0,0].plot(diams_tight, Fhat, 'r-')
+
+                    #
 
