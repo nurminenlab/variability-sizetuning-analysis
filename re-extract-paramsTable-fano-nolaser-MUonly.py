@@ -30,7 +30,7 @@ S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-M
 SUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
 # for these units we will use constrained optimization
-shitty_fits = [2,5,6,7,13,19,35,58,53,57,59,68,70,71,72,77,78,79,90,92,98,105]
+# shitty_fits = [2,5,6,7,13,19,35,58,53,57,59,68,70,71,72,77,78,79,90,92,98,105]
 # we were not able to fit this units and excluded it from the analysis
 excluded_fits = [72]
 
@@ -292,11 +292,9 @@ for unit in range(len(data)):
                     surr_narrow_new = diams_tight[surr_ind_narrow_new]
                     # ROG fit fano data 
                     args = (data[unit]['info']['diam'],fano_container)
-                    if unit in shitty_fits:
-                        bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
-                        res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
-                    else:
-                        res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args},seed=1234,niter=1000)
+                    
+                    bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+                    res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
 
                     Fhat = dalib.doubleROG(diams_tight,*res.x)                   
 
