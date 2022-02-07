@@ -174,9 +174,9 @@ for stim in range(mn_mtrx.shape[0]):
         
 
 plt.figure(1)
-plt.savefig(fig_dir + 'F1_SG_PSTH_fanoPSTH.eps',bbox_inches='tight',pad_inches=0)        
+plt.savefig(fig_dir + 'F1_SG_PSTH_fanoPSTH.svg',bbox_inches='tight',pad_inches=0)        
 plt.figure(2)
-plt.savefig(fig_dir + 'F1_SG_fano-PSTH-zoomed.eps',bbox_inches='tight',pad_inches=0)
+plt.savefig(fig_dir + 'F1_SG_fano-PSTH-zoomed.svg',bbox_inches='tight',pad_inches=0)
 plt.figure(3)
 plt.savefig(fig_dir + 'F1_SG_rasters.eps',bbox_inches='tight',pad_inches=0)
 
@@ -226,4 +226,4 @@ ax.spines['top'].set_visible(False)
 axb.spines['top'].set_visible(False)
 
 plt.figure(4)
-plt.savefig(fig_dir + 'F1_SG_ASFs.eps',bbox_inches='tight',pad_inches=0)
+plt.savefig(fig_dir + 'F1_SG_ASFs.svg',bbox_inches='tight',pad_inches=0)
