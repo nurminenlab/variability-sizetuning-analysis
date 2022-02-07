@@ -10,6 +10,7 @@ import statsmodels.api as sm
 import scipy.stats as sts
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 
 # analysis done between these timepoints
 anal_duration = 400
@@ -186,6 +187,7 @@ ax.set_ylabel('rSC',color='red')
 ax2.set_ylabel('Spike-count')
 ax.set_xlabel('Grating diameter (deg)')
 ax.set_title('SG')
+plt.savefig(fig_dir + 'F1_SG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = SG_params.groupby('diam')['FR'].mean()
 D = SG_params['diam'].unique()[FR.argmax()]
@@ -218,12 +220,14 @@ ax.set_ylabel('rSC',color='red')
 ax2.set_ylabel('Spike-count')
 ax.set_xlabel('Grating diameter (deg)')
 ax.set_title('G')
+plt.savefig(fig_dir + 'F1_G_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = G_params.groupby('diam')['FR'].mean()
 D = G_params['diam'].unique()[FR.argmax()]
 D_max = G_params['diam'].max()
 FF_RF = G_params[G_params['diam'] == D]
 FF_LAR = G_params[G_params['diam'] == D_max]
+
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
 plt.figure()
@@ -250,6 +254,8 @@ ax.set_ylabel('rSC',color='red')
 ax2.set_ylabel('Spike-count')
 ax.set_xlabel('Grating diameter (deg)')
 ax.set_title('IG')
+plt.savefig(fig_dir + 'F1_IG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
+
 
 FR = IG_params.groupby('diam')['FR'].mean()
 D = IG_params['diam'].unique()[FR.argmax()]
