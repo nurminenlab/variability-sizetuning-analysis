@@ -64,6 +64,8 @@ vr_mtrx = SG_vr_data[unit]
 
 fano      = np.nan * np.ones((mn_mtrx.shape[0]))
 FR        = np.nan * np.ones((mn_mtrx.shape[0]))
+fano_bsl  = np.nan * np.ones((mn_mtrx.shape[0]))
+FR_bsl    = np.nan * np.ones((mn_mtrx.shape[0]))
 FR_boot   = np.nan * np.ones((nboots,mn_mtrx.shape[0]))
 fano_boot = np.nan * np.ones((nboots,mn_mtrx.shape[0]))
 fano_PSTH_RF = np.nan * np.ones((nboots,data[unit][cont]['spkR_NoL'][:,0,:].shape[1] - fano_PSTH_first_tp))
@@ -105,7 +107,10 @@ for stim in range(mn_mtrx.shape[0]):
 
         PSTH_RF = mean_PSTH_booted[:,fano_PSTH_first_tp:]/(count_window/1000)
         PSTH_RF_SD = np.std(PSTH_RF,axis=0)
-        
+
+        fano_bsl[stim] = np.mean(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window] / (eps + mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]))
+        FR_bsl[stim]   = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)/(count_window/1000)
+
         plt.figure(1,figsize=(1.335, 1.115))
         ax = plt.subplot(2,1,a+1)
         axb = ax.twinx()
@@ -201,6 +206,8 @@ ax = plt.subplot(1,1,1)
 axb = ax.twinx()
 ax.errorbar(diamsa, fano, yerr=fano_E,fmt='ro',markersize=4,mfc='None',lw=1)
 axb.errorbar(diamsa, FR, yerr=FR_E,fmt='ko',markersize=4,mfc='None',lw=1)
+ax.plot([diams[0],diams[-1]],[np.nanmean(fano_bsl),np.nanmean(fano_bsl)],'r--')
+axb.plot([diams[0],diams[-1]],[np.nanmean(FR_bsl),np.nanmean(FR_bsl)],'k--')
 # fits
 ax.plot(diams_tight, Fhat, 'r-',lw=1)
 axb.plot(diams_tight, Rhat, 'k-',lw=1)
