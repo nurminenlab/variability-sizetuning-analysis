@@ -6,6 +6,8 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
+
 params = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
 
 FF_size = pd.DataFrame(columns=['fano','size','layer'])
@@ -23,10 +25,12 @@ plt.figure()
 ax = plt.subplot(111)
 SEM = params.groupby('layer')[['fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR']].sem()
 params.groupby('layer')[['fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR']].mean().plot(ax=ax,kind='bar',yerr=SEM)
+plt.savefig(fig_dir + 'F2B-top.svg',bbox_inches='tight',pad_inches=0)
 
 plt.figure()
 ax = plt.subplot(111)
 sns.swarmplot(x='layer',y='fano',hue='size',data=FF_size,ax=ax,size=3,dodge=True)
+plt.savefig(fig_dir + 'F2B-bottom.svg',bbox_inches='tight',pad_inches=0)
 
 FF_SML = pd.DataFrame(data={'fano':params['fit_fano_SML'].values,'size':['SML']*len(params.index),'layer':params['layer'].values})
 FF_RF  = pd.DataFrame(data={'fano':params['fit_fano_RF'].values,'size':['RF']*len(params.index),'layer':params['layer'].values})
