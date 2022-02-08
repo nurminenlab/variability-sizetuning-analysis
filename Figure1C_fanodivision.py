@@ -163,7 +163,7 @@ for unit in list(IG_mn_data.keys()):
         q_indx += 1
 
 
-plt.figure()
+plt.figure(figsize=(1.335, 1.115))
 ax = plt.subplot(111)
 ax2 = ax.twinx()
 
@@ -171,22 +171,19 @@ SG_bsl_FR = SG_params['bsl_FR'].apply(lambda x: x/(anal_duration/1000.0)).mean()
 SG_bsl_FF = SG_params['bsl'].mean()
 
 SEM = SG_params.groupby(['diam'])['fano'].sem()
-SG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-')
+SG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-',markersize=4,mfc='None',lw=1)
+ax.set_xlabel('')
 ax.set_xscale('log')
 ax.plot([SG_params['diam'].min(),SG_params['diam'].max()],[SG_bsl_FF,SG_bsl_FF],'r--')
 
 SG_params['FR'] = SG_params['FR'].apply(lambda x: x/(anal_duration/1000))
 SEM_FR = SG_params.groupby(['diam'])['FR'].sem()
-SG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-')
+SG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-',markersize=4,mfc='None',lw=1)
 ax2.plot([SG_params['diam'].min(),SG_params['diam'].max()],[SG_bsl_FR,SG_bsl_FR],'k--')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
-ax.set_ylabel('rSC',color='red')
-ax2.set_ylabel('Spike-count')
-ax.set_xlabel('Grating diameter (deg)')
-ax.set_title('SG')
 plt.savefig(fig_dir + 'F1_SG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = SG_params.groupby('diam')['FR'].mean()
@@ -196,7 +193,7 @@ FF_RF = SG_params[SG_params['diam'] == D]
 FF_LAR = SG_params[SG_params['diam'] == D_max]
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
-plt.figure()
+plt.figure(figsize=(1.335, 1.115))
 ax = plt.subplot(111)
 ax2 = ax.twinx()
 
@@ -204,22 +201,19 @@ G_bsl_FR = G_params['bsl_FR'].apply(lambda x: x/(anal_duration/1000.0)).mean()
 G_bsl_FF = G_params['bsl'].mean()
 
 SEM = G_params.groupby(['diam'])['fano'].sem()
-G_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-')
+G_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-',markersize=4,mfc='None',lw=1)
+ax.set_xlabel('')
 ax.set_xscale('log')
 ax.plot([G_params['diam'].min(),G_params['diam'].max()],[G_bsl_FF,G_bsl_FF],'r--')
 
 G_params['FR'] = G_params['FR'].apply(lambda x: x/(anal_duration/1000))
 SEM_FR = G_params.groupby(['diam'])['FR'].sem()
-G_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-')
+G_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-',markersize=4,mfc='None',lw=1)
 ax2.plot([G_params['diam'].min(),G_params['diam'].max()],[G_bsl_FR,G_bsl_FR],'k--')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
-ax.set_ylabel('rSC',color='red')
-ax2.set_ylabel('Spike-count')
-ax.set_xlabel('Grating diameter (deg)')
-ax.set_title('G')
 plt.savefig(fig_dir + 'F1_G_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = G_params.groupby('diam')['FR'].mean()
@@ -230,7 +224,7 @@ FF_LAR = G_params[G_params['diam'] == D_max]
 
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
-plt.figure()
+plt.figure(figsize=(1.335, 1.115))
 ax = plt.subplot(111)
 ax2 = ax.twinx()
 
@@ -238,24 +232,20 @@ IG_bsl_FR = IG_params['bsl_FR'].apply(lambda x: x/(anal_duration/1000.0)).mean()
 IG_bsl_FF = IG_params['bsl'].mean()
 
 SEM = IG_params.groupby(['diam'])['fano'].sem()
-IG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-')
+IG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-',markersize=4,mfc='None',lw=1)
+ax.set_xlabel('')
 ax.set_xscale('log')
 ax.plot([IG_params['diam'].min(),IG_params['diam'].max()],[IG_bsl_FF,IG_bsl_FF],'r--')
 
 IG_params['FR'] = IG_params['FR'].apply(lambda x: x/(anal_duration/1000))
 SEM_FR = IG_params.groupby(['diam'])['FR'].sem()
-IG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-')
+IG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-',markersize=4,mfc='None',lw=1)
 ax2.plot([IG_params['diam'].min(),IG_params['diam'].max()],[IG_bsl_FR,IG_bsl_FR],'k--')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
-ax.set_ylabel('rSC',color='red')
-ax2.set_ylabel('Spike-count')
-ax.set_xlabel('Grating diameter (deg)')
-ax.set_title('IG')
 plt.savefig(fig_dir + 'F1_IG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
-
 
 FR = IG_params.groupby('diam')['FR'].mean()
 D = IG_params['diam'].unique()[FR.argmax()]
