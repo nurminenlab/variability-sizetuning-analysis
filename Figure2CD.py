@@ -7,6 +7,7 @@ import statsmodels.api as sm
 import scipy.stats as sts
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 params_df = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
 params = params_df[['layer','fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR','fit_fano_MIN','fit_fano_MAX','fit_fano_BSL','SI']]
 params = params.dropna()
@@ -29,6 +30,7 @@ sns.swarmplot(x='layer',y='FFsuppression',data=params,ax=ax,size=3)
 ax = plt.subplot(2,2,3)
 SEM = params.groupby('layer')['FFsuppression'].sem()
 params.groupby('layer')['FFsuppression'].mean().plot(kind='bar',ax=ax,yerr=SEM)
+plt.savefig(fig_dir + 'F2C-left.svg',bbox_inches='tight',pad_inches=0)
 
 print('\n t-test FFsuppression LSG vs L4C')
 print(sts.ttest_ind(params[params['layer'] == 'L4C']['FFsuppression'],params[params['layer'] == 'LSG']['FFsuppression']))
@@ -49,6 +51,7 @@ sns.swarmplot(x='layer',y='FFsurfac',data=params,ax=ax,size=3)
 ax = plt.subplot(2,2,4)
 SEM = params.groupby('layer')['FFsurfac'].sem()
 params.groupby('layer')['FFsurfac'].mean().plot(kind='bar',ax=ax,yerr=SEM)
+plt.savefig(fig_dir + 'F2C-right.svg',bbox_inches='tight',pad_inches=0)
 
 # point stats and tests for each layer
 print(params.groupby('layer')['FFsuppression'].mean())
@@ -70,6 +73,7 @@ sns.scatterplot(x='SI',y='FFsurfac',hue='layer',data=params,ax=ax)
 ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
 ax.set_xlabel('Suppression Index')
 ax.set_ylabel('Fano Factor change (%)')
+plt.savefig(fig_dir + 'F2D.svg',bbox_inches='tight',pad_inches=0)
 
 print('\n test on correlation between FFsurfac and SI')
 print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI'],df['FFsurfac'])))
