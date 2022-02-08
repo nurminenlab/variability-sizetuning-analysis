@@ -6,7 +6,7 @@ import seaborn as sns
 import scipy.stats as sts
 import numpy as np
 import sys
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
 
 amplification_DF = pd.read_csv('amplification_DF_division.csv')
