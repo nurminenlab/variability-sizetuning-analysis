@@ -128,5 +128,5 @@ SEM = amplification_DF[['maxquench','maxamplif']].sem()
 amplification_DF[['maxquench','maxamplif']].mean().plot(kind='bar',yerr=SEM,ax=ax)
 
 DF = amplification_DF
-DF['maxamplif_olRem'] = DF.groupby('layer')[['maxamplif']].apply(dalib.outlier, args=(DF['maxamplif'].median(),DF['maxamplif'].mad()))
+DF.groupby('layer')[['maxamplif']].apply(dalib.outlier, args=(DF['maxamplif'].median(),DF['maxamplif'].mad()))
 
