@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pickle as pkl
 import sys
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols

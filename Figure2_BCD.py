@@ -41,14 +41,6 @@ SG = amplification_DF[amplification_DF['layer']=='SG']
 G = amplification_DF[amplification_DF['layer']=='G']
 IG = amplification_DF[amplification_DF['layer']=='IG']
 
-maxquench_diam_bootstrap_SG = np.nan * np.ones(n_boots)
-maxquench_diam_bootstrap_G  = np.nan * np.ones(n_boots)
-maxquench_diam_bootstrap_IG = np.nan * np.ones(n_boots)
-
-maxamplif_diam_bootstrap_SG = np.nan * np.ones(n_boots)
-maxamplif_diam_bootstrap_G  = np.nan * np.ones(n_boots)
-maxamplif_diam_bootstrap_IG = np.nan * np.ones(n_boots)
-
 maxquench_diam_RFnormed_bootstrap_SG = np.nan * np.ones(n_boots)
 maxquench_diam_RFnormed_bootstrap_G  = np.nan * np.ones(n_boots)
 maxquench_diam_RFnormed_bootstrap_IG = np.nan * np.ones(n_boots)
@@ -57,42 +49,42 @@ maxamplif_diam_RFnormed_bootstrap_SG = np.nan * np.ones(n_boots)
 maxamplif_diam_RFnormed_bootstrap_G  = np.nan * np.ones(n_boots)
 maxamplif_diam_RFnormed_bootstrap_IG = np.nan * np.ones(n_boots)
 
+SG['RFnormed_maxquench_diam_outliers'] = SG['RFnormed_maxquench_diam'].apply(dalib.outlier,args=(SG['RFnormed_maxquench_diam'].median(),SG['RFnormed_maxquench_diam'].mad()))
+G['RFnormed_maxquench_diam_outliers'] = G['RFnormed_maxquench_diam'].apply(dalib.outlier,args=(G['RFnormed_maxquench_diam'].median(),G['RFnormed_maxquench_diam'].mad()))
+IG['RFnormed_maxquench_diam_outliers'] = IG['RFnormed_maxquench_diam'].apply(dalib.outlier,args=(IG['RFnormed_maxquench_diam'].median(),IG['RFnormed_maxquench_diam'].mad()))
+
+SG['RFnormed_maxamplif_diam_outliers'] = SG['RFnormed_maxamplif_diam'].apply(dalib.outlier,args=(SG['RFnormed_maxamplif_diam'].median(),SG['RFnormed_maxamplif_diam'].mad()))
+G['RFnormed_maxamplif_diam_outliers'] = G['RFnormed_maxamplif_diam'].apply(dalib.outlier,args=(G['RFnormed_maxamplif_diam'].median(),G['RFnormed_maxamplif_diam'].mad()))
+IG['RFnormed_maxamplif_diam_outliers'] = IG['RFnormed_maxamplif_diam'].apply(dalib.outlier,args=(IG['RFnormed_maxamplif_diam'].median(),IG['RFnormed_maxamplif_diam'].mad()))
 
 for i in range(n_boots):
-    maxquench_diam_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['maxquench_diam'],size=len(SG),replace=True))
-    maxquench_diam_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['maxquench_diam'],size=len(G),replace=True))
-    maxquench_diam_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['maxquench_diam'],size=len(IG),replace=True))
-
-    maxquench_diam_RFnormed_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['RFnormed_maxquench_diam'],size=len(SG),replace=True))
-    maxquench_diam_RFnormed_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['RFnormed_maxquench_diam'],size=len(G),replace=True))
-    maxquench_diam_RFnormed_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['RFnormed_maxquench_diam'],size=len(IG),replace=True))
-
-    maxamplif_diam_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['maxamplif_diam'],size=len(SG),replace=True))
-    maxamplif_diam_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['maxamplif_diam'],size=len(G),replace=True))
-    maxamplif_diam_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['maxamplif_diam'],size=len(IG),replace=True))
+    maxquench_diam_RFnormed_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['RFnormed_maxquench_diam'][SG['RFnormed_maxquench_diam_outliers']==False],
+                                                            size=np.sum(~SG['RFnormed_maxquench_diam_outliers']),replace=True))
+    maxquench_diam_RFnormed_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['RFnormed_maxquench_diam'][G['RFnormed_maxquench_diam_outliers']==False],
+                                                            size=np.sum(~G['RFnormed_maxquench_diam_outliers']),replace=True))
+    maxquench_diam_RFnormed_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['RFnormed_maxquench_diam'][IG['RFnormed_maxquench_diam_outliers']==False],
+                                                            size=np.sum(~IG['RFnormed_maxquench_diam_outliers']),replace=True))
     
-    maxamplif_diam_RFnormed_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['RFnormed_maxamplif_diam'],size=len(SG),replace=True))
-    maxamplif_diam_RFnormed_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['RFnormed_maxamplif_diam'],size=len(G),replace=True))
-    maxamplif_diam_RFnormed_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['RFnormed_maxamplif_diam'],size=len(IG),replace=True))
+    maxamplif_diam_RFnormed_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['RFnormed_maxamplif_diam'][SG['RFnormed_maxamplif_diam_outliers']==False],
+                                                            size=np.sum(~SG['RFnormed_maxamplif_diam_outliers']),replace=True))
+    maxamplif_diam_RFnormed_bootstrap_G[i]  = np.nanmedian(np.random.choice(G['RFnormed_maxamplif_diam'][G['RFnormed_maxamplif_diam_outliers']==False],
+                                                            size=np.sum(~G['RFnormed_maxamplif_diam_outliers']),replace=True))
+    maxamplif_diam_RFnormed_bootstrap_IG[i] = np.nanmedian(np.random.choice(IG['RFnormed_maxamplif_diam'][IG['RFnormed_maxamplif_diam_outliers']==False],
+                                                            size=np.sum(~IG['RFnormed_maxamplif_diam_outliers']),replace=True))
 
-maxquench_diam_SD = np.array([np.nanstd(maxquench_diam_bootstrap_SG),np.nanstd(maxquench_diam_bootstrap_G),np.nanstd(maxquench_diam_bootstrap_IG)])
-maxquench_diam = np.array([np.nanmedian(SG['maxquench_diam']),np.nanmedian(G['maxquench_diam']),np.nanmedian(IG['maxquench_diam'])])
 
-RFnormed_maxquench_diam_SD = np.array([np.nanstd(maxquench_diam_RFnormed_bootstrap_SG),np.nanstd(maxquench_diam_RFnormed_bootstrap_G),np.nanstd(maxquench_diam_RFnormed_bootstrap_IG)])
-RFnormed_maxquench_diam = np.array([np.nanmedian(SG['RFnormed_maxquench_diam']),np.nanmedian(G['RFnormed_maxquench_diam']),np.nanmedian(IG['RFnormed_maxquench_diam'])])
 
-maxamplif_diam_SD = np.array([np.nanstd(maxquench_diam_bootstrap_SG),np.nanstd(maxquench_diam_bootstrap_G),np.nanstd(maxquench_diam_bootstrap_IG)])
-maxamplif_diam = np.array([np.nanmedian(SG['maxamplif_diam']),np.nanmedian(G['maxamplif_diam']),np.nanmedian(IG['maxamplif_diam'])])
+RFnormed_maxquench_diam_SD = np.array([np.nanstd(maxquench_diam_RFnormed_bootstrap_SG),
+                                    np.nanstd(maxquench_diam_RFnormed_bootstrap_G),
+                                    np.nanstd(maxquench_diam_RFnormed_bootstrap_IG)])
+
+RFnormed_maxquench_diam = np.array([np.nanmedian(SG['RFnormed_maxquench_diam'][SG['RFnormed_maxquench_diam_outliers']==False]),
+                                    np.nanmedian(G['RFnormed_maxquench_diam'][G['RFnormed_maxquench_diam_outliers']==False]),
+                                    np.nanmedian(IG['RFnormed_maxquench_diam'][IG['RFnormed_maxquench_diam_outliers']==False])])
 
 RFnormed_maxamplif_diam_SD = np.array([np.nanstd(maxamplif_diam_RFnormed_bootstrap_SG),np.nanstd(maxamplif_diam_RFnormed_bootstrap_G),np.nanstd(maxamplif_diam_RFnormed_bootstrap_IG)])
 RFnormed_maxamplif_diam = np.array([np.nanmedian(SG['RFnormed_maxamplif_diam']),np.nanmedian(G['RFnormed_maxamplif_diam']),np.nanmedian(IG['RFnormed_maxamplif_diam'])])
 
-ax = plt.subplot(1,2,2)
-ax.bar([0.75,2.75,4.75],maxquench_diam,yerr=maxquench_diam_SD,fc='blue',ec='black',width=0.5)
-ax.bar(np.array([0.75,2.75,4.75])+0.5,maxamplif_diam,yerr=maxamplif_diam_SD,fc='orange',ec='black',width=0.5)
-ax.set_ylim([0,4.5])
-ax.set_xticks([1,3,5])
-ax.set_xticklabels(['SG','G','IG'])
 
 plt.figure()
 ax = plt.subplot(1,2,1)
