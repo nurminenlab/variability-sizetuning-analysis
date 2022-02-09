@@ -126,7 +126,3 @@ plt.figure()
 ax = plt.subplot(1,1,1)
 SEM = amplification_DF[['maxquench','maxamplif']].sem()
 amplification_DF[['maxquench','maxamplif']].mean().plot(kind='bar',yerr=SEM,ax=ax)
-
-DF = amplification_DF
-DF.groupby('layer')[['maxamplif']].apply(dalib.outlier, args=(DF['maxamplif'].median(),DF['maxamplif'].mad()))
-
