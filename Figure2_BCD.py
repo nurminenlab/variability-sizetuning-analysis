@@ -30,12 +30,6 @@ plt.figure()
 sns.barplot(y='bsl',x='qtype_signi',data=amplification_DF,fc='gray')
 sns.stripplot(y='bsl',x='qtype_signi',data=amplification_DF,alpha=0.5)
 
-plt.figure()
-ax = plt.subplot(1,2,1)
-sns.stripplot(x='layer',y='maxquench_diam',data=amplification_DF,color='blue',ax=ax)
-sns.stripplot(x='layer',y='maxamplif_diam',data=amplification_DF,color='orange',ax=ax)
-ax.set_yscale('log')
-
 # stimulus diameter relative to RF at maxquench / maxmplif 
 RFnormed_maxquench_diam = amplification_DF['maxquench_diam']/amplification_DF['RFdiam']
 RFnormed_maxamplif_diam = amplification_DF['maxamplif_diam']/amplification_DF['RFdiam']
