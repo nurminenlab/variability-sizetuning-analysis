@@ -8,6 +8,8 @@ import numpy as np
 import sys
 sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
+import warnings
+warnings.filterwarnings('ignore')
 
 amplification_DF = pd.read_csv('amplification_DF_division.csv')
 n_boots = 1000
@@ -49,13 +51,34 @@ maxamplif_diam_RFnormed_bootstrap_SG = np.nan * np.ones(n_boots)
 maxamplif_diam_RFnormed_bootstrap_G  = np.nan * np.ones(n_boots)
 maxamplif_diam_RFnormed_bootstrap_IG = np.nan * np.ones(n_boots)
 
-SG['RFnormed_maxquench_diam_outliers'] = SG['RFnormed_maxquench_diam'].apply(dalib.outlier,args=(SG['RFnormed_maxquench_diam'].median(),SG['RFnormed_maxquench_diam'].mad()))
-G['RFnormed_maxquench_diam_outliers'] = G['RFnormed_maxquench_diam'].apply(dalib.outlier,args=(G['RFnormed_maxquench_diam'].median(),G['RFnormed_maxquench_diam'].mad()))
-IG['RFnormed_maxquench_diam_outliers'] = IG['RFnormed_maxquench_diam'].apply(dalib.outlier,args=(IG['RFnormed_maxquench_diam'].median(),IG['RFnormed_maxquench_diam'].mad()))
+# get indices to outliers
+SG['RFnormed_maxquench_diam_outliers'] = SG['RFnormed_maxquench_diam'].apply(dalib.outlier,
+                                            args=(SG['RFnormed_maxquench_diam'].median(),SG['RFnormed_maxquench_diam'].mad()))
+G['RFnormed_maxquench_diam_outliers'] = G['RFnormed_maxquench_diam'].apply(dalib.outlier,
+                                            args=(G['RFnormed_maxquench_diam'].median(),G['RFnormed_maxquench_diam'].mad()))
+IG['RFnormed_maxquench_diam_outliers'] = IG['RFnormed_maxquench_diam'].apply(dalib.outlier,
+                                            args=(IG['RFnormed_maxquench_diam'].median(),IG['RFnormed_maxquench_diam'].mad()))
 
-SG['RFnormed_maxamplif_diam_outliers'] = SG['RFnormed_maxamplif_diam'].apply(dalib.outlier,args=(SG['RFnormed_maxamplif_diam'].median(),SG['RFnormed_maxamplif_diam'].mad()))
-G['RFnormed_maxamplif_diam_outliers'] = G['RFnormed_maxamplif_diam'].apply(dalib.outlier,args=(G['RFnormed_maxamplif_diam'].median(),G['RFnormed_maxamplif_diam'].mad()))
-IG['RFnormed_maxamplif_diam_outliers'] = IG['RFnormed_maxamplif_diam'].apply(dalib.outlier,args=(IG['RFnormed_maxamplif_diam'].median(),IG['RFnormed_maxamplif_diam'].mad()))
+SG['RFnormed_maxamplif_diam_outliers'] = SG['RFnormed_maxamplif_diam'].apply(dalib.outlier,
+                                            args=(SG['RFnormed_maxamplif_diam'].median(),SG['RFnormed_maxamplif_diam'].mad()))
+G['RFnormed_maxamplif_diam_outliers'] = G['RFnormed_maxamplif_diam'].apply(dalib.outlier,
+                                            args=(G['RFnormed_maxamplif_diam'].median(),G['RFnormed_maxamplif_diam'].mad()))
+IG['RFnormed_maxamplif_diam_outliers'] = IG['RFnormed_maxamplif_diam'].apply(dalib.outlier,
+                                            args=(IG['RFnormed_maxamplif_diam'].median(),IG['RFnormed_maxamplif_diam'].mad()))
+
+SG['maxamplif_outliers'] = SG['maxamplif'].apply(dalib.outlier,
+                                            args=(SG['maxamplif'].median(),SG['maxamplif'].mad()))
+G['maxamplif_outliers'] = G['maxamplif'].apply(dalib.outlier,
+                                            args=(G['maxamplif'].median(),G['maxamplif'].mad()))
+IG['maxamplif_outliers'] = IG['maxamplif'].apply(dalib.outlier,
+                                            args=(IG['maxamplif'].median(),IG['maxamplif'].mad()))
+
+SG['maxquench_outliers'] = SG['maxquench'].apply(dalib.outlier,
+                                            args=(SG['maxquench'].median(),SG['maxquench'].mad()))
+G['maxquench_outliers'] = G['maxquench'].apply(dalib.outlier,
+                                            args=(G['maxquench'].median(),G['maxquench'].mad()))
+IG['maxquench_outliers'] = IG['maxquench'].apply(dalib.outlier,
+                                            args=(IG['maxquench'].median(),IG['maxquench'].mad()))
 
 for i in range(n_boots):
     maxquench_diam_RFnormed_bootstrap_SG[i] = np.nanmedian(np.random.choice(SG['RFnormed_maxquench_diam'][SG['RFnormed_maxquench_diam_outliers']==False],
@@ -85,11 +108,23 @@ RFnormed_maxquench_diam = np.array([np.nanmedian(SG['RFnormed_maxquench_diam'][S
 RFnormed_maxamplif_diam_SD = np.array([np.nanstd(maxamplif_diam_RFnormed_bootstrap_SG),np.nanstd(maxamplif_diam_RFnormed_bootstrap_G),np.nanstd(maxamplif_diam_RFnormed_bootstrap_IG)])
 RFnormed_maxamplif_diam = np.array([np.nanmedian(SG['RFnormed_maxamplif_diam']),np.nanmedian(G['RFnormed_maxamplif_diam']),np.nanmedian(IG['RFnormed_maxamplif_diam'])])
 
+SG_olRem = pd.DataFrame(SG[SG['RFnormed_maxquench_diam_outliers']==False])
+G_olRem  = pd.DataFrame(G[G['RFnormed_maxquench_diam_outliers']==False])
+IG_olRem = pd.DataFrame(IG[IG['RFnormed_maxquench_diam_outliers']==False])
+RFnormed = SG_olRem.append(G_olRem).append(IG_olRem)
+
+SG_olRem = pd.DataFrame(SG[SG['maxquench_outliers']==False])
+G_olRem  = pd.DataFrame(G[G['maxquench_outliers']==False])
+IG_olRem = pd.DataFrame(IG[IG['maxquench_outliers']==False])
+aSG_olRem = pd.DataFrame(SG[SG['maxamplif_outliers']==False])
+aG_olRem  = pd.DataFrame(G[G['maxamplif_outliers']==False])
+aIG_olRem = pd.DataFrame(IG[IG['maxamplif_outliers']==False])
+ampquench = SG_olRem.append(G_olRem).append(IG_olRem).append(aSG_olRem).append(aG_olRem).append(aIG_olRem)
 
 plt.figure()
 ax = plt.subplot(1,2,1)
-sns.stripplot(x='layer',y='RFnormed_maxquench_diam',data=amplification_DF,color='blue',ax=ax)
-sns.stripplot(x='layer',y='RFnormed_maxamplif_diam',data=amplification_DF,color='orange',ax=ax)
+sns.stripplot(x='layer',y='RFnormed_maxquench_diam',data=RFnormed,color='blue',ax=ax,dodge=True)
+sns.stripplot(x='layer',y='RFnormed_maxamplif_diam',data=RFnormed,color='orange',ax=ax,dodge=True)
 ax.set_yscale('log')
 
 ax = plt.subplot(1,2,2)
@@ -101,14 +136,14 @@ ax.set_xticklabels(['SG','G','IG'])
 
 plt.figure()
 ax = plt.subplot(1,3,1)
-sns.stripplot(x='layer',y='maxquench',data=amplification_DF,color='blue',ax=ax)
-sns.stripplot(x='layer',y='maxamplif',data=amplification_DF,color='orange',ax=ax)
+sns.stripplot(x='layer',y='maxquench',data=ampquench,color='blue',ax=ax)
+sns.stripplot(x='layer',y='maxamplif',data=ampquench,color='orange',ax=ax)
 
 ax = plt.subplot(1,3,2)
-SEM = amplification_DF.groupby('layer')[['maxquench','maxamplif']].sem()
-amplification_DF.groupby('layer')[['maxquench','maxamplif']].mean().plot(kind='bar',yerr=SEM,ax=ax)
+SEM = ampquench.groupby('layer')[['maxquench','maxamplif']].sem()
+ampquench.groupby('layer')[['maxquench','maxamplif']].mean().plot(kind='bar',yerr=SEM,ax=ax)
 
 plt.figure()
 ax = plt.subplot(1,1,1)
-SEM = amplification_DF[['maxquench','maxamplif']].sem()
-amplification_DF[['maxquench','maxamplif']].mean().plot(kind='bar',yerr=SEM,ax=ax)
+SEM = ampquench[['maxquench','maxamplif']].sem()
+ampquench[['maxquench','maxamplif']].mean().plot(kind='bar',yerr=SEM,ax=ax)
