@@ -113,7 +113,7 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
         if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus 
             G_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
-            G_fano[unit_indx,stim+1,:] = FF/np.mean(FF[bsl_begin:bsl_begin + 151])
+            G_fano[unit_indx,stim+1,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
         else:
             G_mean[unit_indx,stim,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
