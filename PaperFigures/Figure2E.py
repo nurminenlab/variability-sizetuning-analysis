@@ -7,7 +7,7 @@ import statsmodels.api as sm
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 
 # to generate quencher_DF run generate_quencher_DF.py
-quencher_DF = pd.read_csv('quencher_DF.csv')
+quencher_DF = pd.read_csv('../quencher_DF.csv')
 
 # bar graph of the proportion of quenchers in each layer
 ax = plt.subplot(111)
