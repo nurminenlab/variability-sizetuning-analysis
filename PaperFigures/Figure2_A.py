@@ -19,7 +19,7 @@ MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 anal_duration = 400
 first_tp  = 450
 last_tp   = first_tp + anal_duration
-bsl_begin = 120
+bsl_begin = 250
 bsl_end   = bsl_begin + anal_duration
 
 eps = 0.0000001
@@ -80,7 +80,7 @@ ax_good = ax.ravel()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
-t = np.arange(-280,600,1)
+t = np.arange(-150,600,1)
 for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*SG_mean[:,stim,bsl_begin:],axis=0)
@@ -91,12 +91,13 @@ for plt_idx, stim in enumerate([0,5]):
 
     ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
     ax_good[plt_idx].plot(t,PSTH,'k-')
-    ax_good[plt_idx].set_xlim([-400,600])
+    ax_good[plt_idx].set_xlim([-150,600])
     ax_good[plt_idx].set_ylim([0,150])
 
     ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
-
+    ax_fano[plt_idx].plot([t[0],t[-1]],[np.mean(fano_PSTH[0:151]),np.mean(fano_PSTH[0:151])],'k--')
+    ax_good[plt_idx].set_xlim([-150,600])
 
 # collect G data
 #------------------------------------------------------------------------------
@@ -121,7 +122,6 @@ ax_good = ax.ravel()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
-t = np.arange(-280,600,1)
 for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*G_mean[:,stim,bsl_begin:],axis=0)
@@ -132,12 +132,13 @@ for plt_idx, stim in enumerate([0,5]):
 
     ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
     ax_good[plt_idx].plot(t,PSTH,'k-')
-    ax_good[plt_idx].set_xlim([-400,600])
+    ax_good[plt_idx].set_xlim([-150,600])
     ax_good[plt_idx].set_ylim([0,150])
 
     ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
-
+    ax_fano[plt_idx].plot([t[0],t[-1]],[np.mean(fano_PSTH[0:151]),np.mean(fano_PSTH[0:151])],'k--')
+    ax_good[plt_idx].set_xlim([-150,600])
 
 # collect IG data
 #------------------------------------------------------------------------------
@@ -160,7 +161,6 @@ ax_good = ax.ravel()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
-t = np.arange(-280,600,1)
 for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*IG_mean[:,stim,bsl_begin:],axis=0)
@@ -171,11 +171,12 @@ for plt_idx, stim in enumerate([0,5]):
 
     ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
     ax_good[plt_idx].plot(t,PSTH,'k-')
-    ax_good[plt_idx].set_xlim([-400,600])
+    ax_good[plt_idx].set_xlim([-150,600])
     ax_good[plt_idx].set_ylim([0,150])
 
     ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
-
+    ax_fano[plt_idx].plot([t[0],t[-1]],[np.mean(fano_PSTH[0:151]),np.mean(fano_PSTH[0:151])],'k--')
+    ax_good[plt_idx].set_xlim([-150,600])
 
 
