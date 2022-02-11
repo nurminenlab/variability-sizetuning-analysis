@@ -68,22 +68,22 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
         if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus 
             SG_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
-            SG_fano[unit_indx,stim+1,:] = FF / np.mean(FF[0:151])
+            SG_fano[unit_indx,stim+1,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
         else:
             SG_mean[unit_indx,stim,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
-            SG_fano[unit_indx,stim,:] = FF / np.mean(FF[0:151])
+            SG_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
 plt.figure()
 row = 0
 column = 0
-fig, ax = plt.subplots(5,4)
+fig, ax = plt.subplots(2,1)
 ax_good = ax.ravel()
-fig, ax2 = plt.subplots(5,4)
+fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
 t = np.arange(-150,600,1)
-for stim in range(SG_mean.shape[1]):
+for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*SG_mean[:,stim,bsl_begin:],axis=0)
     PSTH_SE = np.nanstd((1000/count_window)*SG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_mean.shape[0])
@@ -91,13 +91,15 @@ for stim in range(SG_mean.shape[1]):
     fano_PSTH = np.nanmean(SG_fano[:,stim,bsl_begin:],axis=0)
     fano_PSTH_SE = np.nanstd(SG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_fano.shape[0])
 
-    ax_good[stim].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
-    ax_good[stim].plot(t,PSTH,'k-')
-    ax_good[stim].set_xlim([-400,600])
-    ax_good[stim].set_ylim([0,150])
+    ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
+    ax_good[plt_idx].plot(t,PSTH,'k-')
+    ax_good[plt_idx].set_xlim([-150,600])
+    ax_good[plt_idx].set_ylim([0,150])
 
-    ax_fano[stim].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
-    ax_fano[stim].plot(t,fano_PSTH,'r-')
+    ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
+    ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
+    ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
+    ax_fano[plt_idx].set_xlim([-150,600])
 
 
 # collect G data
@@ -111,21 +113,21 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
         if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus 
             G_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
-            G_fano[unit_indx,stim+1,:] = FF/np.mean(FF[0:151])
+            G_fano[unit_indx,stim+1,:] = FF/np.mean(FF[bsl_begin:bsl_begin + 151])
         else:
             G_mean[unit_indx,stim,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
-            G_fano[unit_indx,stim,:] = FF/np.mean(FF[0:151])
+            G_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
 plt.figure()
 row = 0
 column = 0
-fig, ax = plt.subplots(5,4)
+fig, ax = plt.subplots(2,1)
 ax_good = ax.ravel()
-fig, ax2 = plt.subplots(5,4)
+fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
-for stim in range(G_mean.shape[1]):
+for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*G_mean[:,stim,bsl_begin:],axis=0)
     PSTH_SE = np.nanstd((1000/count_window)*G_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(G_mean.shape[0])
@@ -133,14 +135,15 @@ for stim in range(G_mean.shape[1]):
     fano_PSTH = np.nanmean(G_fano[:,stim,bsl_begin:],axis=0)
     fano_PSTH_SE = np.nanstd(G_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(G_fano.shape[0])
 
-    ax_good[stim].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
-    ax_good[stim].plot(t,PSTH,'k-')
-    ax_good[stim].set_xlim([-400,600])
-    ax_good[stim].set_ylim([0,150])
+    ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
+    ax_good[plt_idx].plot(t,PSTH,'k-')
+    ax_good[plt_idx].set_xlim([-400,600])
+    ax_good[plt_idx].set_ylim([0,150])
 
-    ax_fano[stim].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
-    ax_fano[stim].plot(t,fano_PSTH,'r-')
-
+    ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
+    ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
+    ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
+    ax_fano[plt_idx].set_xlim([-150,600])
 
 # collect IG data
 #------------------------------------------------------------------------------
@@ -153,19 +156,19 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
         if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus 
             IG_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
-            IG_fano[unit_indx,stim+1,:] = FF/np.mean(FF[0:151])
+            IG_fano[unit_indx,stim+1,:] = FF/np.mean(FF[bsl_begin:bsl_begin + 151])
         else:
             IG_mean[unit_indx,stim,:] = mn_mtrx[stim,:]
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
-            IG_fano[unit_indx,stim,:] = FF/np.mean(FF[0:151])
+            IG_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
 plt.figure()
-fig, ax = plt.subplots(5,4)
+fig, ax = plt.subplots(2,1)
 ax_good = ax.ravel()
-fig, ax2 = plt.subplots(5,4)
+fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
-for stim in range(IG_mean.shape[1]):
+for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*IG_mean[:,stim,bsl_begin:],axis=0)
     PSTH_SE = np.nanstd((1000/count_window)*IG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_mean.shape[0])
@@ -173,13 +176,14 @@ for stim in range(IG_mean.shape[1]):
     fano_PSTH = np.nanmean(IG_fano[:,stim,bsl_begin:],axis=0)
     fano_PSTH_SE = np.nanstd(IG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_fano.shape[0])
 
-    ax_good[stim].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
-    ax_good[stim].plot(t,PSTH,'k-')
-    ax_good[stim].set_xlim([-400,600])
-    ax_good[stim].set_ylim([0,150])
+    ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
+    ax_good[plt_idx].plot(t,PSTH,'k-')
+    ax_good[plt_idx].set_xlim([-400,600])
+    ax_good[plt_idx].set_ylim([0,150])
 
-    ax_fano[stim].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
-    ax_fano[stim].plot(t,fano_PSTH,'r-')
-
+    ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
+    ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
+    ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
+    ax_fano[plt_idx].set_xlim([-150,600])
 
 
