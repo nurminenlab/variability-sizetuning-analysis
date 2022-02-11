@@ -123,9 +123,9 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
 plt.figure()
 row = 0
 column = 0
-fig, ax = plt.subplots(2,1)
+fig1, ax = plt.subplots(2,1)
 ax_good = ax.ravel()
-fig, ax2 = plt.subplots(2,1)
+fig2, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
 for plt_idx, stim in enumerate([0,5]):
@@ -167,9 +167,9 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
             IG_fano[unit_indx,stim,:] = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)            
 
 plt.figure()
-fig, ax = plt.subplots(2,1)
+fig1, ax = plt.subplots(2,1)
 ax_good = ax.ravel()
-fig, ax2 = plt.subplots(2,1)
+fig2, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
 plt.figure(fig1)
@@ -193,5 +193,3 @@ for plt_idx, stim in enumerate([0,5]):
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
     ax_fano[plt_idx].plot([t[0],t[-1]],[np.mean(fano_PSTH[0:151]),np.mean(fano_PSTH[0:151])],'k--')
     ax_good[plt_idx].set_xlim([-150,600])
-
-
