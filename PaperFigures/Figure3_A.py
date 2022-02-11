@@ -172,10 +172,7 @@ ax_good = ax.ravel()
 fig2, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
-plt.figure(fig1)
-plt.savefig(fig_dir + 'F3A_PSTH_IG_mean.svg')
-plt.figure(fig2)
-plt.savefig(fig_dir + 'F3A_PSTH_IG_fano.svg')
+
 for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*IG_mean[:,stim,bsl_begin:],axis=0)
@@ -193,3 +190,8 @@ for plt_idx, stim in enumerate([0,5]):
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
     ax_fano[plt_idx].plot([t[0],t[-1]],[np.mean(fano_PSTH[0:151]),np.mean(fano_PSTH[0:151])],'k--')
     ax_good[plt_idx].set_xlim([-150,600])
+
+plt.figure(fig1)
+plt.savefig(fig_dir + 'F3A_PSTH_IG_mean.svg')
+plt.figure(fig2)
+plt.savefig(fig_dir + 'F3A_PSTH_IG_fano.svg')
