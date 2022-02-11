@@ -13,6 +13,7 @@ import pdb
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
+fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
 # analysis done between these timepoints
@@ -84,23 +85,16 @@ ax_fano = ax2.ravel()
 
 t = np.arange(-150,600,1)
 for plt_idx, stim in enumerate([0,5]):
-    
-    PSTH = np.nanmean((1000/count_window)*SG_mean[:,stim,bsl_begin:],axis=0)
-    PSTH_SE = np.nanstd((1000/count_window)*SG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_mean.shape[0])
 
     fano_PSTH = np.nanmean(SG_fano[:,stim,bsl_begin:],axis=0)
     fano_PSTH_SE = np.nanstd(SG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_fano.shape[0])
-
-    ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
-    ax_good[plt_idx].plot(t,PSTH,'k-')
-    ax_good[plt_idx].set_xlim([-150,600])
-    ax_good[plt_idx].set_ylim([0,150])
 
     ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
     ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
     ax_fano[plt_idx].set_xlim([-150,600])
 
+plt.savefig(fig_dir + 'F3B_PSTH_SG_mean_normalized-fano_plot.svg')
 
 # collect G data
 #------------------------------------------------------------------------------
@@ -128,22 +122,16 @@ fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
 for plt_idx, stim in enumerate([0,5]):
-    
-    PSTH = np.nanmean((1000/count_window)*G_mean[:,stim,bsl_begin:],axis=0)
-    PSTH_SE = np.nanstd((1000/count_window)*G_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(G_mean.shape[0])
 
     fano_PSTH = np.nanmean(G_fano[:,stim,bsl_begin:],axis=0)
     fano_PSTH_SE = np.nanstd(G_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(G_fano.shape[0])
-
-    ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
-    ax_good[plt_idx].plot(t,PSTH,'k-')
-    ax_good[plt_idx].set_xlim([-400,600])
-    ax_good[plt_idx].set_ylim([0,150])
 
     ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
     ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
     ax_fano[plt_idx].set_xlim([-150,600])
+
+plt.savefig(fig_dir + 'F3B_PSTH_G_mean_normalized-fano_plot.svg')
 
 # collect IG data
 #------------------------------------------------------------------------------
@@ -163,23 +151,14 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
             IG_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
 plt.figure()
-fig, ax = plt.subplots(2,1)
-ax_good = ax.ravel()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
+plt.savefig(fig_dir + 'F3B_PSTH_IG_mean_normalized-fano_plot.svg')
 for plt_idx, stim in enumerate([0,5]):
-    
-    PSTH = np.nanmean((1000/count_window)*IG_mean[:,stim,bsl_begin:],axis=0)
-    PSTH_SE = np.nanstd((1000/count_window)*IG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_mean.shape[0])
 
     fano_PSTH = np.nanmean(IG_fano[:,stim,bsl_begin:],axis=0)
     fano_PSTH_SE = np.nanstd(IG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_fano.shape[0])
-
-    ax_good[plt_idx].fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray',alpha=0.5)
-    ax_good[plt_idx].plot(t,PSTH,'k-')
-    ax_good[plt_idx].set_xlim([-400,600])
-    ax_good[plt_idx].set_ylim([0,150])
 
     ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')

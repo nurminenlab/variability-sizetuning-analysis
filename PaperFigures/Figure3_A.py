@@ -13,6 +13,7 @@ import pdb
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
+fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
 # analysis done between these timepoints
@@ -75,9 +76,9 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
 plt.figure()
 row = 0
 column = 0
-fig, ax = plt.subplots(2,1)
+fig1, ax = plt.subplots(2,1)
 ax_good = ax.ravel()
-fig, ax2 = plt.subplots(2,1)
+fig2, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
 t = np.arange(-150,600,1)
@@ -98,6 +99,11 @@ for plt_idx, stim in enumerate([0,5]):
     ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
     ax_fano[plt_idx].plot([t[0],t[-1]],[np.mean(fano_PSTH[0:151]),np.mean(fano_PSTH[0:151])],'k--')
     ax_good[plt_idx].set_xlim([-150,600])
+
+plt.figure(fig1)
+plt.savefig(fig_dir + 'F3A_PSTH_SG_mean.svg')
+plt.figure(fig2)
+plt.savefig(fig_dir + 'F3A_PSTH_SG_fano.svg')
 
 # collect G data
 #------------------------------------------------------------------------------
@@ -140,6 +146,11 @@ for plt_idx, stim in enumerate([0,5]):
     ax_fano[plt_idx].plot([t[0],t[-1]],[np.mean(fano_PSTH[0:151]),np.mean(fano_PSTH[0:151])],'k--')
     ax_good[plt_idx].set_xlim([-150,600])
 
+plt.figure(fig1)
+plt.savefig(fig_dir + 'F3A_PSTH_G_mean.svg')
+plt.figure(fig2)
+plt.savefig(fig_dir + 'F3A_PSTH_G_fano.svg')
+
 # collect IG data
 #------------------------------------------------------------------------------
 for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
@@ -161,6 +172,10 @@ ax_good = ax.ravel()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
+plt.figure(fig1)
+plt.savefig(fig_dir + 'F3A_PSTH_IG_mean.svg')
+plt.figure(fig2)
+plt.savefig(fig_dir + 'F3A_PSTH_IG_fano.svg')
 for plt_idx, stim in enumerate([0,5]):
     
     PSTH = np.nanmean((1000/count_window)*IG_mean[:,stim,bsl_begin:],axis=0)
