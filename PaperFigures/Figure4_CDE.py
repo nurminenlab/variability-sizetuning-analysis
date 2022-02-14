@@ -11,7 +11,7 @@ import data_analysislib as dalib
 import warnings
 warnings.filterwarnings('ignore')
 
-amplification_DF = pd.read_csv('amplification_DF_division.csv')
+amplification_DF = pd.read_csv('../amplification_DF_division.csv')
 n_boots = 1000
 
 plt.figure()
