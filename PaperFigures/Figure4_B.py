@@ -76,10 +76,6 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
             SG_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
 plt.figure()
-row = 0
-column = 0
-fig, ax = plt.subplots(2,1)
-ax_good = ax.ravel()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
@@ -114,10 +110,6 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
             G_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
 plt.figure()
-row = 0
-column = 0
-fig, ax = plt.subplots(2,1)
-ax_good = ax.ravel()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
@@ -154,7 +146,7 @@ plt.figure()
 fig, ax2 = plt.subplots(2,1)
 ax_fano = ax2.ravel()
 
-plt.savefig(fig_dir + 'F3B_PSTH_IG_mean_normalized-fano_plot.svg')
+
 for plt_idx, stim in enumerate([0,5]):
 
     fano_PSTH = np.nanmean(IG_fano[:,stim,bsl_begin:],axis=0)
@@ -165,4 +157,4 @@ for plt_idx, stim in enumerate([0,5]):
     ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
     ax_fano[plt_idx].set_xlim([-150,600])
 
-
+plt.savefig(fig_dir + 'F3B_PSTH_IG_mean_normalized-fano_plot.svg')
