@@ -67,7 +67,7 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
 
         fig, ax = plt.subplots(3,8,figsize=(8,4))
         
-        for stim in range(mn_mtrx.shape[0]):
+        for stim in range(7):
             
             if mn_mtrx.shape[0] == 18:
                 diam = diams[stim+1]
@@ -87,7 +87,7 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
 
             # raster
             dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax[0,stim],color='black')        
-            ax[0,stim].set_title('diam = ' + str(diam))
+            ax[0,stim].set_title(str(np.around(diam,1)))
             # PSTH
             ax[1,stim].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
             ax[1,stim].plot(t,mean_PSTH,color='black')
