@@ -79,8 +79,7 @@ IG_params = pd.DataFrame(columns=['fano',
                                   'signi'])
 
 
-quencher_DF = pd.DataFrame(columns=['qtype',
-                                    'qtype_signi',
+quencher_DF = pd.DataFrame(columns=['qtype_signi',
                                     'bsl',
                                     'bsl_FR',
                                     'layer',
@@ -159,13 +158,6 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
         indx += 1
 
 
-    if all(delta_fano < 0):
-        qtype = 'quencher'
-    elif all(delta_fano > 0):
-        qtype = 'amplifier'
-    else:
-        qtype = 'mixer'
-
     if signi_all.shape[0] == 19:
         # amplification
         b_vec = np.logical_and(signi_all == 'S', delta_fano > 0)
@@ -225,8 +217,7 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
 
     para_tmp = {'bsl':np.mean(bsl),
                 'bsl_FR':np.mean(bsl_FR),
-                'layer':'SG',
-                'qtype':qtype,
+                'layer':'SG',                
                 'qtype_signi':qtype_signi,
                 'maxquench_diam':maxquench_diam,
                 'maxamplif_diam':maxamplif_diam,
@@ -291,14 +282,6 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
         indx += 1
 
 
-    if all(delta_fano < 0):
-        qtype = 'quencher'
-    elif all(delta_fano > 0):
-        qtype = 'amplifier'
-    else:
-        qtype = 'mixer'
-
-
     if signi_all.shape[0] == 19:
         # amplification
         b_vec = np.logical_and(signi_all == 'S', delta_fano > 0)
@@ -357,8 +340,7 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
 
     para_tmp = {'bsl':np.mean(bsl),
                 'bsl_FR':np.mean(bsl_FR),
-                'layer':'G',
-                'qtype':qtype,
+                'layer':'G',                
                 'qtype_signi':qtype_signi,
                 'maxquench_diam':maxquench_diam,
                 'maxamplif_diam':maxamplif_diam,
@@ -423,13 +405,6 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
         indx += 1
 
 
-    if all(delta_fano < 0):
-        qtype = 'quencher'
-    elif all(delta_fano > 0):
-        qtype = 'amplifier'
-    else:
-        qtype = 'mixer'
-
     if signi_all.shape[0] == 19:
         # amplification
         b_vec = np.logical_and(signi_all == 'S', delta_fano > 0)
@@ -487,17 +462,9 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
         qtype_signi = 'mixer'
 
 
-    if all(delta_fano < 0):
-        qtype_signi = 'quencher'
-    elif all(delta_fano > 0):
-        qtype = 'amplifier'
-    else:
-        qtype = 'mixer'
-
     para_tmp = {'bsl':np.mean(bsl),
                 'bsl_FR':np.mean(bsl_FR),
-                'layer':'IG',
-                'qtype':qtype,
+                'layer':'IG',                
                 'qtype_signi':qtype_signi,
                 'maxquench_diam':maxquench_diam,
                 'maxamplif_diam':maxamplif_diam,
