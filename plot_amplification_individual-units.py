@@ -53,6 +53,9 @@ t = np.arange(-150,600,1)
 
 
 def process(data,mean_data,this_pdf,bsl_begin,t,diams):
+    anal_duration = 400
+    first_tp  = 450
+    last_tp   = first_tp + anal_duration
 
     for unit in list(mean_data.keys()):
         # loop diams
