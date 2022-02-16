@@ -29,7 +29,7 @@ G_quencher = amplification_DF.query('qtype_signi=="quencher" & layer=="G"')
 IG_mixer = amplification_DF.query('qtype_signi=="mixer" & layer=="IG"')
 IG_quencher = amplification_DF.query('qtype_signi=="quencher" & layer=="IG"')
 plt.ylim(0,7.5)
-plt.savefig(fig_dir+'Figure4_E_bsl_means.svg')
+plt.savefig(fig_dir+'Figure4-D-bsl-means.svg')
 
 print('Baseline difference between quenchers and mixers')
 print('p-value for SG: ',sts.ttest_ind(SG_mixer['bsl'],SG_quencher['bsl'])[1])
@@ -39,7 +39,7 @@ print('p-value IG: ',sts.ttest_ind(IG_mixer['bsl'],IG_quencher['bsl'])[1])
 plt.figure()
 sns.stripplot(x='layer',y='bsl',data=amplification_DF,hue='qtype_signi',dodge=True)
 plt.ylim(0,7.5)
-plt.savefig(fig_dir+'Figure4_E_bsl_distribution.svg')
+plt.savefig(fig_dir+'Figure4-D-bsl-distribution.svg')
 
 lm = ols('bsl ~ C(qtype_signi) + C(layer)',data=amplification_DF).fit()
 table = sm.stats.anova_lm(lm,typ=1)
@@ -50,6 +50,7 @@ print(table)
 plt.figure()
 sns.barplot(y='bsl',x='layer',data=amplification_DF,alpha=0.5)
 sns.stripplot(y='bsl',x='layer',data=amplification_DF)
+plt.savefig(fig_dir+'Figure4-E-bsl-layers-only.svg')
 
 SG_layer = amplification_DF.query('layer=="SG"')
 G_layer = amplification_DF.query('layer=="G"')
@@ -64,6 +65,8 @@ print('G vs IG',sts.ttest_ind(G_layer['bsl'],IG_layer['bsl'])[1])
 plt.figure()
 sns.barplot(y='bsl',x='qtype_signi',data=amplification_DF,fc='gray')
 sns.stripplot(y='bsl',x='qtype_signi',data=amplification_DF,alpha=0.5)
+plt.savefig(fig_dir+'Figure4-E-bsl-responsetype_only.svg')
+
 mixer = amplification_DF.query('qtype_signi=="mixer"')
 quencher = amplification_DF.query('qtype_signi=="quencher"')
 print('Baseline difference between mixer vs quencher')
@@ -203,6 +206,7 @@ ax.bar(np.array([0.75,2.75,4.75])+0.5,RFnormed_maxamplif_diam,yerr=RFnormed_maxa
 ax.set_ylim([0,9.0])
 ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
+plt.savefig(fig_dir+'Figure4-F-RFnormed-diameter-only.svg')
 
 # bootstrapped statistics for RFnormed stimulus diameter at maxquench vs maxamplif
 # indices to not NaN
@@ -287,6 +291,7 @@ ax.bar(np.array([0.75,2.75,4.75])+0.5,mean_maxamplif_ampli,yerr=SE_maxamplif_amp
 ax.set_ylim([0,9.0])
 ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
+plt.savefig(fig_dir+'Figure4-G-effect-magnitude.svg')
 
 print('Difference in amplification and quenching magnitude:')
 print('SG p-value', sts.ttest_ind(SG_olRem_ampli['maxquench-ampli'],aSG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
