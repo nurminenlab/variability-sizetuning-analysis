@@ -65,7 +65,7 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
         for stim in range(mn_mtrx.shape[0]):
             Resp[stim] = np.mean(mn_mtrx[stim,first_tp:last_tp])
 
-        fig, ax = plt.subplots(3,7,figsize=(4,8))
+        fig, ax = plt.subplots(3,8,figsize=(8,4))
         
         for stim in range(mn_mtrx.shape[0]):
             
@@ -98,14 +98,14 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
         # -- plot results for RF size stimulus
         stim = np.argmax(Resp)
         # raster
-        dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax[0,stim],color='black')        
-        ax[0,stim].set_title('RF')
+        dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax[0,7],color='black')        
+        ax[0,7].set_title('RF')
         # PSTH
-        ax[1,stim].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
-        ax[1,stim].plot(t,mean_PSTH,color='black')
+        ax[1,7].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
+        ax[1,7].plot(t,mean_PSTH,color='black')
         # fano PSTH
-        ax[2,stim].fill_between(t,fano_PSTH-fano_SE,fano_PSTH+fano_SE,color='red',alpha=0.5)
-        ax[2,stim].plot(t,fano_PSTH,color='red')    
+        ax[2,7].fill_between(t,fano_PSTH-fano_SE,fano_PSTH+fano_SE,color='red',alpha=0.5)
+        ax[2,7].plot(t,fano_PSTH,color='red')    
         this_pdf.savefig()
 
     this_pdf.close()
