@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 import pickle as pkl
 import pandas as pd
 import seaborn as sns
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+from matplotlib.backends.backend_pdf import PdfPages
 
 import pdb
 
@@ -43,6 +44,11 @@ with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
     IG_mn_data = pkl.load(f)    
 with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
     IG_vr_data = pkl.load(f)    
+
+
+examples_SG = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-SUPRAGRANULAR.pdf')
+examples_G  = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-GRANULAR.pdf')
+examples_IG = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-INFRAGRANULAR.pdf')
 
 
 
