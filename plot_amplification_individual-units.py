@@ -10,8 +10,6 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from matplotlib.backends.backend_pdf import PdfPages
 
-import pdb
-
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
@@ -32,26 +30,17 @@ del(diams_data)
 
 with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
-    SG_vr_data = pkl.load(f)
     
 with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
     G_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
-    G_vr_data = pkl.load(f)
     
 with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
     IG_mn_data = pkl.load(f)    
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
-    IG_vr_data = pkl.load(f)    
 
 
 examples_SG = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-SUPRAGRANULAR.pdf')
 examples_G  = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-GRANULAR.pdf')
 examples_IG = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-INFRAGRANULAR.pdf')
-
-
-
 
 # loop SG units
 indx  = 0
@@ -60,20 +49,10 @@ cont  = 100.0
 count_window = 100
 nboots = 3000
 
-SG_perc_amplif = np.zeros((len(list(SG_mn_data.keys())),19))
-SG_perc_quench = np.zeros((len(list(SG_mn_data.keys())),19))
-
-G_perc_amplif = np.zeros((len(list(G_mn_data.keys())),19))
-G_perc_quench = np.zeros((len(list(G_mn_data.keys())),19))
-
-IG_perc_amplif = np.zeros((len(list(IG_mn_data.keys())),19))
-IG_perc_quench = np.zeros((len(list(IG_mn_data.keys())),19))
-
 t = np.arange(-150,600,1)
 
 
-
-def process(data,mean_data,this_pdf,bsl_begin):
+def process(data,mean_data,this_pdf,bsl_begin,t,diams):
 
     for unit in list(mean_data.keys()):
         # loop diams
@@ -93,7 +72,7 @@ def process(data,mean_data,this_pdf,bsl_begin):
                 diam = diams[stim]
 
             mean_PSTH, vari_PSTH,binned_data,mean_PSTH_booted,vari_PSTH_booted = dalib.meanvar_PSTH(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:],
-                                                                                                    count_window,
+                                                                                                    count_window=100,
                                                                                                     style='same',
                                                                                                     return_bootdstrs=True,
                                                                                                     nboots=nboots)
@@ -126,4 +105,9 @@ def process(data,mean_data,this_pdf,bsl_begin):
         ax[2,stim].plot(t,fano_PSTH,color='red')    
         this_pdf.savefig()
 
+    this_pdf.close()
+
+process(data,SG_mn_data,examples_SG,bsl_begin,t,diams)
+process(data,G_mn_data,examples_G,bsl_begin,t,diams)
+process(data,IG_mn_data,examples_IG,bsl_begin,t,diams)
 
