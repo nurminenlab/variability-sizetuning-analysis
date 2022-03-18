@@ -245,7 +245,7 @@ ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
-plt.savefig(fig_dir + 'F2_IG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
+#plt.savefig(fig_dir + 'F2_IG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = IG_params.groupby('diam')['FR'].mean()
 D = IG_params['diam'].unique()[FR.argmax()]

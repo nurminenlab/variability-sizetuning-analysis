@@ -52,3 +52,10 @@ print(params.groupby('layer').apply(lambda df: sts.ttest_rel(df['fit_fano_SML'],
 
 print('\n t-test for fano-factor in RF vs LAR across layers')
 print(params.groupby('layer').apply(lambda df: sts.ttest_rel(df['fit_fano_LAR'],df['fit_fano_RF'],nan_policy='omit')))
+
+
+print('\n mean fano-factor RF vs LAR across layers')
+print(params.groupby('layer')[['fit_fano_RF','fit_fano_LAR']].mean())
+
+print('\n SEM fano-factor RF vs LAR across layers')
+print(params.groupby('layer')[['fit_fano_RF','fit_fano_LAR']].sem())
