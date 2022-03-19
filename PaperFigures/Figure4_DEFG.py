@@ -31,6 +31,14 @@ IG_quencher = amplification_DF.query('qtype_signi=="quencher" & layer=="IG"')
 plt.ylim(0,7.5)
 plt.savefig(fig_dir+'Figure4-D-bsl-means.svg')
 
+
+print('Baseline difference between quenchers and mixers')
+print(amplification_DF.groupby(['layer','qtype_signi'])['bsl'].mean())
+
+print('SEM')
+print(SEM)
+
+
 print('Baseline difference between quenchers and mixers')
 print('p-value for SG: ',sts.ttest_ind(SG_mixer['bsl'],SG_quencher['bsl'])[1])
 print('p-value G: ',sts.ttest_ind(G_mixer['bsl'],G_quencher['bsl'])[1])
@@ -69,6 +77,11 @@ plt.savefig(fig_dir+'Figure4-E-bsl-responsetype_only.svg')
 
 mixer = amplification_DF.query('qtype_signi=="mixer"')
 quencher = amplification_DF.query('qtype_signi=="quencher"')
+
+print('\nDifference in baseline Fano-factor depending on response type')
+print(amplification_DF.groupby('qtype_signi')['bsl'].mean())
+print('\nSEM')
+print(amplification_DF.groupby('qtype_signi')['bsl'].sem())
 print('Baseline difference between mixer vs quencher')
 print('p-value',sts.ttest_ind(mixer['bsl'],quencher['bsl'])[1])
 
@@ -208,6 +221,16 @@ ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
 plt.savefig(fig_dir+'Figure4-F-RFnormed-diameter-only.svg')
 
+print('\nRF normed maxquench diameter:')
+print(RFnormed_maxquench_diam)
+print('SEM')
+print(RFnormed_maxquench_diam_SD)
+
+print('\nRF normed maxamplif diameter:')
+print(RFnormed_maxamplif_diam)
+print('SEM')
+print(RFnormed_maxamplif_diam_SD)
+
 # bootstrapped statistics for RFnormed stimulus diameter at maxquench vs maxamplif
 # indices to not NaN
 SG_quench_notnan = ~np.isnan(SG_olRem_diam['RFnormed_maxquench_diam'].values)
@@ -245,7 +268,7 @@ SG_thr = np.nanmedian(SG_olRem_diam['RFnormed_maxquench_diam'].values) - np.nanm
 G_thr  = np.nanmedian(G_olRem_diam['RFnormed_maxquench_diam'].values) - np.nanmedian(aG_olRem_diam['RFnormed_maxamplif_diam'].values)    
 IG_thr = np.nanmedian(IG_olRem_diam['RFnormed_maxquench_diam'].values) - np.nanmedian(aIG_olRem_diam['RFnormed_maxamplif_diam'].values)
 
-print('Difference of median maxquench and maxamplif stimulus diameters:')
+print('\nDifference of median maxquench and maxamplif stimulus diameters:')
 print('p-value SG ', np.sum(delta_SG_boot > SG_thr)/n_boots)
 print('p-value G ', np.sum(delta_G_boot > G_thr)/n_boots)
 print('p-value IG ', np.sum(delta_IG_boot > IG_thr)/n_boots)
@@ -292,8 +315,24 @@ ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
 plt.savefig(fig_dir+'Figure4-G-effect-magnitude.svg')
 
+print('\nMean effect magnitude quench')
+print(mean_maxquench_ampli)
+print('SEM')
+print(SE_maxquench_ampli)
+
+print('\nMean effect magnitude amplif')
+print(mean_maxamplif_ampli)
+print('SEM')
+print(SE_maxamplif_ampli)
+
+
+
+
 print('Difference in amplification and quenching magnitude:')
 print('SG p-value', sts.ttest_ind(SG_olRem_ampli['maxquench-ampli'],aSG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
 print('G p-value', sts.ttest_ind(G_olRem_ampli['maxquench-ampli'],aG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
 print('IG p-value', sts.ttest_ind(IG_olRem_ampli['maxquench-ampli'],aIG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
 #print('across layers p-value', sts.ttest_ind(ampquench['maxquench-ampli'],ampquench['maxamplif'],nan_policy='omit')[1])
+
+
+amplification_DF.groupby(['layer','qtype_signi']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum())
