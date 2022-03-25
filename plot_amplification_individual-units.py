@@ -15,7 +15,7 @@ F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
 # analysis done between these timepoints
-bsl_begin = 250
+bsl_begin = 100
 
 eps = 0.0000001
 
@@ -49,7 +49,7 @@ cont  = 100.0
 count_window = 100
 nboots = 3000
 
-t = np.arange(-150,600,1)
+t = np.arange(-300,600,1)
 
 
 def process(data,mean_data,this_pdf,bsl_begin,t,diams):
