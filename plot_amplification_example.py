@@ -27,20 +27,9 @@ with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
 
 diams = np.array(list(diams_data.keys()))
 del(diams_data)
-
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
-    SG_mn_data = pkl.load(f)
-    
-with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
-    G_mn_data = pkl.load(f)
     
 with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
-    IG_mn_data = pkl.load(f)    
-
-
-examples_SG = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-SUPRAGRANULAR.pdf')
-examples_G  = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-GRANULAR.pdf')
-examples_IG = PdfPages(S_dir + 'fanoPSTHs-small-stimuli-INFRAGRANULAR.pdf')
+    IG_mn_data = pkl.load(f)
 
 # loop SG units
 indx  = 0
@@ -51,13 +40,12 @@ nboots = 3000
 
 t = np.arange(-300,600,1)
 
-
 def process(data,mean_data,this_pdf,bsl_begin,t,diams):
     anal_duration = 400
     first_tp  = 450
     last_tp   = first_tp + anal_duration
 
-    for unit in list(mean_data.keys()):
+    for unit in [24]:
         # loop diams
         mn_mtrx = mean_data[unit]
         
@@ -65,9 +53,9 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
         for stim in range(mn_mtrx.shape[0]):
             Resp[stim] = np.mean(mn_mtrx[stim,first_tp:last_tp])
 
-        fig, ax = plt.subplots(3,8,figsize=(8,4))
+        fig, ax = plt.subplots(3,2,figsize=(8,4))
         
-        for stim in range(7):
+        for count, stim in np.array([0,np.argmax(Resp)]):
             
             if mn_mtrx.shape[0] == 18:
                 diam = diams[stim+1]
@@ -86,31 +74,15 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
             fano_SE = np.std(fano_boot,axis=0)
 
             # raster
-            dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax[0,stim],color='black')        
-            ax[0,stim].set_title(str(np.around(diam,1)))
+            dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax[0,count],color='black')        
+            ax[0,count].set_title(str(np.around(diam,1)))
             # PSTH
-            ax[1,stim].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
-            ax[1,stim].plot(t,mean_PSTH,color='black')
+            ax[1,count].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
+            ax[1,count].plot(t,mean_PSTH,color='black')
             # fano PSTH
-            ax[2,stim].fill_between(t,fano_PSTH-fano_SE,fano_PSTH+fano_SE,color='red',alpha=0.5)
-            ax[2,stim].plot(t,fano_PSTH,color='red')
+            ax[2,count].fill_between(t,fano_PSTH-fano_SE,fano_PSTH+fano_SE,color='red',alpha=0.5)
+            ax[2,count].plot(t,fano_PSTH,color='red')
 
-        # -- plot results for RF size stimulus
-        stim = np.argmax(Resp)
-        # raster
-        dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax[0,7],color='black')        
-        ax[0,7].set_title(str(unit))
-        # PSTH
-        ax[1,7].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
-        ax[1,7].plot(t,mean_PSTH,color='black')
-        # fano PSTH
-        ax[2,7].fill_between(t,fano_PSTH-fano_SE,fano_PSTH+fano_SE,color='red',alpha=0.5)
-        ax[2,7].plot(t,fano_PSTH,color='red')    
-        this_pdf.savefig()
-
-    this_pdf.close()
-
-process(data,SG_mn_data,examples_SG,bsl_begin,t,diams)
-process(data,G_mn_data,examples_G,bsl_begin,t,diams)
-process(data,IG_mn_data,examples_IG,bsl_begin,t,diams)
+process(data,IG_mn_data,bsl_begin,t,diams)
+plt.savefig(S_dir+'amplification_example.svg')
 
