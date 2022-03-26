@@ -84,7 +84,7 @@ bsl_end   = bsl_begin + anal_duration
 count_window = np.array([100])
 
 print('N pairs total ',len(data))
-for pair in [16,32,45,139,156,188,26,52,79,212,253,548,293,584,586,587]
+for pair in [16,32,45,139,156,188,293,584,586,587]:
 
     for cont in contrast:
         if cont in data[pair].keys():
@@ -175,7 +175,7 @@ for pair in [16,32,45,139,156,188,26,52,79,212,253,548,293,584,586,587]
                 
                 # get z-scored spike-counts
                 sc1 = np.sum(np.squeeze(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,bsl_begin:bsl_end]),axis=1)
-                sc2 = np.sum(np.squeeze(data[pair][cont]['spkR_NoL_pair1'][:,plot_diam,bsl_begin:bsl_end]),axis=1)
+                sc2 = np.sum(np.squeeze(data[pair][cont]['spkR_NoL_pair2'][:,plot_diam,bsl_begin:bsl_end]),axis=1)
                 z_sc1 = dalib.z_score(sc1)
                 z_sc2 = dalib.z_score(sc2)
                 model = sm.OLS(z_sc2,z_sc1).fit()
