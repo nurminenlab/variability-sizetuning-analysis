@@ -40,12 +40,12 @@ nboots = 3000
 
 t = np.arange(-300,600,1)
 
-def process(data,mean_data,this_pdf,bsl_begin,t,diams):
+def process(data,mean_data,bsl_begin,t,diams):
     anal_duration = 400
     first_tp  = 450
     last_tp   = first_tp + anal_duration
 
-    for unit in [24]:
+    for unit in [77]:
         # loop diams
         mn_mtrx = mean_data[unit]
         
@@ -53,9 +53,10 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
         for stim in range(mn_mtrx.shape[0]):
             Resp[stim] = np.mean(mn_mtrx[stim,first_tp:last_tp])
 
-        fig, ax = plt.subplots(3,2,figsize=(8,4))
-        
-        for count, stim in np.array([0,np.argmax(Resp)]):
+        fig1, ax1 = plt.subplots(1,2,figsize=(8,4))
+        fig2, ax2 = plt.subplots(2,2,figsize=(8,4))
+
+        for count, stim in enumerate(np.array([0,6])):
             
             if mn_mtrx.shape[0] == 18:
                 diam = diams[stim+1]
@@ -70,19 +71,32 @@ def process(data,mean_data,this_pdf,bsl_begin,t,diams):
 
             fano_PSTH = vari_PSTH/(eps + mean_PSTH)
             fano_boot = np.divide(vari_PSTH_booted,np.add(eps,mean_PSTH_booted))
-            PSTH_SE = np.std(mean_PSTH_booted,axis=0)
+            PSTH_SE = np.std(mean_PSTH_booted/0.1,axis=0)
             fano_SE = np.std(fano_boot,axis=0)
 
+            mean_PSTH = mean_PSTH/0.1
             # raster
-            dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax[0,count],color='black')        
-            ax[0,count].set_title(str(np.around(diam,1)))
-            # PSTH
-            ax[1,count].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
-            ax[1,count].plot(t,mean_PSTH,color='black')
-            # fano PSTH
-            ax[2,count].fill_between(t,fano_PSTH-fano_SE,fano_PSTH+fano_SE,color='red',alpha=0.5)
-            ax[2,count].plot(t,fano_PSTH,color='red')
+            plt.figure(fig1)
+            dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax1[count],color='black')        
+            
 
-process(data,IG_mn_data,bsl_begin,t,diams)
+            plt.figure(fig2)
+            # PSTH
+            ax2[0,count].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='black',alpha=0.5)
+            ax2[0,count].plot(t,mean_PSTH,color='black')
+            ax2[0,count].set_ylim(0,200) 
+            # fano PSTH
+            ax2[1,count].fill_between(t,fano_PSTH-fano_SE,fano_PSTH+fano_SE,color='red',alpha=0.5)
+            ax2[1,count].plot(t,fano_PSTH,color='red')
+            ax2[1,count].set_ylim(0,5) 
+    
+    return fig1,fig2
+
+fig1,fig2 = process(data,IG_mn_data,bsl_begin,t,diams)
+
+plt.figure(fig1)
+plt.savefig(S_dir+'amplification_example-rasters.eps')
+plt.figure(fig2)
 plt.savefig(S_dir+'amplification_example.svg')
+
 
