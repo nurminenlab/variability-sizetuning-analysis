@@ -20,17 +20,13 @@ cont_wndw_length = 100
 boot_num = int(1e3)
 
 plotter = 'contrast'
+Fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 w_dir   = os.getcwd()
 anal_type = 'MU'
 
 SUdatfile = 'correlationData_selectedUnits_lenient_macaque-MUA-July2020.pkl'
-
-examples_SG = PdfPages(S_dir + 'correlations-candidates-SUPRAGRANULAR.pdf')
-examples_G  = PdfPages(S_dir + 'correlations-candidates-GRANULAR.pdf')
-examples_IG = PdfPages(S_dir + 'correlations-candidates-INFRAGRANULAR.pdf')
-examples_MX = PdfPages(S_dir + 'correlations-candidates-MX.pdf')
 
 shitty_fits = [666]
 excluded_fits = [666]
@@ -72,7 +68,7 @@ count_window = np.array([100])
 
 print('N pairs total ',len(data))
 
-for pair in range(len(data)):
+for pair in [20,275,112]:
 
     for cont in contrast:
         if cont in data[pair].keys():
@@ -159,18 +155,13 @@ for pair in range(len(data)):
 
                 # determine layer type and save to PDF accordinly
                 if data[pair]['info']['L1'] == 'LSG' and data[pair]['info']['L2'] == 'LSG':
-                    examples_SG.savefig()
-                elif data[pair]['info']['L1'] == 'L4C' and data[pair]['info']['L2'] == 'L4C':
-                    examples_G.savefig()
+                    plt.savefig(Fig_dir + 'SG_z-scored-example.svg',format='svg')
                 elif data[pair]['info']['L1'] == 'LIG' and data[pair]['info']['L2'] == 'LIG':
-                    examples_IG.savefig()
+                    plt.savefig(Fig_dir + 'IG_z-scored-example.svg',format='svg')
                 else:
-                    examples_MX.savefig()
+                    plt.savefig(Fig_dir + 'MX_z-scored-example.svg',format='svg')
                 
                 plt.clf()
 
-#
-examples_SG.close()
-examples_G.close()
-examples_IG.close()
-examples_MX.close()
+
+
