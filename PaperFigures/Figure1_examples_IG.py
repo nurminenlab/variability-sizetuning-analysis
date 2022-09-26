@@ -9,6 +9,8 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
 
+save_figures = True
+
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
@@ -58,7 +60,9 @@ cont  = 100.0
 count_window = 100
 nboots = 3000
 
-unit = 78
+#unit = 78
+#unit = 34
+unit = 75
 mn_mtrx = SG_mn_data[unit]
 vr_mtrx = SG_vr_data[unit]
 
@@ -100,7 +104,7 @@ for stim in range(mn_mtrx.shape[0]):
     
     FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)/(count_window/1000)
 
-    if stim == 4 or stim == 18:
+    if stim == 4 or stim == 18: # 4 18
         
         fano_PSTH_RF = np.divide(vari_PSTH_booted[:,fano_PSTH_first_tp:], (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:]))
         fano_PSTH_RF_SD = np.std(fano_PSTH_RF,axis=0)
@@ -118,7 +122,9 @@ for stim in range(mn_mtrx.shape[0]):
         # plot fano-PSTH
         ax.fill_between(t,np.mean(fano_PSTH_RF,axis=0) - fano_PSTH_RF_SD, np.mean(fano_PSTH_RF,axis=0) + fano_PSTH_RF_SD,color='red',alpha=0.3)
         ax.plot(t,np.mean(fano_PSTH_RF,axis=0), 'k-')
-        ax.set_ylim(0,3)
+        ax.set_ylim(0,2.5)
+        ax.set_yticks([0,1,2])
+        ax.set_xticks([0,250,500])
         ax.tick_params(axis='y',color='red')
         ax.spines['left'].set_color('red')
         ax.tick_params(axis='y',colors='red',labelsize=8)
@@ -133,7 +139,7 @@ for stim in range(mn_mtrx.shape[0]):
         # plot PSTH
         axb.fill_between(t,np.mean(PSTH_RF,axis=0) - PSTH_RF_SD, np.mean(PSTH_RF,axis=0) + PSTH_RF_SD,color='gray')
         axb.plot(t,np.mean(PSTH_RF,axis=0), 'k-')
-        axb.set_ylim(0,200)
+        axb.set_ylim(0,100)
         axb.spines['left'].set_color('red')
         axb.spines['top'].set_visible(False)
         axb.tick_params(axis='y',labelsize=8)
@@ -175,11 +181,16 @@ for stim in range(mn_mtrx.shape[0]):
         
 
 plt.figure(1)
-plt.savefig(fig_dir + 'F1_IG_PSTH_fanoPSTH.svg',bbox_inches='tight',pad_inches=0)        
+if save_figures:
+    plt.savefig(fig_dir + 'F1_IG_PSTH_fanoPSTH.svg',bbox_inches='tight',pad_inches=0)        
+
 plt.figure(2)
-plt.savefig(fig_dir + 'F1_IG_fano-PSTH-zoomed.svg',bbox_inches='tight',pad_inches=0)
+if save_figures:
+    plt.savefig(fig_dir + 'F1_IG_fano-PSTH-zoomed.svg',bbox_inches='tight',pad_inches=0)
+
 plt.figure(3)
-plt.savefig(fig_dir + 'F1_IG_rasters.eps',bbox_inches='tight',pad_inches=0)
+if save_figures:
+    plt.savefig(fig_dir + 'F1_IG_rasters.eps',bbox_inches='tight',pad_inches=0)
 
 ##
 fano_E = 2 * np.std(fano_boot,axis=0)
@@ -227,4 +238,5 @@ ax.spines['top'].set_visible(False)
 axb.spines['top'].set_visible(False)
 
 plt.figure(4)
-plt.savefig(fig_dir + 'F1_IG_ASFs.svg',bbox_inches='tight',pad_inches=0)
+if save_figures:
+    plt.savefig(fig_dir + 'F1_IG_ASFs.svg',bbox_inches='tight',pad_inches=0)
