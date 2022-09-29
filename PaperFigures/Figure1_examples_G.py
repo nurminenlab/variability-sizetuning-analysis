@@ -8,10 +8,12 @@ import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
+import scipy.io as scio
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
+mat_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/PSTHmats/'
 
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
@@ -118,8 +120,9 @@ for stim in range(mn_mtrx.shape[0]):
         axb = ax.twinx()
         t = np.arange(-100,600,1)
         # plot fano-PSTH
-        ax.fill_between(t,np.mean(fano_PSTH_RF,axis=0) - fano_PSTH_RF_SD, np.mean(fano_PSTH_RF,axis=0) + fano_PSTH_RF_SD,color='red',alpha=0.3)
-        ax.plot(t,np.mean(fano_PSTH_RF,axis=0), 'k-')
+        ax.fill_between(t,np.mean(fano_PSTH_RF,axis=0) - fano_PSTH_RF_SD, np.mean(fano_PSTH_RF,axis=0) + fano_PSTH_RF_SD,color='red')
+        ax.plot(t,np.mean(fano_PSTH_RF,axis=0), '-',color=[0.5, 0, 0])
+        ax.plot([-100,600],[np.mean(fano_PSTH_RF[:,0:100]),np.mean(fano_PSTH_RF[:,0:100])], '--',color='red')
         ax.set_ylim(0,5)
         ax.tick_params(axis='y',color='red')
         ax.spines['left'].set_color('red')
@@ -135,18 +138,22 @@ for stim in range(mn_mtrx.shape[0]):
         # plot PSTH
         axb.fill_between(t,np.mean(PSTH_RF,axis=0) - PSTH_RF_SD, np.mean(PSTH_RF,axis=0) + PSTH_RF_SD,color='gray')
         axb.plot(t,np.mean(PSTH_RF,axis=0), 'k-')
-        axb.set_ylim(0,150)
+        axb.plot([-100,600],[np.mean(PSTH_RF[:,0:100]),np.mean(PSTH_RF[:,0:100])], 'k--')
+        axb.set_ylim(0,150)        
         axb.spines['left'].set_color('red')
         axb.spines['top'].set_visible(False)
         axb.tick_params(axis='y',labelsize=8)
         #axb.set_ylabel('Firing-rate (Hz)')
         
+        mdic = {'t':t,'fano_PSTH_RF': fano_PSTH_RF, 'fano_PSTH_RF_SD': fano_PSTH_RF_SD, 'PSTH_RF': PSTH_RF, 'PSTH_RF_SD': PSTH_RF_SD}
+        scio.savemat(mat_dir+'PSTHsG_stim_%s.mat' % stim, mdic)
+
         plt.figure(2)
         ax = plt.subplot(2,1,1)
         t = np.arange(50,350,1)
         # plot fano-PSTH
-        ax.fill_between(t,np.mean(fano_PSTH_RF[:,150:450],axis=0) - fano_PSTH_RF_SD[150:450], np.mean(fano_PSTH_RF[:,150:450],axis=0) + fano_PSTH_RF_SD[150:450],color='red',alpha=0.3)
-        ax.plot(t,np.mean(fano_PSTH_RF[:,150:450],axis=0), 'k-')
+        ax.fill_between(t,np.mean(fano_PSTH_RF[:,150:450],axis=0) - fano_PSTH_RF_SD[150:450], np.mean(fano_PSTH_RF[:,150:450],axis=0) + fano_PSTH_RF_SD[150:450],color='red')
+        ax.plot(t,np.mean(fano_PSTH_RF[:,150:450],axis=0), '-',color=[0.5, 0, 0])
         ax.set_ylabel('Fano-factor')
         ax.set_xlabel('Peri-stimulus time (ms)')
         ax.spines['left'].set_color('red')
@@ -155,6 +162,9 @@ for stim in range(mn_mtrx.shape[0]):
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         
+        mdic = {'t':t, 'fano_PSTH_RF': fano_PSTH_RF[:,150:450], 'fano_PSTH_RF_SD': fano_PSTH_RF_SD[150:450]}
+        scio.savemat(mat_dir+'truncated_PSTHsG_stim_%s.mat' % stim, mdic)
+
         plt.figure(3,figsize=(1.335, 1.115))
         # plot rasters
         t = np.arange(-100,600,1)
@@ -201,6 +211,22 @@ res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B',
 diams_tight = np.logspace(np.log10(diamsa[0]),np.log10(diamsa[-1]),1000)
 Rhat = dalib.ROG(diams_tight,*popt)
 Fhat = dalib.doubleROG(diams_tight,*res.x)
+
+# compute gradient for surround size detection
+GG = np.gradient(Rhat,diams_tight)
+GG_min_ind = np.argmin(GG)
+
+if GG_min_ind == Rhat.shape[0] - 1:
+    surr_ind_narrow_new = Rhat.shape[0] -1
+else:
+    if np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0].size != 0:
+        surr_ind_narrow_new = np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0][0] + GG_min_ind
+    else:
+        surr_ind_narrow_new = -1
+
+RFsurr = diams_tight[surr_ind_narrow_new]
+RFsize = diams_tight[np.argmax(Rhat)]
+SI = (np.max(Rhat) - Rhat[-1]) / np.max(Rhat)
 
 plt.figure(4,figsize=(1.335, 1.115))
 ax = plt.subplot(1,1,1)
