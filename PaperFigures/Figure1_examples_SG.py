@@ -144,15 +144,12 @@ for stim in range(mn_mtrx.shape[0]):
         axb.tick_params(axis='y',labelsize=8)
         #axb.set_ylabel('Firing-rate (Hz)')
 
-        mdic = {'t':t,'fano_PSTH_RF': fano_PSTH_RF, 'fano_PSTH_RF_SD': fano_PSTH_RF_SD, 'PSTH_RF': PSTH_RF, 'PSTH_RF_SD': PSTH_RF_SD}
-        scio.savemat(mat_dir+'PSTHsSG_stim_%s.mat' % stim, mdic)
-
         plt.figure(2)
         ax = plt.subplot(2,1,1)
-        t = np.arange(50,350,1)
+        t = np.arange(50,450,1)
         # plot fano-PSTH
-        ax.fill_between(t,np.mean(fano_PSTH_RF[:,150:450],axis=0) - fano_PSTH_RF_SD[150:450], np.mean(fano_PSTH_RF[:,150:450],axis=0) + fano_PSTH_RF_SD[150:450],color='red')
-        ax.plot(t,np.mean(fano_PSTH_RF[:,150:450],axis=0), '-',color=[0.5, 0, 0])
+        ax.fill_between(t,np.mean(fano_PSTH_RF[:,150:550],axis=0) - fano_PSTH_RF_SD[150:550], np.mean(fano_PSTH_RF[:,150:550],axis=0) + fano_PSTH_RF_SD[150:550],color='red')
+        ax.plot(t,np.mean(fano_PSTH_RF[:,150:550],axis=0), '-',color=[0.5, 0, 0])
         ax.set_ylabel('Fano-factor')
         ax.set_xlabel('Peri-stimulus time (ms)')
         ax.spines['left'].set_color('red')
@@ -160,9 +157,6 @@ for stim in range(mn_mtrx.shape[0]):
         ax.yaxis.label.set_color('red')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-        
-        mdic = {'t':t, 'fano_PSTH_RF': fano_PSTH_RF[:,150:450], 'fano_PSTH_RF_SD': fano_PSTH_RF_SD[150:450]}
-        scio.savemat(mat_dir+'truncated_PSTHsSG_stim_%s.mat' % stim, mdic)
 
         plt.figure(3,figsize=(1.335, 1.115))
         # plot rasters

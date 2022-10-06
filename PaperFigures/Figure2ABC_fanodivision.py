@@ -7,9 +7,14 @@ import seaborn as sns
 #import pdb
 import statsmodels.api as sm
 
+import sys
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
+import data_analysislib as dalib
+from scipy.optimize import basinhopping, curve_fit
+
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
@@ -20,7 +25,18 @@ first_tp  = 450
 last_tp   = first_tp + anal_duration
 bsl_begin = 120
 bsl_end   = bsl_begin + anal_duration
+
 count_window = 100
+
+def cost_response(params,xdata,ydata):
+    Rhat = dalib.ROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
+
+def cost_fano(params,xdata,ydata):
+    Rhat = dalib.doubleROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
 
 eps = 0.0000001
 
@@ -165,23 +181,50 @@ for unit in list(IG_mn_data.keys()):
         q_indx += 1
 
 
+# supragranular layer
 plt.figure(figsize=(1.335, 1.115))
+SG_params['FR'] = SG_params['FR'].apply(lambda x: x/(count_window/1000))
+
+FR_size_tune = SG_params.groupby(['diam'], as_index=False)['FR'].mean()
+FF_size_tune = SG_params.groupby(['diam'], as_index=False)['fano'].mean()
+
+# fit data
+try:
+    popt,pcov = curve_fit(dalib.ROG,FR_size_tune['diam'].values,FR_size_tune['FR'].values,bounds=(0,np.inf),maxfev=100000)
+except:
+    args = (FR_size_tune['diam'].values,FR_size_tune['FR'].values)
+    bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+    res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+    popt = res.x
+
+args = (FF_size_tune['diam'].values,FF_size_tune['fano'].values)
+bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
+diams_tight = np.logspace(np.log10(FF_size_tune['diam'].values[0]),np.log10(FF_size_tune['diam'].values[-1]),1000)
+Rhat = dalib.ROG(diams_tight,*popt)
+Fhat = dalib.doubleROG(diams_tight,*res.x)
+
+
 ax = plt.subplot(111)
 ax2 = ax.twinx()
 
-SG_bsl_FR = SG_params['bsl_FR'].apply(lambda x: x/(anal_duration/1000.0)).mean()
+SG_bsl_FR = SG_params['bsl_FR'].apply(lambda x: x/(count_window/1000.0)).mean()
 SG_bsl_FF = SG_params['bsl'].mean()
 
 SEM = SG_params.groupby(['diam'])['fano'].sem()
-SG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-',markersize=4,mfc='None',lw=1)
+SG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro',markersize=4,mfc='None',lw=1)
+
 ax.set_xlabel('')
 ax.set_xscale('log')
 ax.plot([SG_params['diam'].min(),SG_params['diam'].max()],[SG_bsl_FF,SG_bsl_FF],'r--')
+# fits
+ax.plot(diams_tight, Fhat, 'r-',lw=1)
 
-SG_params['FR'] = SG_params['FR'].apply(lambda x: x/(anal_duration/1000))
+
 SEM_FR = SG_params.groupby(['diam'])['FR'].sem()
-SG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-',markersize=4,mfc='None',lw=1)
+SG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.plot([SG_params['diam'].min(),SG_params['diam'].max()],[SG_bsl_FR,SG_bsl_FR],'k--')
+ax2.plot(diams_tight, Rhat, 'k-',lw=1)
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
@@ -196,23 +239,47 @@ FF_RF = SG_params[SG_params['diam'] == D]
 FF_LAR = SG_params[SG_params['diam'] == D_max]
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
+# granular layer
 plt.figure(figsize=(1.335, 1.115))
+G_params['FR'] = G_params['FR'].apply(lambda x: x/(count_window/1000))
+
+FR_size_tune = G_params.groupby(['diam'], as_index=False)['FR'].mean()
+FF_size_tune = G_params.groupby(['diam'], as_index=False)['fano'].mean()
+
+# fit data
+try:
+    popt,pcov = curve_fit(dalib.ROG,FR_size_tune['diam'].values,FR_size_tune['FR'].values,bounds=(0,np.inf),maxfev=100000)
+except:
+    args = (FR_size_tune['diam'].values,FR_size_tune['FR'].values)
+    bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+    res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+    popt = res.x
+
+args = (FF_size_tune['diam'].values,FF_size_tune['fano'].values)
+bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
+diams_tight = np.logspace(np.log10(FF_size_tune['diam'].values[0]),np.log10(FF_size_tune['diam'].values[-1]),1000)
+Rhat = dalib.ROG(diams_tight,*popt)
+Fhat = dalib.doubleROG(diams_tight,*res.x)
+
 ax = plt.subplot(111)
 ax2 = ax.twinx()
 
-G_bsl_FR = G_params['bsl_FR'].apply(lambda x: x/(anal_duration/1000.0)).mean()
+G_bsl_FR = G_params['bsl_FR'].apply(lambda x: x/(count_window/1000.0)).mean()
 G_bsl_FF = G_params['bsl'].mean()
 
 SEM = G_params.groupby(['diam'])['fano'].sem()
-G_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-',markersize=4,mfc='None',lw=1)
+G_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xlabel('')
 ax.set_xscale('log')
 ax.plot([G_params['diam'].min(),G_params['diam'].max()],[G_bsl_FF,G_bsl_FF],'r--')
+# fits
+ax.plot(diams_tight, Fhat, 'r-',lw=1)
 
-G_params['FR'] = G_params['FR'].apply(lambda x: x/(anal_duration/1000))
 SEM_FR = G_params.groupby(['diam'])['FR'].sem()
-G_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-',markersize=4,mfc='None',lw=1)
+G_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.plot([G_params['diam'].min(),G_params['diam'].max()],[G_bsl_FR,G_bsl_FR],'k--')
+ax2.plot(diams_tight, Rhat, 'k-',lw=1)
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
@@ -229,22 +296,48 @@ FF_LAR = G_params[G_params['diam'] == D_max]
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
 plt.figure(figsize=(1.335, 1.115))
+IG_params['FR'] = IG_params['FR'].apply(lambda x: x/(count_window/1000))
+
+FR_size_tune = IG_params.groupby(['diam'], as_index=False)['FR'].mean()
+FF_size_tune = IG_params.groupby(['diam'], as_index=False)['fano'].mean()
+
+# fit data
+try:
+    popt,pcov = curve_fit(dalib.ROG,FR_size_tune['diam'].values,FR_size_tune['FR'].values,bounds=(0,np.inf),maxfev=100000)
+except:
+    args = (FR_size_tune['diam'].values,FR_size_tune['FR'].values)
+    bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+    res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+    popt = res.x
+
+args = (FF_size_tune['diam'].values,FF_size_tune['fano'].values)
+bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
+diams_tight = np.logspace(np.log10(FF_size_tune['diam'].values[0]),np.log10(FF_size_tune['diam'].values[-1]),1000)
+Rhat = dalib.ROG(diams_tight,*popt)
+Fhat = dalib.doubleROG(diams_tight,*res.x)
+
 ax = plt.subplot(111)
 ax2 = ax.twinx()
 
-IG_bsl_FR = IG_params['bsl_FR'].apply(lambda x: x/(anal_duration/1000.0)).mean()
+IG_bsl_FR = IG_params['bsl_FR'].apply(lambda x: x/(count_window/1000.0)).mean()
 IG_bsl_FF = IG_params['bsl'].mean()
 
 SEM = IG_params.groupby(['diam'])['fano'].sem()
-IG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro-',markersize=4,mfc='None',lw=1)
+IG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xlabel('')
 ax.set_xscale('log')
 ax.plot([IG_params['diam'].min(),IG_params['diam'].max()],[IG_bsl_FF,IG_bsl_FF],'r--')
+# fits
+ax.plot(diams_tight, Fhat, 'r-',lw=1)
 
-IG_params['FR'] = IG_params['FR'].apply(lambda x: x/(anal_duration/1000))
+
 SEM_FR = IG_params.groupby(['diam'])['FR'].sem()
-IG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko-',markersize=4,mfc='None',lw=1)
+IG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.plot([IG_params['diam'].min(),IG_params['diam'].max()],[IG_bsl_FR,IG_bsl_FR],'k--')
+# fits
+ax2.plot(diams_tight, Rhat, 'k-',lw=1)
+
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
