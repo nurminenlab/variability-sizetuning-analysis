@@ -94,20 +94,21 @@ for unit in list(SG_mn_data.keys()):
     # get FF @ RF size
     RFind = np.argmax(FR)
 
-    u1 = np.mean(fano_boot[:,RFind],axis=0)
-    u2 = np.mean(fano_boot[:,-1],axis=0)
-    uc = (u1 + u2) / 2
+    # do linear regression to see if surround suppression affects fano
+    FF_sup = fano[RFind:]
+    if mn_mtrx.shape[0] == 18:
+        X = diams[RFind+1:]
+    else:
+        X = diams[RFind:]
 
-    FF_RF = fano_boot[:,RFind] - u1 + uc
-    FF_LR = fano_boot[:,-1] - u2 + uc
-
-    delta_FF = fano[RFind] - fano[-1]
-    delta_FF_boot = FF_RF - FF_LR
+    X = np.column_stack((X,np.ones(X.shape[0])))
+    model = sm.OLS(FF_sup,X)
+    results = model.fit()
     
-    if delta_FF > np.percentile(delta_FF_boot,95):
+    if results.params[0] < 0 and results.pvalues[0] < 0.05:
         FF_sup = 'suppresser'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
-    elif delta_FF < np.percentile(delta_FF_boot,5):
+    elif results.params[0] > 0 and results.pvalues[0] < 0.05:
         FF_sup = 'facilitator'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
     else:
@@ -154,30 +155,31 @@ for unit in list(G_mn_data.keys()):
 
 
 
-
     # get FF @ RF size
     RFind = np.argmax(FR)
 
-    u1 = np.mean(fano_boot[:,RFind],axis=0)
-    u2 = np.mean(fano_boot[:,-1],axis=0)
-    uc = (u1 + u2) / 2
+    # do linear regression to see if surround suppression affects fano
+    FF_sup = fano[RFind:]
+    if mn_mtrx.shape[0] == 18:
+        X = diams[RFind+1:]
+    else:
+        X = diams[RFind:]
 
-    FF_RF = fano_boot[:,RFind] - u1 + uc
-    FF_LR = fano_boot[:,-1] - u2 + uc
-
-    delta_FF = fano[RFind] - fano[-1]
-    delta_FF_boot = FF_RF - FF_LR
+    X = np.column_stack((X,np.ones(X.shape[0])))
+    model = sm.OLS(FF_sup,X)
+    results = model.fit()
     
-    if delta_FF > np.percentile(delta_FF_boot,95):
+    if results.params[0] < 0 and results.pvalues[0] < 0.05:
         FF_sup = 'suppresser'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
-    elif delta_FF < np.percentile(delta_FF_boot,5):
+    elif results.params[0] > 0 and results.pvalues[0] < 0.05:
         FF_sup = 'facilitator'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
     else:
         FF_sup = 'nonether'
         FF_sup_magn = np.nan
-        
+
+
     SI = (np.max(FR) - FR[-1]) / np.max(FR)
     para_tmp = {'FF_sup':FF_sup,'SI':SI,'layer':'G','FF_sup_magn':FF_sup_magn,'unit':unit}
     tmp_df    = pd.DataFrame(para_tmp, index=[indx])
@@ -215,33 +217,38 @@ for unit in list(IG_mn_data.keys()):
             fano_boot[boot_num,stim] = np.mean(vari_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window] / (eps + mean_PSTH_booted[boot_num,first_tp:last_tp][0:-1:count_window]))
 
 
+
+
+
     # get FF @ RF size
     RFind = np.argmax(FR)
 
-    u1 = np.mean(fano_boot[:,RFind],axis=0)
-    u2 = np.mean(fano_boot[:,-1],axis=0)
-    uc = (u1 + u2) / 2
+    # do linear regression to see if surround suppression affects fano
+    FF_sup = fano[RFind:]
+    if mn_mtrx.shape[0] == 18:
+        X = diams[RFind+1:]
+    else:
+        X = diams[RFind:]
 
-    FF_RF = fano_boot[:,RFind] - u1 + uc
-    FF_LR = fano_boot[:,-1] - u2 + uc
-
-    delta_FF = fano[RFind] - fano[-1]
-    delta_FF_boot = FF_RF - FF_LR
+    X = np.column_stack((X,np.ones(X.shape[0])))
+    model = sm.OLS(FF_sup,X)
+    results = model.fit()
     
-    if delta_FF > np.percentile(delta_FF_boot,95):
+    if results.params[0] < 0 and results.pvalues[0] < 0.05:
         FF_sup = 'suppresser'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
-    elif delta_FF < np.percentile(delta_FF_boot,5):
+    elif results.params[0] > 0 and results.pvalues[0] < 0.05:
         FF_sup = 'facilitator'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
     else:
         FF_sup = 'nonether'
         FF_sup_magn = np.nan
-        
+
+
     SI = (np.max(FR) - FR[-1]) / np.max(FR)
     para_tmp = {'FF_sup':FF_sup,'SI':SI,'layer':'IG','FF_sup_magn':FF_sup_magn,'unit':unit}
     tmp_df    = pd.DataFrame(para_tmp, index=[indx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
     indx += 1
 
-quencher_DF.to_csv('quencher_DF.csv')
+quencher_DF.to_csv('quencher_DF_regression.csv')

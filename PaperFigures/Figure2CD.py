@@ -6,7 +6,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
@@ -27,11 +27,13 @@ params.insert(3,'FFsurfac',FFsurfac.values)
 plt.figure()
 inds = params[params['FFsuppression'] < -300].index
 params.drop(inds,inplace=True)
-ax = plt.subplot(2,2,1)
-sns.swarmplot(x='layer',y='FFsuppression',data=params,ax=ax,size=3)
-ax = plt.subplot(2,2,3)
+ax = plt.subplot(121)
 SEM = params.groupby('layer')['FFsuppression'].sem()
-params.groupby('layer')['FFsuppression'].mean().plot(kind='bar',ax=ax,yerr=SEM)
+params.groupby('layer')['FFsuppression'].mean().plot(kind='bar',ax=ax,yerr=SEM,color='white',edgecolor='red')
+ax.set_ylim(-80,0)
+ax = plt.subplot(122)
+sns.swarmplot(x='layer',y='FFsuppression',data=params,ax=ax,size=3,color='red')
+ax.set_ylim(-80,0)
 if save_figures:
     plt.savefig(fig_dir + 'F2C-left.svg',bbox_inches='tight',pad_inches=0)
 
@@ -49,11 +51,15 @@ inds = params[params['FFsurfac'] > 300].index
 params.drop(inds,inplace=True)
 
 plt.figure()
-ax = plt.subplot(2,2,2)
-sns.swarmplot(x='layer',y='FFsurfac',data=params,ax=ax,size=3)
-ax = plt.subplot(2,2,4)
+
+ax = plt.subplot(121)
 SEM = params.groupby('layer')['FFsurfac'].sem()
-params.groupby('layer')['FFsurfac'].mean().plot(kind='bar',ax=ax,yerr=SEM)
+params.groupby('layer')['FFsurfac'].mean().plot(kind='bar',ax=ax,yerr=SEM,color='white',edgecolor='red')
+ax.set_ylim(-70,160)
+ax = plt.subplot(122)
+sns.swarmplot(x='layer',y='FFsurfac',data=params,ax=ax,size=3,color='red')
+ax.set_ylim(-70,160)
+
 if save_figures:
     plt.savefig(fig_dir + 'F2C-right.svg',bbox_inches='tight',pad_inches=0)
 
