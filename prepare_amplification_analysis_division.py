@@ -91,7 +91,8 @@ quencher_DF = pd.DataFrame(columns=['qtype_signi',
                                     'maxamplif',
                                     'maxquench_perc',
                                     'maxamplif_perc',
-                                    'RFdiam'])
+                                    'RFdiam',
+                                    'unit'])
 
 # loop SG units
 indx  = 0
@@ -227,7 +228,8 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
                 'maxamplif':maxamplif,
                 'maxquench_perc':maxquench_perc,
                 'maxamplif_perc':maxamplif_perc,
-                'RFdiam':RFdiam}
+                'RFdiam':RFdiam,
+                'unit':unit}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
@@ -350,7 +352,8 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
                 'maxamplif':maxamplif,
                 'maxquench_perc':maxquench_perc,
                 'maxamplif_perc':maxamplif_perc,
-                'RFdiam':RFdiam}
+                'RFdiam':RFdiam,
+                'unit':unit}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
@@ -474,7 +477,8 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
                 'maxamplif':maxamplif,
                 'maxquench_perc':maxquench_perc,
                 'maxamplif_perc':maxamplif_perc,
-                'RFdiam':RFdiam}
+                'RFdiam':RFdiam,
+                'unit':unit}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
     quencher_DF = quencher_DF.append(tmp_df,sort=True)
