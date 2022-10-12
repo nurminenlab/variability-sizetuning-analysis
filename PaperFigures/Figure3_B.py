@@ -9,7 +9,9 @@ import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
-import pdb
+#import pdb
+
+save_figures = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
@@ -66,31 +68,80 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
     vr_mtrx = SG_vr_data[unit]
     
     for stim in range(mn_mtrx.shape[0]):
-        if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus 
-            SG_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:]
+        if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus             
+            SG_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:] / np.mean(mn_mtrx[stim,bsl_begin:bsl_begin + 151])
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
             SG_fano[unit_indx,stim+1,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
-        else:
-            SG_mean[unit_indx,stim,:] = mn_mtrx[stim,:]
+        else:           
+            SG_mean[unit_indx,stim,:] = mn_mtrx[stim,:] / np.mean(mn_mtrx[stim,bsl_begin:bsl_begin + 151])
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
             SG_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
-plt.figure()
-fig, ax2 = plt.subplots(2,1)
-ax_fano = ax2.ravel()
-
+plt.figure(1,figsize=(1.335, 1.115))
+# plot smallest stimulus
+ax  = plt.subplot(211)
+ax2 = ax.twinx()
 t = np.arange(-150,600,1)
-for plt_idx, stim in enumerate([0,5]):
+stim = 0
+fano_PSTH    = np.nanmean(SG_fano[:,stim,bsl_begin:],axis=0)
+fano_PSTH_SE = np.nanstd(SG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_fano.shape[0])
 
-    fano_PSTH = np.nanmean(SG_fano[:,stim,bsl_begin:],axis=0)
-    fano_PSTH_SE = np.nanstd(SG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_fano.shape[0])
+PSTH    = np.nanmean(SG_mean[:,stim,bsl_begin:],axis=0)
+PSTH_SE = np.nanstd(SG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_fano.shape[0])
 
-    ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
-    ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
-    ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
-    ax_fano[plt_idx].set_xlim([-150,600])
+ax.fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red')
+ax.plot(t,fano_PSTH,'-',color=[0.5, 0, 0])
+ax.plot([t[0], t[-1]], [1, 1], 'r--')
+ax.set_ylim([0.5, 2.0])
+ax.set_xlim([-150,600])
+ax.tick_params(axis='y',color='red')
+ax.spines['left'].set_color('red')
+ax.tick_params(axis='y',colors='red',labelsize=8)
+ax.yaxis.label.set_color('red')
+ax.spines['top'].set_visible(False)
 
-plt.savefig(fig_dir + 'F3B_PSTH_SG_mean_normalized-fano_plot.svg')
+ax2.fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray')
+ax2.plot(t,PSTH,'k-')
+ax2.plot([t[0], t[-1]], [1, 1], 'k--')
+ax2.set_ylim([0, 20])
+ax2.set_xlim([-150,600])
+ax2.spines['left'].set_color('red')
+ax2.spines['top'].set_visible(False)
+ax2.tick_params(axis='y',labelsize=8)
+
+# 1 deg
+ax  = plt.subplot(212)
+ax2 = ax.twinx()
+t = np.arange(-150,600,1)
+stim = 5
+fano_PSTH    = np.nanmean(SG_fano[:,stim,bsl_begin:],axis=0)
+fano_PSTH_SE = np.nanstd(SG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_fano.shape[0])
+
+PSTH    = np.nanmean(SG_mean[:,stim,bsl_begin:],axis=0)
+PSTH_SE = np.nanstd(SG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(SG_fano.shape[0])
+
+ax.fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red')
+ax.plot(t,fano_PSTH,'-',color=[0.5, 0, 0])
+ax.plot([t[0], t[-1]], [1, 1], 'r--')
+ax.set_ylim([0.5, 2.0])
+ax.set_xlim([-150,600])
+ax.tick_params(axis='y',color='red')
+ax.spines['left'].set_color('red')
+ax.tick_params(axis='y',colors='red',labelsize=8)
+ax.yaxis.label.set_color('red')
+ax.spines['top'].set_visible(False)
+
+ax2.fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray')
+ax2.plot(t,PSTH,'k-')
+ax2.plot([t[0], t[-1]], [1, 1], 'k--')
+ax2.set_ylim([0, 20])
+ax2.set_xlim([-150,600])
+ax2.spines['left'].set_color('red')
+ax2.spines['top'].set_visible(False)
+ax2.tick_params(axis='y',labelsize=8)
+
+if save_figures:
+    plt.savefig(fig_dir + 'F3B_PSTH_SG_mean_normalized-fano_plot.svg')
 
 # collect G data
 #------------------------------------------------------------------------------
@@ -101,29 +152,81 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
     
     for stim in range(mn_mtrx.shape[0]):
         if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus 
-            G_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:]
+            G_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:] / np.mean(mn_mtrx[stim,bsl_begin:bsl_begin + 151])
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
             G_fano[unit_indx,stim+1,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
         else:
-            G_mean[unit_indx,stim,:] = mn_mtrx[stim,:]
+            G_mean[unit_indx,stim,:] = mn_mtrx[stim,:] / np.mean(mn_mtrx[stim,bsl_begin:bsl_begin + 151])
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
             G_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
-plt.figure()
-fig, ax2 = plt.subplots(2,1)
-ax_fano = ax2.ravel()
 
-for plt_idx, stim in enumerate([0,5]):
 
-    fano_PSTH = np.nanmean(G_fano[:,stim,bsl_begin:],axis=0)
-    fano_PSTH_SE = np.nanstd(G_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(G_fano.shape[0])
+plt.figure(2,figsize=(1.335, 1.115))
+# plot smallest stimulus
+ax  = plt.subplot(211)
+ax2 = ax.twinx()
+t = np.arange(-150,600,1)
+stim = 0
+fano_PSTH    = np.nanmean(G_fano[:,stim,bsl_begin:],axis=0)
+fano_PSTH_SE = np.nanstd(G_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(G_fano.shape[0])
 
-    ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
-    ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
-    ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
-    ax_fano[plt_idx].set_xlim([-150,600])
+PSTH    = np.nanmean(G_mean[:,stim,bsl_begin:],axis=0)
+PSTH_SE = np.nanstd(G_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(G_fano.shape[0])
 
-plt.savefig(fig_dir + 'F3B_PSTH_G_mean_normalized-fano_plot.svg')
+ax.fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red')
+ax.plot(t,fano_PSTH,'-',color=[0.5, 0, 0])
+ax.plot([t[0], t[-1]], [1, 1], 'r--')
+ax.set_ylim([0.5, 2.0])
+ax.set_xlim([-150,600])
+ax.tick_params(axis='y',color='red')
+ax.spines['left'].set_color('red')
+ax.tick_params(axis='y',colors='red',labelsize=8)
+ax.yaxis.label.set_color('red')
+ax.spines['top'].set_visible(False)
+
+ax2.fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray')
+ax2.plot(t,PSTH,'k-')
+ax2.plot([t[0], t[-1]], [1, 1], 'k--')
+ax2.set_ylim([0, 20])
+ax2.set_xlim([-150,600])
+ax2.spines['left'].set_color('red')
+ax2.spines['top'].set_visible(False)
+ax2.tick_params(axis='y',labelsize=8)
+
+# 1 deg
+ax  = plt.subplot(212)
+ax2 = ax.twinx()
+t = np.arange(-150,600,1)
+stim = 5
+fano_PSTH    = np.nanmean(G_fano[:,stim,bsl_begin:],axis=0)
+fano_PSTH_SE = np.nanstd(G_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(G_fano.shape[0])
+
+PSTH    = np.nanmean(G_mean[:,stim,bsl_begin:],axis=0)
+PSTH_SE = np.nanstd(G_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(G_fano.shape[0])
+
+ax.fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red')
+ax.plot(t,fano_PSTH,'-',color=[0.5, 0, 0])
+ax.plot([t[0], t[-1]], [1, 1], 'r--')
+ax.set_ylim([0.5, 2.0])
+ax.set_xlim([-150,600])
+ax.tick_params(axis='y',color='red')
+ax.spines['left'].set_color('red')
+ax.tick_params(axis='y',colors='red',labelsize=8)
+ax.yaxis.label.set_color('red')
+ax.spines['top'].set_visible(False)
+
+ax2.fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray')
+ax2.plot(t,PSTH,'k-')
+ax2.plot([t[0], t[-1]], [1, 1], 'k--')
+ax2.set_ylim([0, 20])
+ax2.set_xlim([-150,600])
+ax2.spines['left'].set_color('red')
+ax2.spines['top'].set_visible(False)
+ax2.tick_params(axis='y',labelsize=8)
+
+if save_figures:
+    plt.savefig(fig_dir + 'F3B_PSTH_G_mean_normalized-fano_plot.svg')
 
 # collect IG data
 #------------------------------------------------------------------------------
@@ -134,27 +237,76 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
     
     for stim in range(mn_mtrx.shape[0]):
         if mn_mtrx.shape[0] == 18: # if there is no 0.1 deg stimulus 
-            IG_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:]
+            IG_mean[unit_indx,stim+1,:] = mn_mtrx[stim,:] / np.mean(mn_mtrx[stim,bsl_begin:bsl_begin + 151])
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
             IG_fano[unit_indx,stim+1,:] = FF/np.mean(FF[bsl_begin:bsl_begin + 151])
         else:
-            IG_mean[unit_indx,stim,:] = mn_mtrx[stim,:]
+            IG_mean[unit_indx,stim,:] = mn_mtrx[stim,:] / np.mean(mn_mtrx[stim,bsl_begin:bsl_begin + 151])
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
             IG_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
 
-plt.figure()
-fig, ax2 = plt.subplots(2,1)
-ax_fano = ax2.ravel()
+plt.figure(3,figsize=(1.335, 1.115))
+# plot smallest stimulus
+ax  = plt.subplot(211)
+ax2 = ax.twinx()
+t = np.arange(-150,600,1)
+stim = 0
+fano_PSTH    = np.nanmean(IG_fano[:,stim,bsl_begin:],axis=0)
+fano_PSTH_SE = np.nanstd(IG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_fano.shape[0])
 
+PSTH    = np.nanmean(IG_mean[:,stim,bsl_begin:],axis=0)
+PSTH_SE = np.nanstd(IG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_fano.shape[0])
 
-for plt_idx, stim in enumerate([0,5]):
+ax.fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red')
+ax.plot(t,fano_PSTH,'-',color=[0.5, 0, 0])
+ax.plot([t[0], t[-1]], [1, 1], 'r--')
+ax.set_ylim([0.6, 1.3])
+ax.set_xlim([-150,600])
+ax.tick_params(axis='y',color='red')
+ax.spines['left'].set_color('red')
+ax.tick_params(axis='y',colors='red',labelsize=8)
+ax.yaxis.label.set_color('red')
+ax.spines['top'].set_visible(False)
 
-    fano_PSTH = np.nanmean(IG_fano[:,stim,bsl_begin:],axis=0)
-    fano_PSTH_SE = np.nanstd(IG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_fano.shape[0])
+ax2.fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray')
+ax2.plot(t,PSTH,'k-')
+ax2.plot([t[0], t[-1]], [1, 1], 'k--')
+ax2.set_ylim([0, 6])
+ax2.set_xlim([-150,600])
+ax2.spines['left'].set_color('red')
+ax2.spines['top'].set_visible(False)
+ax2.tick_params(axis='y',labelsize=8)
 
-    ax_fano[plt_idx].fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red',alpha=0.5)
-    ax_fano[plt_idx].plot(t,fano_PSTH,'r-')
-    ax_fano[plt_idx].plot([t[0], t[-1]], [1, 1], 'k--')
-    ax_fano[plt_idx].set_xlim([-150,600])
+# 1 deg
+ax  = plt.subplot(212)
+ax2 = ax.twinx()
+t = np.arange(-150,600,1)
+stim = 5
+fano_PSTH    = np.nanmean(IG_fano[:,stim,bsl_begin:],axis=0)
+fano_PSTH_SE = np.nanstd(IG_fano[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_fano.shape[0])
 
-plt.savefig(fig_dir + 'F3B_PSTH_IG_mean_normalized-fano_plot.svg')
+PSTH    = np.nanmean(IG_mean[:,stim,bsl_begin:],axis=0)
+PSTH_SE = np.nanstd(IG_mean[:,stim,bsl_begin:],axis=0)/np.sqrt(IG_fano.shape[0])
+
+ax.fill_between(t,fano_PSTH-fano_PSTH_SE,fano_PSTH+fano_PSTH_SE,color='red')
+ax.plot(t,fano_PSTH,'-',color=[0.5, 0, 0])
+ax.plot([t[0], t[-1]], [1, 1], 'r--')
+ax.set_ylim([0.6, 1.3])
+ax.set_xlim([-150,600])
+ax.tick_params(axis='y',color='red')
+ax.spines['left'].set_color('red')
+ax.tick_params(axis='y',colors='red',labelsize=8)
+ax.yaxis.label.set_color('red')
+ax.spines['top'].set_visible(False)
+
+ax2.fill_between(t,PSTH-PSTH_SE,PSTH+PSTH_SE,color='gray')
+ax2.plot(t,PSTH,'k-')
+ax2.plot([t[0], t[-1]], [1, 1], 'k--')
+ax2.set_ylim([0, 6])
+ax2.set_xlim([-150,600])
+ax2.spines['left'].set_color('red')
+ax2.spines['top'].set_visible(False)
+ax2.tick_params(axis='y',labelsize=8)
+
+if save_figures:
+    plt.savefig(fig_dir + 'F3B_PSTH_IG_mean_normalized-fano_plot.svg')

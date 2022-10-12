@@ -11,6 +11,8 @@ import data_analysislib as dalib
 import warnings
 warnings.filterwarnings('ignore')
 
+save_figures = True
+
 fig_dir  = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 dada_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
 
@@ -20,16 +22,19 @@ n_boots = 1000
 # Baseline mean and distribution plots factorized by layer and response type (amplifier vs. quencher)
 # ----------------------------------------------------------------------------------------------------------------------
 plt.figure()
+ax = plt.subplot(111)
 SEM = amplification_DF.groupby(['layer','qtype_signi'])['bsl'].sem()
-amplification_DF.groupby(['layer','qtype_signi'])['bsl'].mean().plot(kind='bar',yerr=SEM)
+amplification_DF.groupby(['layer','qtype_signi'])['bsl'].mean().plot(kind='bar',yerr=SEM,ax=ax,color='white',edgecolor='black')
+
 SG_mixer = amplification_DF.query('qtype_signi=="mixer" & layer=="SG"')
 SG_quencher = amplification_DF.query('qtype_signi=="quencher" & layer=="SG"')
 G_mixer = amplification_DF.query('qtype_signi=="mixer" & layer=="G"')
 G_quencher = amplification_DF.query('qtype_signi=="quencher" & layer=="G"')
 IG_mixer = amplification_DF.query('qtype_signi=="mixer" & layer=="IG"')
 IG_quencher = amplification_DF.query('qtype_signi=="quencher" & layer=="IG"')
-plt.ylim(0,7.5)
-plt.savefig(fig_dir+'Figure4-D-bsl-means.svg')
+ax.set_ylim(0,7.5)
+if save_figures:
+    plt.savefig(fig_dir+'Figure4-D-bsl-means.svg')
 
 
 print('Baseline difference between quenchers and mixers')
@@ -45,9 +50,12 @@ print('p-value G: ',sts.ttest_ind(G_mixer['bsl'],G_quencher['bsl'])[1])
 print('p-value IG: ',sts.ttest_ind(IG_mixer['bsl'],IG_quencher['bsl'])[1])
 
 plt.figure()
-sns.stripplot(x='layer',y='bsl',data=amplification_DF,hue='qtype_signi',dodge=True)
-plt.ylim(0,7.5)
-plt.savefig(fig_dir+'Figure4-D-bsl-distribution.svg')
+SZZ = 2
+ax = plt.subplot(111)
+sns.stripplot(x='layer',y='bsl',data=amplification_DF,hue='qtype_signi',dodge=True,ax=ax)
+ax.set_ylim(0,7.5)
+if save_figures:
+    plt.savefig(fig_dir+'Figure4-D-bsl-distribution.svg')
 
 lm = ols('bsl ~ C(qtype_signi) + C(layer)',data=amplification_DF).fit()
 table = sm.stats.anova_lm(lm,typ=1)
@@ -58,7 +66,8 @@ print(table)
 plt.figure()
 sns.barplot(y='bsl',x='layer',data=amplification_DF,alpha=0.5)
 sns.stripplot(y='bsl',x='layer',data=amplification_DF)
-plt.savefig(fig_dir+'Figure4-E-bsl-layers-only.svg')
+if save_figures:
+    plt.savefig(fig_dir+'Figure4-E-bsl-layers-only.svg')
 
 SG_layer = amplification_DF.query('layer=="SG"')
 G_layer = amplification_DF.query('layer=="G"')
@@ -73,7 +82,9 @@ print('G vs IG',sts.ttest_ind(G_layer['bsl'],IG_layer['bsl'])[1])
 plt.figure()
 sns.barplot(y='bsl',x='qtype_signi',data=amplification_DF,fc='gray')
 sns.stripplot(y='bsl',x='qtype_signi',data=amplification_DF,alpha=0.5)
-plt.savefig(fig_dir+'Figure4-E-bsl-responsetype_only.svg')
+
+if save_figures:
+    plt.savefig(fig_dir+'Figure4-E-bsl-responsetype_only.svg')
 
 mixer = amplification_DF.query('qtype_signi=="mixer"')
 quencher = amplification_DF.query('qtype_signi=="quencher"')
@@ -108,6 +119,10 @@ maxamplif_diam_RFnormed_bootstrap_IG = np.nan * np.ones(n_boots)
 
 # Compute RF normed stimulus diameter at maxquench and maxamplif
 # ----------------------------------------------------------------------------------------------------------------------
+SG = SG[~np.isnan(SG['maxamplif_diam'].values)]
+G = G[~np.isnan(G['maxamplif_diam'].values)]
+IG = IG[~np.isnan(IG['maxamplif_diam'].values)]
+
 # get indices to outliers
 # RF normed stimulus diameter at maxquench
 SG['RFnormed_maxquench_diam_outliers'] = SG['RFnormed_maxquench_diam'].apply(dalib.outlier,
@@ -219,7 +234,8 @@ ax.bar(np.array([0.75,2.75,4.75])+0.5,RFnormed_maxamplif_diam,yerr=RFnormed_maxa
 ax.set_ylim([0,6.0])
 ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
-plt.savefig(fig_dir+'Figure4-F-RFnormed-diameter-only.svg')
+if save_figures:
+    plt.savefig(fig_dir+'Figure4-F-RFnormed-diameter-only.svg')
 
 print('\nRF normed maxquench diameter:')
 print(RFnormed_maxquench_diam)
@@ -309,11 +325,12 @@ SE_maxamplif_ampli = np.array([SG_olRem_ampli['maxamplif'].sem(),
                                 IG_olRem_ampli['maxamplif'].sem()])
 
 ax = plt.subplot(1,2,2)
-ax.bar([0.75,2.75,4.75],mean_maxquench_ampli,yerr=SE_maxquench_ampli,fc='blue',ec='black',width=0.5)
+ax.bar([0.75,2.75,4.75],mean_maxquench_ampli, yerr=SE_maxquench_ampli,fc='blue',ec='black',width=0.5)
 ax.bar(np.array([0.75,2.75,4.75])+0.5,mean_maxamplif_ampli,yerr=SE_maxamplif_ampli,fc='orange',ec='black',width=0.5)
 ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
-plt.savefig(fig_dir+'Figure4-G-effect-magnitude.svg')
+if save_figures:
+    plt.savefig(fig_dir+'Figure4-G-effect-magnitude.svg')
 
 print('\nMean effect magnitude quench')
 print(mean_maxquench_ampli)
@@ -326,8 +343,6 @@ print('SEM')
 print(SE_maxamplif_ampli)
 
 
-
-
 print('Difference in amplification and quenching magnitude:')
 print('SG p-value', sts.ttest_ind(SG_olRem_ampli['maxquench-ampli'],aSG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
 print('G p-value', sts.ttest_ind(G_olRem_ampli['maxquench-ampli'],aG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
@@ -336,3 +351,35 @@ print('IG p-value', sts.ttest_ind(IG_olRem_ampli['maxquench-ampli'],aIG_olRem_am
 
 
 amplification_DF.groupby(['layer','qtype_signi']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum())
+
+# swarmplot RF normalized max quech and amplif stimulus diameters 
+plt.figure()
+SZZ = 2
+frame = [SG_olRem_diam, G_olRem_diam, IG_olRem_diam]
+QF = pd.concat(frame)
+
+ax = plt.subplot(2,2,1)
+sns.swarmplot(x='layer',y='RFnormed_maxquench_diam',data=QF,color='blue',size=SZZ)
+ax.set_ylim(0.05,70)
+ax.set_yscale('log')
+
+ax = plt.subplot(2,2,2)
+QF.groupby('layer')['RFnormed_maxquench_diam'].median().plot(kind='bar',yerr=RFnormed_maxquench_diam_SD, color='white',ec='black')
+ax.set_ylim(0.05,70)
+ax.set_yscale('log')
+
+frame = [aSG_olRem_diam, aG_olRem_diam, aIG_olRem_diam]
+aQF = pd.concat(frame)
+
+ax = plt.subplot(2,2,3)
+sns.swarmplot(x='layer',y='RFnormed_maxamplif_diam',data=aQF,color='orange',size=SZZ)
+ax.set_ylim(0.05,70)
+ax.set_yscale('log')
+
+ax = plt.subplot(2,2,4)
+aQF.groupby('layer')['RFnormed_maxamplif_diam'].median().plot(kind='bar',yerr=RFnormed_maxamplif_diam_SD, color='white',ec='black')
+ax.set_ylim(0.05,70)
+ax.set_yscale('log')
+
+plt.savefig(fig_dir+'Figure_3C-amp_quench_diameters.svg')
+

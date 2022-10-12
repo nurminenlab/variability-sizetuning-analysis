@@ -15,7 +15,6 @@ params = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
 FF_size = pd.DataFrame(columns=['fano','size','layer'])
 FF_size_all = pd.DataFrame(columns=['fano','size','layer'])
 
-
 FF_RF = pd.DataFrame(data={'fano':params['fit_fano_RF'].values,'size':['RF']*len(params.index),'layer':params['layer'].values})
 FF_LAR = pd.DataFrame(data={'fano':params['fit_fano_LAR'].values,'size':['LAR']*len(params.index),'layer':params['layer'].values})
 

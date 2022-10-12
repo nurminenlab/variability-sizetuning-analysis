@@ -69,7 +69,7 @@ params_df = pd.DataFrame(columns=['RFdiam','maxResponse','SI','baseline',
                                   'fit_fano_SUR','fit_fano_LAR',
                                   'fit_fano_BSL','fit_fano_MIN',
                                   'fit_fano_MAX','fit_fano_MAX_diam',
-                                  'fit_fano_MIN_diam'])
+                                  'fit_fano_MIN_diam', 'fit_fano_near_SUR'])
 mean_PSTHs = {}
 vari_PSTHs = {}
 mean_PSTHs_SG = {}
@@ -95,6 +95,7 @@ bsl_end   = bsl_begin + anal_time
 count_window = 100
 
 for unit in range(len(data)):
+    print('Unit: ',unit)
     for cont in contrast:
         if cont in data[unit].keys():
             # data selection
@@ -297,7 +298,7 @@ for unit in range(len(data)):
                     res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
 
                     Fhat = dalib.doubleROG(diams_tight,*res.x)                   
-
+                    
                     # collect parameters from the fits and set bg to gray for shitty fits
                     if unit in excluded_fits:                        
                         fit_fano_SML = np.nan
@@ -307,6 +308,7 @@ for unit in range(len(data)):
                         fit_fano_BSL = np.nan
                         fit_fano_MIN = np.nan
                         fit_fano_MAX = np.nan
+                        fit_fano_near_SUR = np.nan
 
                         fit_fano_MAX_diam = np.nan
                         fit_fano_MIN_diam = np.nan
@@ -320,6 +322,7 @@ for unit in range(len(data)):
                         fit_fano_BSL = np.mean(bsl_container)
                         fit_fano_MIN = np.max((np.min(Fhat),0)) # in case of negative values resulting from bad fits
                         fit_fano_MAX = np.max(Fhat)
+                        fit_fano_near_SUR = dalib.doubleROG(diams_tight[np.argmax(Rhat)]*2,*res.x)
 
                         fit_fano_MAX_diam = diams_tight[np.argmax(Fhat)]
                         fit_fano_MIN_diam = diams_tight[np.argmin(Fhat)]
@@ -350,7 +353,8 @@ for unit in range(len(data)):
                                 'fit_fano_MIN':fit_fano_MIN,
                                 'fit_fano_MAX':fit_fano_MAX,
                                 'fit_fano_MIN_diam':fit_fano_MIN_diam,
-                                'fit_fano_MAX_diam':fit_fano_MAX_diam}
+                                'fit_fano_MAX_diam':fit_fano_MAX_diam,
+                                'fit_fano_near_SUR':fit_fano_near_SUR}
 
                     tmp_df = pd.DataFrame(para_tmp, index=[indx])
                     params_df = params_df.append(tmp_df,sort=True)
@@ -358,7 +362,7 @@ for unit in range(len(data)):
                     
 
 # save data
-params_df.to_csv(S_dir+'extracted_params-Dec-2021.csv')
+params_df.to_csv(S_dir+'extracted_params-Oct-2022.csv')
 
 with open(S_dir + 'mean_PSTHs-MK-MU-Dec-2021.pkl','wb') as f:
     pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)

@@ -12,6 +12,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
+fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
 save_figures = True
@@ -100,9 +101,9 @@ fig1,fig2 = process(data,IG_mn_data,bsl_begin,t,diams)
 
 plt.figure(fig1)
 if save_figures:
-    plt.savefig(S_dir+'amplification_example-rasters.eps')
+    plt.savefig(fig_dir+'F3A-amplification_example-rasters.eps')
 plt.figure(fig2)
 if save_figures:
-    plt.savefig(S_dir+'amplification_example.svg')
+    plt.savefig(fig_dir+'F3A-amplification_example-PSTHs.svg')
 
 

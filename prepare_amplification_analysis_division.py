@@ -13,6 +13,8 @@ import pdb
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
+save_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
+
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
 # analysis done between these timepoints
@@ -480,4 +482,4 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
 
 
 # save results
-quencher_DF.to_csv('amplification_DF_division.csv')
+quencher_DF.to_csv(save_dir+'amplification_DF_division.csv')
