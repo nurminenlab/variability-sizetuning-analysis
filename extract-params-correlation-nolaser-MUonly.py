@@ -15,6 +15,7 @@ import pandas as pd
 from scipy.optimize import curve_fit
 from scipy.optimize import basinhopping
 
+
 plot_rasters = False
 cont_wndw_length = 100
 boot_num = int(1e3)
@@ -124,7 +125,7 @@ means_all = {}
 indx = 0
 
 # analysis done between these timepoints
-anal_duration = 400
+anal_duration = 300
 first_tp  = 450
 last_tp   = first_tp + anal_duration
 bsl_begin = 120
@@ -152,17 +153,17 @@ for pair in range(len(data)):
             if u1_responsive and u2_responsive and anipe != 'MM385P1' and anipe != 'MM385P2': # because of the poor quality of the data in MM385P1 and MM385P2
                 print('Now analyzing pair ',pair)
 
-                u1_response_mean = np.mean(data[pair][100.0]['spkC_NoL_pair1'],axis=0)
-                u1_response_SE = np.std(data[pair][100.0]['spkC_NoL_pair1'],axis=0) / np.sqrt(data[pair][100.0]['spkC_NoL_pair1'].shape[0])
-                u2_response_mean = np.mean(data[pair][100.0]['spkC_NoL_pair2'],axis=0)
-                u2_response_SE = np.std(data[pair][100.0]['spkC_NoL_pair2'],axis=0) / np.sqrt(data[pair][100.0]['spkC_NoL_pair2'].shape[0])
+                u1_response_mean = np.mean(np.sum(data[pair][100.0]['spkR_NoL_pair1'][:,:,first_tp:last_tp],axis=2),axis=0)
+                u1_response_SE = np.std(np.sum(data[pair][100.0]['spkR_NoL_pair1'][:,:,first_tp:last_tp],axis=2),axis=0) / np.sqrt(data[pair][100.0]['spkR_NoL_pair1'].shape[0])
+                u2_response_mean = np.mean(np.sum(data[pair][100.0]['spkR_NoL_pair2'][:,:,first_tp:last_tp],axis=2),axis=0)
+                u2_response_SE = np.std(np.sum(data[pair][100.0]['spkC_NoL_pair2'][:,:,first_tp:last_tp],axis=2),axis=0) / np.sqrt(data[pair][100.0]['spkR_NoL_pair2'].shape[0])
                 
                 R1 = np.reshape(u1_response_mean,(1,u1_response_mean.shape[0]))
                 R2 = np.reshape(u2_response_mean,(1,u2_response_mean.shape[0]))
                 gm_response = sts.mstats.gmean(np.concatenate((R1,R2)))
-                gm_response_SE = np.ones(data[pair][100.0]['spkC_NoL_pair1'].shape)
-                for pp in range(data[pair][100.0]['spkC_NoL_pair1'].shape[0]):
-                    gm_response_SE[pp,:] = np.sqrt(data[pair][100.0]['spkC_NoL_pair1'][pp,:] * data[pair][100.0]['spkC_NoL_pair2'][pp,:])
+                gm_response_SE = np.ones(data[pair][100.0]['spkR_NoL_pair1'].shape)
+                for pp in range(data[pair][100.0]['spkR_NoL_pair1'].shape[0]):
+                    gm_response_SE[pp,:] = np.sqrt(data[pair][100.0]['spkR_NoL_pair1'][pp,:] * data[pair][100.0]['spkR_NoL_pair2'][pp,:])
                     
                 # 
                 gm_response_SE = np.std(gm_response_SE,axis=0) / np.sqrt(data[pair][100.0]['spkC_NoL_pair1'].shape[0])
@@ -467,7 +468,7 @@ for pair in range(len(data)):
 
 
 
-params_df.to_csv(S_dir+'extracted_correlation_params.csv')
+params_df.to_csv(S_dir+'extracted_correlation_params-October-2022.csv')
 
 # save data means
 with open(S_dir + 'means.pkl','wb') as f:
