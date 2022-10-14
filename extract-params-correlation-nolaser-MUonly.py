@@ -134,7 +134,7 @@ count_window = np.array([100])
 
 print('N pairs total ',len(data))
 for pair in range(len(data)):
-
+    
     for cont in contrast:
         if cont in data[pair].keys():
             # data selection
@@ -156,7 +156,7 @@ for pair in range(len(data)):
                 u1_response_mean = np.mean(np.sum(data[pair][100.0]['spkR_NoL_pair1'][:,:,first_tp:last_tp],axis=2),axis=0)
                 u1_response_SE = np.std(np.sum(data[pair][100.0]['spkR_NoL_pair1'][:,:,first_tp:last_tp],axis=2),axis=0) / np.sqrt(data[pair][100.0]['spkR_NoL_pair1'].shape[0])
                 u2_response_mean = np.mean(np.sum(data[pair][100.0]['spkR_NoL_pair2'][:,:,first_tp:last_tp],axis=2),axis=0)
-                u2_response_SE = np.std(np.sum(data[pair][100.0]['spkC_NoL_pair2'][:,:,first_tp:last_tp],axis=2),axis=0) / np.sqrt(data[pair][100.0]['spkR_NoL_pair2'].shape[0])
+                u2_response_SE = np.std(np.sum(data[pair][100.0]['spkR_NoL_pair2'][:,:,first_tp:last_tp],axis=2),axis=0) / np.sqrt(data[pair][100.0]['spkR_NoL_pair2'].shape[0])
                 
                 R1 = np.reshape(u1_response_mean,(1,u1_response_mean.shape[0]))
                 R2 = np.reshape(u2_response_mean,(1,u2_response_mean.shape[0]))
@@ -363,7 +363,9 @@ for pair in range(len(data)):
                     pair_num            = np.nan
                     
                 else:
-                    u1_fit_correlation_SML = Corr_hat[0]
+                    # to accommodate for rounding errors
+                    ind02 = np.argmin(np.abs(data[1]['info']['diam'] - 0.2))
+                    u1_fit_correlation_SML = Corr_hat[ind02]
                     u1_fit_correlation_RF  = Corr_hat[np.argmax(u1_Rhat)]
                     u1_fit_correlation_SUR = Corr_hat[u1_surr_ind_narrow_new]
                     u1_fit_correlation_LAR = Corr_hat[-1]
@@ -375,7 +377,7 @@ for pair in range(len(data)):
                     u1_fit_RF            = diams_tight[np.argmax(u1_Rhat)]
                     u1_fit_surr          = diams_tight[u1_surr_ind_narrow_new]
 
-                    u2_fit_correlation_SML = Corr_hat[0]
+                    u2_fit_correlation_SML = Corr_hat[ind02]
                     u2_fit_correlation_RF  = Corr_hat[np.argmax(u2_Rhat)]
                     u2_fit_correlation_SUR = Corr_hat[u2_surr_ind_narrow_new]
                     u2_fit_correlation_LAR = Corr_hat[-1]
@@ -387,7 +389,7 @@ for pair in range(len(data)):
                     u2_fit_RF            = diams_tight[np.argmax(u2_Rhat)]
                     u2_fit_surr          = diams_tight[u2_surr_ind_narrow_new]
 
-                    gm_fit_correlation_SML = Corr_hat[0]
+                    gm_fit_correlation_SML = Corr_hat[ind02]
                     gm_fit_correlation_RF  = Corr_hat[np.argmax(gm_Rhat)]
                     gm_fit_correlation_SUR = Corr_hat[gm_surr_ind_narrow_new]
                     gm_fit_correlation_LAR = Corr_hat[-1]
