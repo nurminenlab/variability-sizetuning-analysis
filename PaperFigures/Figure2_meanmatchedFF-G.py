@@ -22,13 +22,13 @@ MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 with open(F_dir + MUdatfile,'rb') as f:
     data = pkl.load(f)
 
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
 
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
 
-with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-MU.pkl','rb') as f:
     diams_data = pkl.load(f)
 
 
@@ -121,7 +121,8 @@ this_col = 1
 axes[this_row,this_col].fill_between(t,(fano_RF2) - np.nanstd(fano_boot_RF2,axis=0),(fano_RF2) + np.nanstd(fano_boot_RF2,axis=0),color='b',alpha=0.5)
 axes[this_row,this_col].fill_between(t,(fano_LAR) - np.nanstd(fano_boot_LAR,axis=0),(fano_LAR) + np.nanstd(fano_boot_LAR,axis=0),color='r',alpha=0.5)
 
-plt.savefig(fig_dir+'mean-matched-PSTHs.svg')
+if save_figures:
+    plt.savefig(fig_dir+'F2-G-mean-matched-PSTHs.svg')
 
 plt.figure(2)
 ax = plt.subplot(2,2,1)
@@ -143,14 +144,16 @@ ax.bar([1,2],
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.2','0.4'])
 ax.set_ylabel('Firing rate (Hz)')
-plt.savefig(fig_dir+'mean-matched-averages-SMLRF.svg')
+
+if save_figures:
+    plt.savefig(fig_dir+'F2-G-mean-matched-averages-SMLRF.svg')
 
 
 plt.figure(3)
 ax = plt.subplot(2,2,1)
 ax.bar([1,2],
     np.array([np.mean(fano_RF2),
-    np.mean(fano_LAR)]),
+    np.nanmean(fano_LAR)]),
     yerr=[3.96*np.nanstd(np.nanmean(fano_boot_RF2,axis=1)),3.96*np.nanstd(np.nanmean(fano_boot_LAR,axis=1))],
     color=['b','r'])
 ax.set_ylabel('Fano factor')
@@ -167,5 +170,6 @@ ax.set_xticks([1,2])
 ax.set_xticklabels(['0.4','26'])
 ax.set_ylabel('Firing rate (Hz)')
 
-plt.savefig(fig_dir+'mean-matched-averages-RFLAR.svg')
+if save_figures:
+    plt.savefig(fig_dir+'F2-G-mean-matched-averages-RFLAR.svg')
 

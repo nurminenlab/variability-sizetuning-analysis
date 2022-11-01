@@ -1,0 +1,179 @@
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+import pickle as pkl
+import pandas as pd
+import seaborn as sns
+#import pdb
+import statsmodels.api as sm
+
+import sys
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
+import data_analysislib as dalib
+from scipy.optimize import basinhopping, curve_fit
+
+import scipy.stats as sts
+
+# this way of computing the mean firing-rate functions is cumbersome but we do it this way for consistency with the other scripts
+
+save_figures = False
+
+S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
+
+data_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
+
+SG_netvariance = np.load(data_dir+'netvariance_all_SG.npy')
+IG_netvariance = np.load(data_dir+'netvariance_all_IG.npy')
+
+SG_meanresponses = np.load(data_dir+'mean_response_all_SG.npy')
+IG_meanresponses = np.load(data_dir+'mean_response_all_IG.npy')
+
+count_window = 100
+
+def cost_response(params,xdata,ydata):
+    Rhat = dalib.ROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
+
+def cost_fano(params,xdata,ydata):
+    Rhat = dalib.doubleROG(xdata,*params)
+    err  = np.sum(np.power(Rhat - ydata,2))
+    return err
+
+# this dataframe holds params for each unit
+params_df = pd.DataFrame(columns=['layer',
+                                'anipe',
+                                'ntrials',                                  
+                                'fit_FA_SML',
+                                'fit_FA_RF',
+                                'fit_FA_SUR',
+                                'fit_FA_LAR',
+                                'fit_FA_BSL',
+                                'fit_FA_MIN',
+                                'fit_FA_MAX',
+                                'fit_FA_MAX_diam',
+                                'fit_FA_MIN_diam'])
+
+
+# loop
+indx = 0
+for u in range(SG_netvariance.shape[0]):
+    print('Now analysing unit ',u)
+
+    if np.isnan(SG_netvariance[u,0]):
+        diams = np.array([0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
+        diams_tight = np.logspace(np.log10(diams[0]),np.log10(diams[-1]),1000)
+        FR = SG_meanresponses[u,1:]
+        FA = SG_netvariance[u,1:]
+    else:
+        diams = np.array([0.1, 0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
+        diams_tight = np.logspace(np.log10(diams[0]),np.log10(diams[-1]),1000)
+        FR = SG_meanresponses[u,:]
+        FA = SG_netvariance[u,:]
+    # fit FR data
+    try:
+        FR_popt,pcov = curve_fit(dalib.ROG,diams,FR,bounds=(0,np.inf),maxfev=100000)
+    except:
+        args = (diams,FR)
+        bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+        res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+        FR_popt = res.x
+
+    # fit netvariance data
+    args = (diams,FA)
+    bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+    res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
+    FA_popt = res.x
+
+    Rhat  = dalib.ROG(diams_tight,*FR_popt)
+    FAhat = dalib.doubleROG(diams_tight,*FA_popt)
+
+    # compute gradient for surround size detection
+    GG = np.gradient(Rhat,diams_tight)
+    GG_min_ind = np.argmin(GG)
+    if GG_min_ind == Rhat.shape[0] - 1:
+        surr_ind_narrow_new = Rhat.shape[0] -1
+    else:
+        if np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0].size != 0:
+            surr_ind_narrow_new = np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0][0] + GG_min_ind
+        else:
+            surr_ind_narrow_new = -1
+    
+    # 
+    surr_narrow_new = diams_tight[surr_ind_narrow_new]
+
+    para_tmp = {'layer':'SG',                                                               
+                'fit_FA_SML':FAhat[0],
+                'fit_FA_RF':FAhat[np.argmax(Rhat)],
+                'fit_FA_SUR':FAhat[surr_ind_narrow_new],
+                'fit_FA_LAR':FAhat[-1],                
+                'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
+                'fit_FA_MAX':np.max(FAhat),
+                'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
+                'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)]}
+
+    tmp_df = pd.DataFrame(para_tmp, index=[indx])
+    params_df = params_df.append(tmp_df,sort=True)
+    indx = indx + 1
+
+for u in range(IG_netvariance.shape[0]):
+    if np.isnan(IG_netvariance[u,0]):
+        diams = np.array([0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
+        diams_tight = np.logspace(np.log10(diams[0]),np.log10(diams[-1]),1000)
+        FR = IG_meanresponses[u,1:]
+        FA = IG_netvariance[u,1:]
+    else:
+        diams = np.array([0.1, 0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
+        diams_tight = np.logspace(np.log10(diams[0]),np.log10(diams[-1]),1000)
+        FR = IG_meanresponses[u,:]
+        FA = IG_netvariance[u,:]
+
+    # fit FR data
+    try:
+        FR_popt,pcov = curve_fit(dalib.ROG,diams, FR,bounds=(0,np.inf),maxfev=100000)
+    except:
+        args = (diams,FR)
+        bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+        res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+        FR_popt = res.x
+
+    # fit netvariance data
+    args = (diams,FA)
+    bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+    res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
+    FA_popt = res.x
+
+    Rhat  = dalib.ROG(diams_tight,*FR_popt)
+    FAhat = dalib.doubleROG(diams_tight,*FA_popt)
+
+    # compute gradient for surround size detection
+    GG = np.gradient(Rhat,diams_tight)
+    GG_min_ind = np.argmin(GG)
+    if GG_min_ind == Rhat.shape[0] - 1:
+        surr_ind_narrow_new = Rhat.shape[0] -1
+    else:
+        if np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0].size != 0:
+            surr_ind_narrow_new = np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0][0] + GG_min_ind
+        else:
+            surr_ind_narrow_new = -1
+    
+    # 
+    surr_narrow_new = diams_tight[surr_ind_narrow_new]
+
+    para_tmp = {'layer':'IG',                                                               
+                'fit_FA_SML':FAhat[0],
+                'fit_FA_RF':FAhat[np.argmax(Rhat)],
+                'fit_FA_SUR':FAhat[surr_ind_narrow_new],
+                'fit_FA_LAR':FAhat[-1],                
+                'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
+                'fit_FA_MAX':np.max(FAhat),
+                'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
+                'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)]}
+
+    tmp_df = pd.DataFrame(para_tmp, index=[indx])
+    params_df = params_df.append(tmp_df,sort=True)
+    indx = indx + 1
+
+# save data
+params_df.to_csv(S_dir+'FA-params-Oct-2022.csv')
