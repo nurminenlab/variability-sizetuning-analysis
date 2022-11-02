@@ -272,6 +272,9 @@ ax.tick_params(axis='y',colors='red')
 ax.set_ylabel('Shared variance (au)',color='red')
 ax.set_title('SG')
 
+if save_figures:
+    plt.savefig(fig_dir+'Figure5A_SG.svg',bbox_inches='tight')
+
 plt.figure()
 ax = plt.subplot(111)
 ax2 = ax.twinx()
@@ -291,6 +294,9 @@ ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
 ax.set_ylabel('Shared variance (au)',color='red')
 ax.set_title('G')
+
+if save_figures:
+    plt.savefig(fig_dir+'Figure5A_G.svg',bbox_inches='tight')
 
 plt.figure()
 ax = plt.subplot(111)
@@ -312,3 +318,6 @@ ax.tick_params(axis='y',colors='red')
 ax.tick_params(axis='y',colors='red')
 ax.set_ylabel('Shared variance (au)',color='red')
 ax.set_title('IG')
+
+if save_figures:
+    plt.savefig(fig_dir+'Figure5A_IG.svg',bbox_inches='tight')

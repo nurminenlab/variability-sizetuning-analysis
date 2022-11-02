@@ -116,30 +116,14 @@ diams = [0.1, 0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 
 
 mean_response_all_SG = mean_response_all_SG./0.08;
 mean_response_all_IG = mean_response_all_IG./0.08;
+mean_response_all_G  = mean_response_all_G./0.08;
 
-subplot(2,2,1)
-hold on 
-errorbar(diams, nanmean(netvariance_all_SG,1),nanstd(netvariance_all_SG,1)./sqrt(size(netvariance_all_SG,1)),'ro') %#ok<*NANSTD,*NANMEAN> 
-errorbar(diams, nanmean(mean_response_all_SG,1),nanstd(mean_response_all_SG,1)./sqrt(size(mean_response_all_SG,1)),'ko-')
-set(gca,'XScale','log')
-set(gca,'XTick', [0.1, 1, 10])
-set(gca,'TickDir','out')
-axis([0.05 30 0.2 1])
-box off
-title('SG')
-xlabel('Grating diameter (deg)')
-ylabel('Network variance (au)')
+writeNPY(netvariance_all_SG,'netvariance_all_SG.npy');
+writeNPY(mean_response_all_SG,'mean_response_all_SG.npy');
 
+writeNPY(netvariance_all_G,'netvariance_all_G.npy');
+writeNPY(mean_response_all_G,'mean_response_all_G.npy');
 
-subplot(2,2,2)
-errorbar(diams, nanmean(netvariance_all_IG,1),nanstd(netvariance_all_IG,1)./sqrt(size(netvariance_all_IG,1)),'ro') %#ok<*NANSTD,*NANMEAN> 
-errorbar(diams, nanmean(mean_response_all_IG,1),nanstd(mean_response_all_IG,1)./sqrt(size(mean_response_all_IG,1)),'ko-')
-set(gca,'XScale','log')
-set(gca,'XTick', [0.1, 1, 10])
-set(gca,'TickDir','out')
-axis([0.05 30 0.1 0.8])
-box off
-title('IG')
-xlabel('Grating diameter (deg)')
-ylabel('Network variance (au)')
+writeNPY(netvariance_all_IG,'netvariance_all_IG.npy');
+writeNPY(mean_response_all_IG,'mean_response_all_IG.npy');
 

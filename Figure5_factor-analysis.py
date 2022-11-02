@@ -97,16 +97,5 @@ lm = ols('FFsurfac ~ C(layer)',data=params).fit()
 print(sm.stats.anova_lm(lm,typ=1))
 
 print('\n t-test FFsurfac different from zero')
-print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac'],0)))
+print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac'],0,alternative='greater')))
 
-plt.figure()
-ax = plt.subplot(111)
-sns.scatterplot(x='SI',y='FFsurfac',hue='layer',data=params,ax=ax)
-ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
-ax.set_xlabel('Suppression Index')
-ax.set_ylabel('Fano Factor change (%)')
-if save_figures:
-    plt.savefig(fig_dir + 'F2D.svg',bbox_inches='tight',pad_inches=0)
-
-print('\n test on correlation between FFsurfac and SI')
-print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI'],df['FFsurfac'])))
