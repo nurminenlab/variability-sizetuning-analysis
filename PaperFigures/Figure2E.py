@@ -14,7 +14,7 @@ quencher_DF = pd.read_csv(anal_root+'quencher_DF_regression.csv')
 # bar graph of the proportion of quenchers in each layer
 ax = plt.subplot(111)
 quencher_DF.groupby(['layer','FF_sup']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()).unstack().plot(kind='bar', stacked=True, ax=ax,color=['red','grey','blue'])
-plt.savefig(fig_dir + 'F2E.svg',bbox_inches='tight',pad_inches=0)
+#plt.savefig(fig_dir + 'F2E.svg',bbox_inches='tight',pad_inches=0)
 # the proportion of quenchers 
 print('\n The proportion of quenchers:')
 print(quencher_DF.groupby(['FF_sup']).size() / len(quencher_DF))

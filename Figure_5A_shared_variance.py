@@ -15,7 +15,6 @@ from scipy.optimize import basinhopping, curve_fit
 import scipy.stats as sts
 
 # this way of computing the mean firing-rate functions is cumbersome but we do it this way for consistency with the other scripts
-
 save_figures = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
@@ -26,6 +25,11 @@ data_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/vari
 SG_netvariance = np.load(data_dir+'netvariance_all_SG.npy')
 G_netvariance  = np.load(data_dir+'netvariance_all_G.npy')
 IG_netvariance = np.load(data_dir+'netvariance_all_IG.npy')
+
+bsl_SG_netvariance = np.load(data_dir+'bsl_netvariance_all_SG.npy')
+bsl_G_netvariance  = np.load(data_dir+'bsl_netvariance_all_G.npy')
+bsl_IG_netvariance = np.load(data_dir+'bsl_netvariance_all_IG.npy')
+
 
 # analysis done between these timepoints
 anal_duration = 400
@@ -258,12 +262,15 @@ ax2 = ax.twinx()
 SEM = SG_params.groupby(['diam'])['FR'].sem()
 SG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM,ax=ax2,kind='line',fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.plot(diams_tight,SG_Rhat,'k-',lw=2)
+ax2.plot([SG_params['diam'].min(),SG_params['diam'].max()],
+        [SG_params['bsl_FR'].mean()/(count_window/1000),SG_params['bsl_FR'].mean()/(count_window/1000)],'k--',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Firing rate (Hz)',color='k')
 
 SG_netshare_tune_SEM = np.nanstd(SG_netvariance,axis=0)/np.sqrt(SG_netvariance.shape[0])
 ax.errorbar(diams,SG_netshare_tune,yerr=SG_netshare_tune_SEM,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.plot(diams_tight,SG_Fhat,'r-',lw=2)
+ax.plot([SG_params['diam'].min(),SG_params['diam'].max()],[np.nanmean(bsl_SG_netvariance),np.nanmean(bsl_SG_netvariance)],'r--',lw=1)
 ax.set_xscale('log')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
@@ -281,12 +288,15 @@ ax2 = ax.twinx()
 SEM = G_params.groupby(['diam'])['FR'].sem()
 G_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM,ax=ax2,kind='line',fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.plot(diams_tight,G_Rhat,'k-',lw=2)
+ax2.plot([G_params['diam'].min(),G_params['diam'].max()],
+        [G_params['bsl_FR'].mean()/(count_window/1000),G_params['bsl_FR'].mean()/(count_window/1000)],'k--',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Firing rate (Hz)',color='k')
 
 G_netshare_tune_SEM = np.nanstd(G_netvariance,axis=0)/np.sqrt(G_netvariance.shape[0])
 ax.errorbar(diams,G_netshare_tune,yerr=G_netshare_tune_SEM,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.plot(diams_tight,G_Fhat,'r-',lw=2)
+ax.plot([G_params['diam'].min(),G_params['diam'].max()],[np.nanmean(bsl_G_netvariance),np.nanmean(bsl_G_netvariance)],'r--',lw=1)
 ax.set_xscale('log')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
@@ -303,6 +313,8 @@ ax = plt.subplot(111)
 ax2 = ax.twinx()
 SEM = IG_params.groupby(['diam'])['FR'].sem()
 IG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM,ax=ax2,kind='line',fmt='ko',markersize=4,mfc='None',lw=1)
+ax2.plot([IG_params['diam'].min(),IG_params['diam'].max()],
+        [IG_params['bsl_FR'].mean()/(count_window/1000),IG_params['bsl_FR'].mean()/(count_window/1000)],'k--',lw=1)
 ax2.plot(diams_tight,IG_Rhat,'k-',lw=2)
 ax2.set_xscale('log')
 ax2.set_ylabel('Firing rate (Hz)',color='k')
@@ -310,6 +322,7 @@ ax2.set_ylabel('Firing rate (Hz)',color='k')
 IG_netshare_tune_SEM = np.nanstd(IG_netvariance,axis=0)/np.sqrt(IG_netvariance.shape[0])
 ax.errorbar(diams,IG_netshare_tune,yerr=IG_netshare_tune_SEM,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.plot(diams_tight,IG_Fhat,'r-',lw=2)
+ax.plot([IG_params['diam'].min(),IG_params['diam'].max()],[np.nanmean(bsl_IG_netvariance),np.nanmean(bsl_IG_netvariance)],'r--',lw=1)
 ax2.set_xscale('log')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')

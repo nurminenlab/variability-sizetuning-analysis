@@ -24,9 +24,15 @@ fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/In
 data_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
 
 SG_netvariance = np.load(data_dir+'netvariance_all_SG.npy')
+G_netvariance  = np.load(data_dir+'netvariance_all_G.npy')
 IG_netvariance = np.load(data_dir+'netvariance_all_IG.npy')
 
+bsl_SG_netvariance = np.load(data_dir+'bsl_netvariance_all_SG.npy')
+bsl_G_netvariance  = np.load(data_dir+'bsl_netvariance_all_G.npy')
+bsl_IG_netvariance = np.load(data_dir+'bsl_netvariance_all_IG.npy')
+
 SG_meanresponses = np.load(data_dir+'mean_response_all_SG.npy')
+G_meanresponses  = np.load(data_dir+'mean_response_all_G.npy')
 IG_meanresponses = np.load(data_dir+'mean_response_all_IG.npy')
 
 count_window = 100
@@ -103,6 +109,7 @@ for u in range(SG_netvariance.shape[0]):
     # 
     surr_narrow_new = diams_tight[surr_ind_narrow_new]
 
+    BSL = np.nanmean(bsl_SG_netvariance[u,:])
     para_tmp = {'layer':'SG',                                                               
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
@@ -111,7 +118,67 @@ for u in range(SG_netvariance.shape[0]):
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
                 'fit_FA_MAX':np.max(FAhat),
                 'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
-                'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)]}
+                'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)],
+                'fit_FA_BSL':BSL}
+
+    tmp_df = pd.DataFrame(para_tmp, index=[indx])
+    params_df = params_df.append(tmp_df,sort=True)
+    indx = indx + 1
+
+for u in range(G_netvariance.shape[0]):
+    if np.isnan(G_netvariance[u,0]):
+        diams = np.array([0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
+        diams_tight = np.logspace(np.log10(diams[0]),np.log10(diams[-1]),1000)
+        FR = G_meanresponses[u,1:]
+        FA = G_netvariance[u,1:]
+    else:
+        diams = np.array([0.1, 0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
+        diams_tight = np.logspace(np.log10(diams[0]),np.log10(diams[-1]),1000)
+        FR = G_meanresponses[u,:]
+        FA = G_netvariance[u,:]
+
+    # fit FR data
+    try:
+        FR_popt,pcov = curve_fit(dalib.ROG,diams, FR,bounds=(0,np.inf),maxfev=100000)
+    except:
+        args = (diams,FR)
+        bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+        res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+        FR_popt = res.x
+
+    # fit netvariance data
+    args = (diams,FA)
+    bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
+    res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
+    FA_popt = res.x
+
+    Rhat  = dalib.ROG(diams_tight,*FR_popt)
+    FAhat = dalib.doubleROG(diams_tight,*FA_popt)
+
+    # compute gradient for surround size detection
+    GG = np.gradient(Rhat,diams_tight)
+    GG_min_ind = np.argmin(GG)
+    if GG_min_ind == Rhat.shape[0] - 1:
+        surr_ind_narrow_new = Rhat.shape[0] -1
+    else:
+        if np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0].size != 0:
+            surr_ind_narrow_new = np.where(GG[GG_min_ind:] >= 0.1 * GG[GG_min_ind])[0][0] + GG_min_ind
+        else:
+            surr_ind_narrow_new = -1
+    
+    # 
+    surr_narrow_new = diams_tight[surr_ind_narrow_new]
+    BSL = np.nanmean(bsl_G_netvariance[u,:])
+    para_tmp = {'layer':'G',                                                               
+                'fit_FA_SML':FAhat[0],
+                'fit_FA_RF':FAhat[np.argmax(Rhat)],
+                'fit_FA_SUR':FAhat[surr_ind_narrow_new],
+                'fit_FA_LAR':FAhat[-1],                
+                'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
+                'fit_FA_MAX':np.max(FAhat),
+                'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
+                'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)],
+                'fit_FA_BSL':BSL}
 
     tmp_df = pd.DataFrame(para_tmp, index=[indx])
     params_df = params_df.append(tmp_df,sort=True)
@@ -160,7 +227,7 @@ for u in range(IG_netvariance.shape[0]):
     
     # 
     surr_narrow_new = diams_tight[surr_ind_narrow_new]
-
+    BSL = np.nanmean(bsl_IG_netvariance[u,:])
     para_tmp = {'layer':'IG',                                                               
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
@@ -169,7 +236,8 @@ for u in range(IG_netvariance.shape[0]):
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
                 'fit_FA_MAX':np.max(FAhat),
                 'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
-                'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)]}
+                'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)],
+                'fit_FA_BSL':BSL}
 
     tmp_df = pd.DataFrame(para_tmp, index=[indx])
     params_df = params_df.append(tmp_df,sort=True)
