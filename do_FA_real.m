@@ -126,6 +126,15 @@ for i = 1:length(penetrations)
 
     end
 
+
+    writeNPY(netvariance_SG,['netvariance_SG',penetrations{i},'.npy']);
+    writeNPY(netvariance_G,['netvariance_G',penetrations{i},'.npy']);
+    writeNPY(netvariance_IG,['netvariance_IG',penetrations{i},'.npy']);
+
+    writeNPY(bsl_netvariance_SG,['bsl_netvariance_SG',penetrations{i},'.npy']);
+    writeNPY(bsl_netvariance_G,['bsl_netvariance_G',penetrations{i},'.npy']);
+    writeNPY(bsl_netvariance_IG,['bsl_netvariance_IG',penetrations{i},'.npy']);
+
     if size(netvariance_SG,2 ) == 18
         netvariance_SG = [nan*ones(size(netvariance_SG,1),1), netvariance_SG]; %#ok<*AGROW> 
         netvariance_G  = [nan*ones(size(netvariance_G,1),1), netvariance_G];

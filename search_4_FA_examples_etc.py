@@ -27,8 +27,7 @@ for p in penetrations:
     IGpdf = PdfPages(S_dir + p + '-IG.pdf')
 
     # stimulus size loop
-    files = files[0,4,18]
-    for f in these_files:
+    for f in files:
         binarized_raster = np.load(f)
         SG_raster = binarized_raster[layers == 1,:,:]
         G_raster  = binarized_raster[layers == 2,:,:]
