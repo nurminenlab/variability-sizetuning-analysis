@@ -8,6 +8,8 @@ import scipy.stats as sts
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 anal_root = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
 
+print('Please note that the computation of effect significance does not correspond to what was done in the paper. Correct ASAP.')
+
 # to generate quencher_DF run generate_quencher_DF.py
 quencher_DF = pd.read_csv(anal_root+'quencher_DF_regression.csv')
 

@@ -11,7 +11,7 @@ import data_analysislib as dalib
 import warnings
 warnings.filterwarnings('ignore')
 
-save_figures = True
+save_figures = False
 
 fig_dir  = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 dada_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
@@ -381,5 +381,6 @@ aQF.groupby('layer')['RFnormed_maxamplif_diam'].median().plot(kind='bar',yerr=RF
 ax.set_ylim(0.05,70)
 ax.set_yscale('log')
 
-plt.savefig(fig_dir+'Figure_3C-amp_quench_diameters.svg')
+if save_figures:
+    plt.savefig(fig_dir+'Figure_3C-amp_quench_diameters.svg')
 

@@ -97,5 +97,12 @@ print('\n ANOVA: the effect of layer on FFfacilitation')
 lm = ols('FFsurfac ~ C(layer)',data=params).fit()
 print(sm.stats.anova_lm(lm,typ=1))
 
-print('\n t-test FFsurfac different from zero')
+print('\n t-test FFsurfac larger than zero')
 print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac'],0,alternative='greater')))
+
+print('\n t-test FFsurfac smaller than zero')
+print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac'],0,alternative='less')))
+
+print('\n t-test FFsupp smaller than zero')
+print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsuppression'],0,alternative='less')))
+

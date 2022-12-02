@@ -6,7 +6,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
@@ -45,4 +45,14 @@ if save_figures:
 
 params_FANO = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
 params['RFdiam'] = params_FANO['RFdiam']
+
+print('RF_normed_maxQuenchDiam medians')
+params.groupby('layer')['RFnormed_maxQuenchDiam'].median()
+
+print('RF_normed_maxQuenchDiam bootstrapper errors for medians')
+print('SG: ', medians[2])
+print('G: ',medians[0])
+print('IG: ',medians[1])
+
+
 
