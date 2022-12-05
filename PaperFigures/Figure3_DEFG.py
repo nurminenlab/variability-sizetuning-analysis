@@ -17,7 +17,7 @@ fig_dir  = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/Int
 dada_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
 
 amplification_DF = pd.read_csv(dada_dir + 'amplification_DF_division.csv')
-n_boots = 1000
+n_boots = 3000
 
 # Baseline mean and distribution plots factorized by layer and response type (amplifier vs. quencher)
 # ----------------------------------------------------------------------------------------------------------------------
@@ -316,13 +316,13 @@ SE_maxquench_ampli = np.array([SG_olRem_ampli['maxquench-ampli'].sem(),
                                 G_olRem_ampli['maxquench-ampli'].sem(),
                                 IG_olRem_ampli['maxquench-ampli'].sem()])
 
-mean_maxamplif_ampli = np.array([np.nanmean(SG_olRem_ampli['maxamplif']),
-                                np.nanmean(G_olRem_ampli['maxamplif']),
-                                np.nanmean(IG_olRem_ampli['maxamplif'])])
+mean_maxamplif_ampli = np.array([np.nanmean(aSG_olRem_ampli['maxamplif']),
+                                np.nanmean(aG_olRem_ampli['maxamplif']),
+                                np.nanmean(aIG_olRem_ampli['maxamplif'])])
 
-SE_maxamplif_ampli = np.array([SG_olRem_ampli['maxamplif'].sem(),
-                                G_olRem_ampli['maxamplif'].sem(),
-                                IG_olRem_ampli['maxamplif'].sem()])
+SE_maxamplif_ampli = np.array([aSG_olRem_ampli['maxamplif'].sem(),
+                                aG_olRem_ampli['maxamplif'].sem(),
+                                aIG_olRem_ampli['maxamplif'].sem()])
 
 ax = plt.subplot(1,2,2)
 ax.bar([0.75,2.75,4.75],mean_maxquench_ampli, yerr=SE_maxquench_ampli,fc='blue',ec='black',width=0.5)
@@ -344,9 +344,9 @@ print(SE_maxamplif_ampli)
 
 
 print('Difference in amplification and quenching magnitude:')
-print('SG p-value', sts.ttest_ind(SG_olRem_ampli['maxquench-ampli'],aSG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
-print('G p-value', sts.ttest_ind(G_olRem_ampli['maxquench-ampli'],aG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
-print('IG p-value', sts.ttest_ind(IG_olRem_ampli['maxquench-ampli'],aIG_olRem_ampli['maxamplif'],nan_policy='omit')[1])
+print('SG p-value', sts.ttest_ind(SG_olRem_ampli['maxquench-ampli'],aSG_olRem_ampli['maxamplif'],alternative='greater',nan_policy='omit')[1])
+print('G p-value', sts.ttest_ind(G_olRem_ampli['maxquench-ampli'],aG_olRem_ampli['maxamplif'],alternative='greater',nan_policy='omit')[1])
+print('IG p-value', sts.ttest_ind(IG_olRem_ampli['maxquench-ampli'],aIG_olRem_ampli['maxamplif'],alternative='greater',nan_policy='omit')[1])
 #print('across layers p-value', sts.ttest_ind(ampquench['maxquench-ampli'],ampquench['maxamplif'],nan_policy='omit')[1])
 
 
@@ -383,4 +383,15 @@ ax.set_yscale('log')
 
 if save_figures:
     plt.savefig(fig_dir+'Figure_3C-amp_quench_diameters.svg')
+
+print('Difference in baseline FR between mixers and quenchers')
+amplification_DF['bsl_FR_new'] = amplification_DF['bsl_FR'].apply(lambda x: x/0.4)
+amplification_DF.groupby('qtype_signi')['bsl_FR_new'].mean()
+print('SEM')
+amplification_DF.groupby('qtype_signi')['bsl_FR_new'].sem()
+
+mixers = amplification_DF[amplification_DF['qtype_signi']=='mixer']
+quenchers = amplification_DF[amplification_DF['qtype_signi']=='quencher']
+
+print(sts.ttest_ind(mixers['bsl_FR'],quenchers['bsl_FR_new'],nan_policy='omit'))
 

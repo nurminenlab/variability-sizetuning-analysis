@@ -6,7 +6,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
@@ -43,6 +43,15 @@ ax.set_ylim(0.01,100)
 
 if save_figures:
     plt.savefig(fig_dir + 'F5E.svg')
+
+
+print(params.groupby('layer')['RFnormed_maxQuenchDiam'].median())
+print('Errors')
+print('SG: ',medians[2])
+print('G: ',medians[0])
+print('IG: ',medians[1])
+
+
 
 
 

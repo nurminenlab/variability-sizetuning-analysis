@@ -158,27 +158,25 @@ for unit in list(G_mn_data.keys()):
     # get FF @ RF size
     RFind = np.argmax(FR)
 
-    # do linear regression to see if surround suppression affects fano
-    FF_sup = fano[RFind:]
-    if mn_mtrx.shape[0] == 18:
-        X = diams[RFind+1:]
-    else:
-        X = diams[RFind:]
+    u1 = np.mean(fano_boot[:,RFind],axis=0)
+    u2 = np.mean(fano_boot[:,-1],axis=0)
+    uc = (u1 + u2) / 2
 
-    X = np.column_stack((X,np.ones(X.shape[0])))
-    model = sm.OLS(FF_sup,X)
-    results = model.fit()
+    FF_RF = fano_boot[:,RFind] - u1 + uc
+    FF_LR = fano_boot[:,-1] - u2 + uc
+
+    delta_FF = fano[RFind] - fano[-1]
+    delta_FF_boot = FF_RF - FF_LR
     
-    if results.params[0] < 0 and results.pvalues[0] < 0.05:
+    if delta_FF > np.percentile(delta_FF_boot,95):
         FF_sup = 'suppresser'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
-    elif results.params[0] > 0 and results.pvalues[0] < 0.05:
+    elif delta_FF < np.percentile(delta_FF_boot,5):
         FF_sup = 'facilitator'
         FF_sup_magn = (fano[-1] - fano[RFind]) / fano[RFind]
     else:
         FF_sup = 'nonether'
         FF_sup_magn = np.nan
-
 
     SI = (np.max(FR) - FR[-1]) / np.max(FR)
     para_tmp = {'FF_sup':FF_sup,'SI':SI,'layer':'G','FF_sup_magn':FF_sup_magn,'unit':unit}
