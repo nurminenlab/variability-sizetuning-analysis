@@ -48,10 +48,10 @@ for i = 1:length(penetrations)
     layers   = readNPY([F_dir,layer_fl.name]);
     
     fls = dir([F_dir,penetrations{i},'*stim*']);  
-    fls = fls([1,4,19]);
+    fls = fls([1,4,12]);
 
     stim_ind = 0;
-    CC_all = ones(sum(layers==3),sum(layers==3),length(fls));
+    CC_all = ones(sum(layers==1),sum(layers==1),length(fls));
     for stim = 1:length(fls)
         stim_ind = stim_ind + 1;
         rindx = rindx + 1;
@@ -60,7 +60,7 @@ for i = 1:length(penetrations)
         % layers loop
         for l = 1            
             for tr = 1:size(spkR,3)
-                D(tr).spikes = [spkR(layers==3,first_tp:last_tp,tr)]; %#ok<*SAGROW> 
+                D(tr).spikes = [spkR(layers==1,first_tp:last_tp,tr)]; %#ok<*SAGROW> 
                 D(tr).trialId = tr;                
             end          
             % estimate gpfa for evoked responses
@@ -68,13 +68,14 @@ for i = 1:length(penetrations)
             CC = results.kern(1).estParams.L*results.kern(1).estParams.L';            
             CC_all(:,:,stim) = CC;
             rmdir('mat_results','s')
+
         end
         clear('D','D_bsl','spkR','bslR');
     end
 end
 
-%writeNPY(CC_all, 'FA_covariances_IG.npy');
 
+writeNPY(CC_all,'IG_FA_network_covariances.npy')
 subplot(2,2,1)
 image(101*CC_all(:,:,1)); colormap("jet"); colorbar;
 axis square off

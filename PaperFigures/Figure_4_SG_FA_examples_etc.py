@@ -16,6 +16,7 @@ F_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/
 S_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/'
 
 penetrations = ['MK366P1','MK366P3','MK366P8','MK374P1','MK374P2']
+save_figures = True
 
 t = np.arange(-100,600,1)
 
@@ -25,7 +26,7 @@ layer_file = glob.glob(F_dir + 'layers_' + penetrations[pn] + '.npy')[0]
 layers = np.load(layer_file)
 
 # stimulus size loop
-files = files[[0,3,11]]
+files = files[[0,3,18]]
 for i,f in enumerate(files):
     binarized_raster = np.load(f)
     SG_raster = binarized_raster[layers == 1,:,:]
@@ -41,7 +42,8 @@ for i,f in enumerate(files):
         
 
     axs[tr].set_xticks([0,250,500])
-    plt.savefig(S_dir + 'IntermediateFigures/' + penetrations[pn] + '_stim' + str(i) + '_SG_raster.eps')
+    if save_figures:
+        plt.savefig(S_dir + 'IntermediateFigures/' + penetrations[pn] + '_stim' + str(i) + '_SG_raster.eps')
 
 for i,f in enumerate(files):
     
@@ -59,7 +61,8 @@ for i,f in enumerate(files):
         
 
     axs[tr].set_xticks([0,250,500])
-    plt.savefig(S_dir + 'IntermediateFigures/' + penetrations[pn] + '_stim' + str(i) + '_G_raster.eps')
+    if save_figures:
+        plt.savefig(S_dir + 'IntermediateFigures/' + penetrations[pn] + '_stim' + str(i) + '_G_raster.eps')
 
 for i,f in enumerate(files):
     binarized_raster = np.load(f)
@@ -76,5 +79,6 @@ for i,f in enumerate(files):
         
 
     axs[tr].set_xticks([0,250,500])
-    plt.savefig(S_dir + 'IntermediateFigures/' + penetrations[pn] + '_stim' + str(i) + '_IG_raster.eps')
+    if save_figures:
+        plt.savefig(S_dir + 'IntermediateFigures/' + penetrations[pn] + '_stim' + str(i) + '_IG_raster.eps')
     
