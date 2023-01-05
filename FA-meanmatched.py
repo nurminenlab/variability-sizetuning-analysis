@@ -15,8 +15,7 @@ from scipy.optimize import basinhopping, curve_fit
 import scipy.stats as sts
 
 # this way of computing the mean firing-rate functions is cumbersome but we do it this way for consistency with the other scripts
-
-save_figures = True
+save_figures = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
@@ -110,6 +109,10 @@ ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.2','0.4'])
 
+print('SG: SML'+ ' mean: ' + str(np.mean(FA_SML)) + ' se: ' + str(np.std(FA_SML)/np.sqrt(FA_SML.shape[0])))
+print('SG: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
+print('p-value: ', sts.ttest_ind(FA_SML,FA_RF))
+
 if save_figures:
     plt.savefig(fig_dir+'SG_FA_meanmatch_SMLvsRF.svg')
 
@@ -142,6 +145,11 @@ ax.bar([1,2],
 ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.4','26'])
+
+print('SG: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
+print('SG: LAR'+ ' mean: ' + str(np.mean(FA_LAR)) + ' se: ' + str(np.std(FA_LAR)/np.sqrt(FA_LAR.shape[0])))
+print('p-value: ', sts.ttest_ind(FA_LAR,FA_RF))
+
 
 if save_figures:
     plt.savefig(fig_dir+'SG_FA_meanmatch_RFvsLAR.svg')
@@ -178,6 +186,10 @@ ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.2','0.4'])
 
+print('G: SML'+ ' mean: ' + str(np.mean(FA_SML)) + ' se: ' + str(np.std(FA_SML)/np.sqrt(FA_SML.shape[0])))
+print('G: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
+print('p-value: ', sts.ttest_ind(FA_SML,FA_RF))
+
 if save_figures:
     plt.savefig(fig_dir+'G_FA_meanmatch_SMLvsRF.svg')
 
@@ -211,6 +223,10 @@ ax.bar([1,2],
 ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.4','26'])
+
+print('G: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
+print('G: LAR'+ ' mean: ' + str(np.mean(FA_LAR)) + ' se: ' + str(np.std(FA_LAR)/np.sqrt(FA_LAR.shape[0])))
+print('p-value: ', sts.ttest_ind(FA_LAR,FA_RF))
 
 if save_figures:
     plt.savefig(fig_dir+'G_FA_meanmatch_RFvsLAR.svg')
@@ -248,6 +264,10 @@ ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.2','0.4'])
 
+print('IG: SML'+ ' mean: ' + str(np.mean(FA_SML)) + ' se: ' + str(np.std(FA_SML)/np.sqrt(FA_SML.shape[0])))
+print('IG: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
+print('p-value: ', sts.ttest_ind(FA_SML,FA_RF))
+
 if save_figures:
     plt.savefig(fig_dir+'IG_FA_meanmatch_SMLvsRF.svg')
 
@@ -280,6 +300,10 @@ ax.bar([1,2],
 ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.4','26'])
+
+print('IG: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
+print('IG: LAR'+ ' mean: ' + str(np.mean(FA_LAR)) + ' se: ' + str(np.std(FA_LAR)/np.sqrt(FA_LAR.shape[0])))
+print('p-value: ', sts.ttest_ind(FA_LAR,FA_RF))
 
 if save_figures:
     plt.savefig(fig_dir+'IG_FA_meanmatch_RFvsLAR.svg')

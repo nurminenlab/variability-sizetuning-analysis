@@ -9,6 +9,7 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
 import scipy.io as scio
+import scipy.stats as sts
 
 save_figures = True
 
@@ -173,4 +174,12 @@ ax.set_xticklabels(['0.4','26'])
 
 if save_figures:
     plt.savefig(fig_dir+'IG-mean-matched-averages.svg')
+
+print('Fano factor for 0.2: ' + str(np.mean(fano_SML))+ ' +/- ' + str(np.std(fano_SML)))
+print('Fano factor for 0.4: ' + str(np.mean(fano_RF))+ ' +/- ' + str(np.std(fano_RF)))
+sts.ttest_ind(fano_SML,fano_RF)
+print('####################')
+print('Fano factor for 0.4: ' + str(np.mean(fano_RF2))+ ' +/- ' + str(np.std(fano_RF2)))
+print('Fano factor for 26: ' + str(np.mean(fano_LAR))+ ' +/- ' + str(np.std(fano_LAR)))
+sts.ttest_ind(fano_RF2,fano_LAR)
 
