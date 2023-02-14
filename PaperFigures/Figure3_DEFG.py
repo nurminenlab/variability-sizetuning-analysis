@@ -306,6 +306,7 @@ ax.plot([2.9]*len(IG_olRem_ampli),IG_olRem_ampli['maxquench-ampli'],'bo',markers
 ax.plot([3.1]*len(aIG_olRem_ampli),aIG_olRem_ampli['maxamplif'],'yo',markersize=ms,color='orange',markerfacecolor='white')
 ax.set_xticks([1,2,3])
 ax.set_xticklabels(['SG','G','IG'])
+ax.set_ylim([0,5.5])
 
 
 mean_maxquench_ampli = np.array([np.nanmean(SG_olRem_ampli['maxquench-ampli']),
@@ -329,8 +330,9 @@ ax.bar([0.75,2.75,4.75],mean_maxquench_ampli, yerr=SE_maxquench_ampli,fc='blue',
 ax.bar(np.array([0.75,2.75,4.75])+0.5,mean_maxamplif_ampli,yerr=SE_maxamplif_ampli,fc='orange',ec='black',width=0.5)
 ax.set_xticks([1,3,5])
 ax.set_xticklabels(['SG','G','IG'])
+ax.set_ylim([0,5.5])
 if save_figures:
-    plt.savefig(fig_dir+'Figure4-G-effect-magnitude.svg')
+    plt.savefig(fig_dir+'Figure3D-effect-magnitude.svg')
 
 print('\nMean effect magnitude quench')
 print(mean_maxquench_ampli)

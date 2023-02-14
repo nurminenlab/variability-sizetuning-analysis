@@ -30,7 +30,6 @@ SG_meanresponses = np.load(data_dir+'mean_response_all_SG.npy')
 G_meanresponses  = np.load(data_dir+'mean_response_all_G.npy')
 IG_meanresponses = np.load(data_dir+'mean_response_all_IG.npy')
 
-
 # SG
 SG_match_mean_SML = np.nan * np.ones((SG_meanresponses.shape[0],1))
 SG_match_FA_SML   = np.nan * np.ones((SG_meanresponses.shape[0],1))
@@ -186,7 +185,7 @@ ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.2','0.4'])
 
-print('G: SML'+ ' mean: ' + str(np.mean(FA_SML)) + ' se: ' + str(np.std(FA_SML)/np.sqrt(FA_SML.shape[0])))
+print('\nG: SML'+ ' mean: ' + str(np.mean(FA_SML)) + ' se: ' + str(np.std(FA_SML)/np.sqrt(FA_SML.shape[0])))
 print('G: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
 print('p-value: ', sts.ttest_ind(FA_SML,FA_RF))
 
@@ -264,7 +263,7 @@ ax.set_ylabel('Firing-rate')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.2','0.4'])
 
-print('IG: SML'+ ' mean: ' + str(np.mean(FA_SML)) + ' se: ' + str(np.std(FA_SML)/np.sqrt(FA_SML.shape[0])))
+print('\nIG: SML'+ ' mean: ' + str(np.mean(FA_SML)) + ' se: ' + str(np.std(FA_SML)/np.sqrt(FA_SML.shape[0])))
 print('IG: RF'+ ' mean: ' + str(np.mean(FA_RF)) + ' se: ' + str(np.std(FA_RF)/np.sqrt(FA_RF.shape[0])))
 print('p-value: ', sts.ttest_ind(FA_SML,FA_RF))
 

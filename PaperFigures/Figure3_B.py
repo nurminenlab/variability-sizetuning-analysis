@@ -8,6 +8,7 @@ sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+import scipy.stats as stats
 
 #import pdb
 
@@ -76,6 +77,8 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
             SG_mean[unit_indx,stim,:] = mn_mtrx[stim,:] / np.mean(mn_mtrx[stim,bsl_begin:bsl_begin + 151])
             FF = vr_mtrx[stim,:] / (mn_mtrx[stim,:] + eps)
             SG_fano[unit_indx,stim,:] = FF / np.mean(FF[bsl_begin:bsl_begin + 151])
+
+
 
 plt.figure(1,figsize=(1.335, 1.115))
 # plot smallest stimulus
@@ -310,3 +313,33 @@ ax2.tick_params(axis='y',labelsize=8)
 
 if save_figures:
     plt.savefig(fig_dir + 'F3B_PSTH_IG_mean_normalized-fano_plot.svg')
+
+# compute stats
+SG_fano_means = np.ones((SG_fano.shape[0],))
+for i in range(SG_fano.shape[0]):
+    if ~np.isnan(SG_fano[i,0,0]):
+        SG_fano_means[i] = np.mean(SG_fano[i,0,first_tp:last_tp])
+    else:
+        SG_fano_means[i] = np.mean(SG_fano[i,1,first_tp:last_tp])
+
+G_fano_means = np.ones((G_fano.shape[0],))
+for i in range(G_fano.shape[0]):
+    if ~np.isnan(G_fano[i,0,0]):
+        G_fano_means[i] = np.mean(G_fano[i,0,first_tp:last_tp])
+    else:
+        G_fano_means[i] = np.mean(G_fano[i,1,first_tp:last_tp])
+
+IG_fano_means = np.ones((IG_fano.shape[0],))
+for i in range(IG_fano.shape[0]):
+    if ~np.isnan(IG_fano[i,0,0]):
+        IG_fano_means[i] = np.mean(IG_fano[i,1,first_tp:last_tp])
+    else:
+        IG_fano_means[i] = np.mean(IG_fano[i,1,first_tp:last_tp])
+
+
+print('SG')
+print(stats.ttest_1samp(SG_fano_means,1,nan_policy='omit',alternative='greater'))
+print('G')
+print(stats.ttest_1samp(G_fano_means,1,nan_policy='omit',alternative='greater'))
+print('IG')
+print(stats.ttest_1samp(IG_fano_means,1,nan_policy='omit',alternative='greater'))

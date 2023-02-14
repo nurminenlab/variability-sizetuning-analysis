@@ -8,6 +8,7 @@ import scipy.stats as sts
 import statsmodels.api as sm
 from matplotlib.backends.backend_pdf import PdfPages
 
+# please download this library from www.github.com/nurminenlab/Analysis
 sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
 
 #import pdb
@@ -25,12 +26,11 @@ boot_num = int(1e3)
 
 plotter = 'contrast'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
+# path to where the extracted parameters are stored
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 
 SUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
-# for these units we will use constrained optimization
-# shitty_fits = [2,5,6,7,13,19,35,58,53,57,59,68,70,71,72,77,78,79,90,92,98,105]
 # we were not able to fit this units and excluded it from the analysis
 excluded_fits = [72]
 
@@ -150,7 +150,7 @@ for unit in range(len(data)):
 
                 bsl      = np.mean(data[unit][cont]['baseline'])
                 bsl_vari = np.var(data[unit][cont]['baseline'])
-                # remove MM385 because the data really looks like there something wrong
+                # remove marmoset data
                 if fano_tailing.shape[0] > 1 and SI >= SI_crit and anipe != 'MM385P1' and anipe != 'MM385P2' and tuned:
 
                     fano_container = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
