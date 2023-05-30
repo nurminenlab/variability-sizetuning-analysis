@@ -7,6 +7,7 @@ import scipy as sc
 import scipy.stats as sts
 import statsmodels.api as sm
 from matplotlib.backends.backend_pdf import PdfPages
+from datetime import datetime
 
 # please download this library from www.github.com/nurminenlab/Analysis
 sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
@@ -360,29 +361,31 @@ for unit in range(len(data)):
                     params_df = params_df.append(tmp_df,sort=True)
                     indx = indx + 1
                     
+month = datetime.now().strftime('%b') 
+year = datetime.now().strftime('%Y')
 
 # save data
-params_df.to_csv(S_dir+'extracted_params-Oct-2022.csv')
+params_df.to_csv(S_dir+'extracted_params-'+month+year+'.csv')
 
-with open(S_dir + 'mean_PSTHs-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
-with open(S_dir + 'vari_PSTHs-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
 # layer resolved
 # SG
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
 # G
-with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
 # IG
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-MU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
