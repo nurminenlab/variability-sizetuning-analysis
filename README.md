@@ -15,6 +15,7 @@ If you would like to use our spike-sorting or multi-unit thresholding, please fo
 6. **Parameter extraction** <br /> Run extract-paramsTable-fano-nolaser-MUonly.py to fit firing-rate and fano-factor data with DOiG functions and extract the parameters we report in the paper. This step produces as output a CSV files extracted_params-Oct-2022.csv which contains extracted parameters for all recorded multi-units. The script also outputs PSTHs for variance and firing rate. These are stored in files called 'mean_PSTHs_SG-MK-MU-'+month+year+'.pkl' and 'vari_PSTHs_SG-MK-MU-'+month+year+'.pkl'. These files are produced for all layers. *Note to self. Modify this file for single-units analysis*. 
 7. **Analyses for variability size tuning, Figures 1-2.** <br /> 
     - Generate example plots by running Figure1_examples_SG.py, Figure1_examples_G.py, Figure1_examples_IG.py
+    - Do population analyses by running Figure2A.py, Figure2B.py, Figure2CDG-top.py, Figure2CD-bottom.py
         
 
 
