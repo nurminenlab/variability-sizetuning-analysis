@@ -23,7 +23,7 @@ for p in penetrations:
     layers = np.load(layer_file)
 
     SGpdf = PdfPages(S_dir + p + '-SG.pdf')
-    Gpdf = PdfPages(S_dir + p + '-G.pdf')
+    Gpdf  = PdfPages(S_dir + p + '-G.pdf')
     IGpdf = PdfPages(S_dir + p + '-IG.pdf')
 
     # stimulus size loop
@@ -38,19 +38,19 @@ for p in penetrations:
         for tr in range(binarized_raster.shape[2]):
             dalib.rasters(SG_raster[:,:,tr],t,axeli=axs[tr])
         plt.axis('off')
-        SGpdf.savefig()
+        #SGpdf.savefig()
 
         fig1,axs = plt.subplots(binarized_raster.shape[2],1,sharex=True)
         for tr in range(binarized_raster.shape[2]):
             dalib.rasters(G_raster[:,:,tr],t,axeli=axs[tr])
         plt.axis('off')
-        Gpdf.savefig()
+        #Gpdf.savefig()
 
         fig1,axs = plt.subplots(binarized_raster.shape[2],1,sharex=True)
         for tr in range(binarized_raster.shape[2]):
             dalib.rasters(IG_raster[:,:,tr],t,axeli=axs[tr])
         plt.axis('off')
-        IGpdf.savefig()
+        #IGpdf.savefig()
     
     SGpdf.close()
     Gpdf.close()

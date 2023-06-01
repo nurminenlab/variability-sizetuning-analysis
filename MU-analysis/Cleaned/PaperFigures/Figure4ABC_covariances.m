@@ -4,7 +4,7 @@ addpath(genpath('C:\Users\lonurmin\Desktop\code\gpfa_v0203'));
 addpath(genpath('C:\Users\lonurmin\Desktop\code\npy-matlab'));
 
 F_dir = 'C:\Users\lonurmin\Desktop\CorrelatedVariability\results\paper_v9\MK-MU\GPFA-long-rasters\';
-%penetrations = {'MK366P1','MK366P3','MK366P8','MK374P1','MK374P2'};
+
 penetrations = {'MK374P1'};
 rindx = 0;
 C_final  = []
