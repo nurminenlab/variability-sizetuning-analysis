@@ -21,7 +21,7 @@ If you would like to use our spike-sorting or multi-unit thresholding, please fo
     - Run Figure3A.py to plot the example amplifiers.
     - Run Figure3B.py to plot mean PSTHs across the layers
     - To prepare intermediate files for population analysis of variability amplification, run prepare_amplification_analysis_division.py, you can skip this step if you wish to use our precomputed files
-    - Run Figure3D.py, Figure3E.py
+    - Run Figure3C.py, Figure3D.py, Figure3E.py
 
 
 
