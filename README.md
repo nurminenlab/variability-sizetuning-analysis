@@ -27,6 +27,7 @@ If you would like to use our spike-sorting or multi-unit thresholding, please fo
     - To plot the example network covariance matrices, run Figure4ABC_covariances.m
     - Run Figure4ABC-size-tuning.py
 11. **Shared variance population data. Figure 5.** <br /> 
+    - Run Figure5A.py, Figure5BCD.py, Figure5CD-scatterplots.py, Figure5E.py
 
 
 
