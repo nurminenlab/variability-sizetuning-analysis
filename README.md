@@ -22,10 +22,11 @@ If you would like to use our spike-sorting or multi-unit thresholding, please fo
     - Run Figure3B.py to plot mean PSTHs across the layers
     - To prepare intermediate files for population analysis of variability amplification, run prepare_amplification_analysis_division.py, you can skip this step if you wish to use our precomputed files
     - Run Figure3C.py, Figure3D.py, Figure3E.py
-10. **Population variability examples. Figure 4.** <br /> 
+10. **Shared variance examples. Figure 4.** <br /> 
     - To plot the rasters, run Figure4ABC-rasters.py
     - To plot the example network covariance matrices, run Figure4ABC_covariances.m
     - Run Figure4ABC-size-tuning.py
+11. **Shared variance population data. Figure 5.** <br /> 
 
 
 
