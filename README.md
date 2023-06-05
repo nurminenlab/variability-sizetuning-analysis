@@ -35,5 +35,9 @@ Run extract-paramsTable-fano-nolaser-MUonly.py to fit firing-rate and fano-facto
     - To perform factor analysis on all data and save analysis files, run do_FA.m. This will create outputs such as netvariance_all_SG.npy, netvariance_GMK366P1.npy, this depends on the Gaussian-process factor analysis toolbox v0203
     - Run Figure5A.py, Figure5BCD.py, Figure5CD-scatterplots.py, Figure5E.py
 12. **Supplementary Figures.** <br /> 
+    - To generate the plots and analyses for supplementary material, please run
+    - SF1A.py, SF1B.py, SF1C.py, SF2.py
+
+
 
 
