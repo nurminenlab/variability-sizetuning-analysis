@@ -9,6 +9,7 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
 import scipy.io as scio
+import scipy.stats as sts
 
 save_figures = False
 
@@ -60,6 +61,7 @@ for i, u in enumerate(SG_mn_data.keys()):
         mn_LAR[i,:] = mn_matrix[-1,first_tp:last_tp]
         vr_SML[i,:] = vr_matrix[0,first_tp:last_tp]
         vr_RF[i,:]  = vr_matrix[1,first_tp:last_tp]
+        vr_LAR[i,:] = vr_matrix[-1,first_tp:last_tp]
     else:
         mn_SML[i,:] = mn_matrix[1,first_tp:last_tp]
         mn_RF[i,:]  = mn_matrix[2,first_tp:last_tp]
@@ -78,98 +80,106 @@ t = np.linspace(t1,t1+anal_duration,anal_duration)
 fig, axes = plt.subplots(4,2,sharex=True)
 this_row = 0
 this_col = 0
-axes[this_row,this_col].plot(t,mean_SML/0.1,'b-',label='0.2')
-axes[this_row,this_col].plot(t,mean_RF/0.1,'r-',label='0.4')
+axes[this_row,this_col].plot(t,mean_SML/0.1,'-',color='grey',label='0.2')
+axes[this_row,this_col].plot(t,mean_RF/0.1,'-',color='orange',label='0.4')
+axes[this_row,this_col].set_ylim([0,100])
 axes[this_row,this_col].set_ylabel('Firing rate (Hz)')
 
 this_row = 1
 this_col = 0
-axes[this_row,this_col].fill_between(t,(mean_SML/0.1) - np.nanstd(bmeans_SML/0.1,axis=0),(mean_SML/0.1) + np.nanstd(bmeans_SML/0.1,axis=0),color='b',alpha=0.5)
-axes[this_row,this_col].fill_between(t,(mean_RF/0.1) - np.nanstd(bmeans_RF/0.1,axis=0),(mean_RF/0.1) + np.nanstd(bmeans_RF/0.1,axis=0),color='r',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(mean_SML/0.1) - np.nanstd(bmeans_SML/0.1,axis=0),(mean_SML/0.1) + np.nanstd(bmeans_SML/0.1,axis=0),color='grey',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(mean_RF/0.1) - np.nanstd(bmeans_RF/0.1,axis=0),(mean_RF/0.1) + np.nanstd(bmeans_RF/0.1,axis=0),color='orange',alpha=0.5)
+axes[this_row,this_col].set_ylim([0,100])
 
 this_row = 2
 this_col = 0
-axes[this_row,this_col].plot(t,fano_SML,'b-',label='0.2')
-axes[this_row,this_col].plot(t,fano_RF,'r-',label='0.4')
+axes[this_row,this_col].plot(t,fano_SML,'-',color='grey',label='0.2')
+axes[this_row,this_col].plot(t,fano_RF,'-',color='orange',label='0.4')
+axes[this_row,this_col].set_ylim([0,5])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
 this_col = 0
-axes[this_row,this_col].fill_between(t,(fano_SML) - np.nanstd(fano_boot_SML,axis=0),(fano_SML) + np.nanstd(fano_boot_SML,axis=0),color='b',alpha=0.5)
-axes[this_row,this_col].fill_between(t,(fano_RF) - np.nanstd(fano_boot_RF,axis=0),(fano_RF) + np.nanstd(fano_boot_RF,axis=0),color='r',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(fano_SML) - np.nanstd(fano_boot_SML,axis=0),(fano_SML) + np.nanstd(fano_boot_SML,axis=0),color='grey',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(fano_RF) - np.nanstd(fano_boot_RF,axis=0),(fano_RF) + np.nanstd(fano_boot_RF,axis=0),color='orange',alpha=0.5)
+axes[this_row,this_col].set_ylim([0,5])
 
 ##
 this_row = 0
 this_col = 1
-axes[this_row,this_col].plot(t,mean_RF2/0.1,'b-',label='0.2')
-axes[this_row,this_col].plot(t,mean_LAR/0.1,'r-',label='0.4')
+axes[this_row,this_col].plot(t,mean_RF2/0.1,'-',color='orange',label='0.2')
+axes[this_row,this_col].plot(t,mean_LAR/0.1,'-',color='blue',label='0.4')
+axes[this_row,this_col].set_ylim([0,60])
 axes[this_row,this_col].set_ylabel('Firing rate (Hz)')
 
 this_row = 1
 this_col = 1
-axes[this_row,this_col].fill_between(t,(mean_RF2/0.1) - np.nanstd(bmeans_RF2/0.1,axis=0),(mean_RF2/0.1) + np.nanstd(bmeans_RF2/0.1,axis=0),color='b',alpha=0.5)
-axes[this_row,this_col].fill_between(t,(mean_LAR/0.1) - np.nanstd(bmeans_LAR/0.1,axis=0),(mean_LAR/0.1) + np.nanstd(bmeans_LAR/0.1,axis=0),color='r',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(mean_RF2/0.1) - np.nanstd(bmeans_RF2/0.1,axis=0),(mean_RF2/0.1) + np.nanstd(bmeans_RF2/0.1,axis=0),color='orange',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(mean_LAR/0.1) - np.nanstd(bmeans_LAR/0.1,axis=0),(mean_LAR/0.1) + np.nanstd(bmeans_LAR/0.1,axis=0),color='blue',alpha=0.5)
+axes[this_row,this_col].set_ylim([0,60])
 
 this_row = 2
 this_col = 1
-axes[this_row,this_col].plot(t,fano_RF2,'b-',label='0.2')
-axes[this_row,this_col].plot(t,fano_LAR,'r-',label='0.4')
+axes[this_row,this_col].plot(t,fano_RF2,'-',color='orange',label='0.4')
+axes[this_row,this_col].plot(t,fano_LAR,'-',color='blue',label='26')
+axes[this_row,this_col].set_ylim([0,5])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
 this_col = 1
-axes[this_row,this_col].fill_between(t,(fano_RF2) - np.nanstd(fano_boot_RF2,axis=0),(fano_RF2) + np.nanstd(fano_boot_RF2,axis=0),color='b',alpha=0.5)
-axes[this_row,this_col].fill_between(t,(fano_LAR) - np.nanstd(fano_boot_LAR,axis=0),(fano_LAR) + np.nanstd(fano_boot_LAR,axis=0),color='r',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(fano_RF2) - np.nanstd(fano_boot_RF2,axis=0),(fano_RF2) + np.nanstd(fano_boot_RF2,axis=0),color='orange',alpha=0.5)
+axes[this_row,this_col].fill_between(t,(fano_LAR) - np.nanstd(fano_boot_LAR,axis=0),(fano_LAR) + np.nanstd(fano_boot_LAR,axis=0),color='blue',alpha=0.5)
+axes[this_row,this_col].set_ylim([0,5])
 
 if save_figures:
-    plt.savefig(fig_dir+'mean-matched-PSTHs.svg')
+    plt.savefig(fig_dir+'SG-mean-matched-PSTHs.svg')
 
 plt.figure(2)
 ax = plt.subplot(2,2,1)
 ax.bar([1,2],
-    np.array([np.mean(fano_SML),np.mean(fano_RF)]),
-    yerr=[3.96*np.nanstd(np.nanmean(fano_boot_SML,axis=1)),3.96*np.nanstd(np.nanmean(fano_boot_RF,axis=1))],
-    color=['b','r'])
+    [np.mean(mean_SML/0.1),np.mean(mean_RF/0.1)],
+    yerr=[np.std(mean_SML/0.1),np.std(mean_RF/0.1)],
+    color=['grey','orange'])
+ax.set_xticks([1,2])
+ax.set_xticklabels(['0.2','0.4'])
+ax.set_ylabel('Firing rate (Hz)')
+
+ax = plt.subplot(2,2,2)
+ax.bar([1,2],
+    [np.mean(mean_RF2/0.1),np.mean(mean_LAR/0.1)],
+    yerr=[np.std(mean_RF2/0.1),np.std(mean_LAR/0.1)],
+    color=['orange','blue'])
+ax.set_xticks([1,2])
+ax.set_xticklabels(['0.4','26'])
+#ax.set_ylabel('Firing rate (Hz)')
+
+ax = plt.subplot(2,2,3)
+ax.bar([1,2],
+    [np.mean(fano_SML),np.mean(fano_RF)],
+    yerr=[np.std(fano_SML),np.std(fano_RF)],
+    color=['grey','orange'])
 
 ax.set_ylabel('Fano factor')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.2','0.4'])
 
-ax = plt.subplot(2,2,3)
+ax = plt.subplot(2,2,4)
 ax.bar([1,2],
-    np.array([np.mean(mean_SML),
-    np.mean(mean_RF)])/0.1,
-    yerr=[np.std(np.mean(bmeans_SML/0.1,axis=1)),np.std(np.mean(bmeans_RF/0.1,axis=1))],
-    color=['b','r'])
-ax.set_xticks([1,2])
-ax.set_xticklabels(['0.2','0.4'])
-ax.set_ylabel('Firing rate (Hz)')
+    [np.mean(fano_RF2),np.mean(fano_LAR)],
+    yerr=[np.std(fano_RF2),np.std(fano_LAR)],
+    color=['orange','blue'])
 
-if save_figures:
-    plt.savefig(fig_dir+'mean-matched-averages-SMLRF.svg')
-
-
-plt.figure(3)
-ax = plt.subplot(2,2,1)
-ax.bar([1,2],
-    np.array([np.mean(fano_RF2),
-    np.mean(fano_LAR)]),
-    yerr=[3.96*np.nanstd(np.nanmean(fano_boot_RF2,axis=1)),3.96*np.nanstd(np.nanmean(fano_boot_LAR,axis=1))],
-    color=['b','r'])
-ax.set_ylabel('Fano factor')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['0.4','26'])
 
-ax = plt.subplot(2,2,3)
-ax.bar([1,2],
-    np.array([np.mean(mean_RF2),
-    np.mean(mean_LAR)])/0.1,
-    yerr=[np.std(np.nanmean(bmeans_RF2/0.1,axis=1)),np.std(np.nanmean(bmeans_LAR/0.1,axis=1))],
-    color=['b','r'])
-ax.set_xticks([1,2])
-ax.set_xticklabels(['0.4','26'])
-ax.set_ylabel('Firing rate (Hz)')
-
 if save_figures:
-    plt.savefig(fig_dir+'mean-matched-averages-RFLAR.svg')
+    plt.savefig(fig_dir+'SG-mean-matched-averages.svg')
 
+
+print('Fano factor for 0.2: ' + str(np.mean(fano_SML))+ ' +/- ' + str(np.std(fano_SML)))
+print('Fano factor for 0.4: ' + str(np.mean(fano_RF))+ ' +/- ' + str(np.std(fano_RF)))
+print('p :', sts.ttest_ind(fano_SML,fano_RF))
+print('####################')
+print('Fano factor for 0.4: ' + str(np.mean(fano_RF2))+ ' +/- ' + str(np.std(fano_RF2)))
+print('Fano factor for 26: ' + str(np.mean(fano_LAR))+ ' +/- ' + str(np.std(fano_LAR)))
+print('p :', sts.ttest_ind(fano_RF2,fano_LAR))

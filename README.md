@@ -8,11 +8,16 @@ Many of the scripts depend on several standard python packages. Please refer to 
 If you would like to use our spike-sorting or multi-unit thresholding, please follow the instructions below from point 4. If you would like to perform the analysis from the scratch, please start from point 1.
 
 1. Download raw data files from ...
-2. **Spike sorting and multi-unit thresholding** <br /> For single-unit analysis, run spike-sorting with Kilosort. For multi-units, first re-threshold the data with ln_rethreshold.m from https://github.com/nurminenlab/Preprocessing. There are dependencies on an old Blackrock Microsystem's NPMK library and modified versions of their functions. We provide access to the legacy NPMK version at https://github.com/nurminenlab/NPMK
-3. **Trial based representation of stimulus conditions** <br /> For spike-sorted data, please run KilosortExtractSpikeCountsRasters_nolasers.m from https://github.com/nurminenlab/Preprocessing. This creates a trial based representation of spike counts and rasters for all stimulus conditions. For multi-unit analysis, run ExtractSpikeCountsRasters_nolasers.m from https://github.com/nurminenlab/Preprocessing. These scripts need to be run for all datafiles separately.
-4. **Reformat to datatable** <br /> From https://github.com/nurminenlab/Preprocessing, run Kilosorted2Pytable_macaque.py for single-unit analysis or MUA2Pytable_macaque.py for multi-unit analysis. These scripts require information about layers. The data folders include our estimates of the borders of cortical layers. You can also estimate these from the data using CSD. Just average the evoked LFPs across all the grating diameters and run CSD. You will also need the file penetrationinfo_macaque.csv at the root of this repo.
-5. **Data selection** <br /> For multi-unit analysis, run select_fano_data_MUA.py. For single-unit analysis, run select_fano_data.py. These scripts produce as outputs, selectedData_MUA_lenient_400ms_macaque_July-2020.pkl, and selectedData_lenient_400ms_macaque_July-2020.pkl, respectively. 
-6. **Parameter extraction** <br /> Run extract-paramsTable-fano-nolaser-MUonly.py to fit firing-rate and fano-factor data with DOiG functions and extract the parameters we report in the paper. This step produces as output a CSV files extracted_params-Oct-2022.csv which contains extracted parameters for all recorded multi-units. The script also outputs PSTHs for variance and firing rate. These are stored in files called 'mean_PSTHs_SG-MK-MU-'+month+year+'.pkl' and 'vari_PSTHs_SG-MK-MU-'+month+year+'.pkl'. These files are produced for all layers. *Note to self. Modify this file for single-units analysis*.
+2. **Spike sorting and multi-unit thresholding** <br /> 
+For single-unit analysis, run spike-sorting with Kilosort. For multi-units, first re-threshold the data with ln_rethreshold.m from https://github.com/nurminenlab/Preprocessing. There are dependencies on an old Blackrock Microsystem's NPMK library and modified versions of their functions. We provide access to the legacy NPMK version at https://github.com/nurminenlab/NPMK
+3. **Trial based representation of stimulus conditions** <br /> 
+For spike-sorted data, please run KilosortExtractSpikeCountsRasters_nolasers.m from https://github.com/nurminenlab/Preprocessing. This creates a trial based representation of spike counts and rasters for all stimulus conditions. For multi-unit analysis, run ExtractSpikeCountsRasters_nolasers.m from https://github.com/nurminenlab/Preprocessing. These scripts need to be run for all datafiles separately.
+4. **Reformat to datatable** <br /> 
+From https://github.com/nurminenlab/Preprocessing, run Kilosorted2Pytable_macaque.py for single-unit analysis or MUA2Pytable_macaque.py for multi-unit analysis. These scripts require information about layers. The data folders include our estimates of the borders of cortical layers. You can also estimate these from the data using CSD. Just average the evoked LFPs across all the grating diameters and run CSD. You will also need the file penetrationinfo_macaque.csv at the root of this repo.
+5. **Data selection** <br /> 
+For multi-unit analysis, run select_fano_data_MUA.py. For single-unit analysis, run select_fano_data.py. These scripts produce as outputs, selectedData_MUA_lenient_400ms_macaque_July-2020.pkl, and selectedData_lenient_400ms_macaque_July-2020.pkl, respectively. 
+6. **Parameter extraction** <br /> 
+Run extract-paramsTable-fano-nolaser-MUonly.py to fit firing-rate and fano-factor data with DOiG functions and extract the parameters we report in the paper. This step produces as output a CSV files extracted_params-Oct-2022.csv which contains extracted parameters for all recorded multi-units. The script also outputs PSTHs for variance and firing rate. These are stored in files called 'mean_PSTHs_SG-MK-MU-'+month+year+'.pkl' and 'vari_PSTHs_SG-MK-MU-'+month+year+'.pkl'. These files are produced for all layers. *Note to self. Modify this file for single-units analysis*.
 8. **Analyses for variability size tuning, Figures 1-2.** <br /> 
     - Generate example plots by running Figure1_examples_SG.py, Figure1_examples_G.py, Figure1_examples_IG.py
     - Run generate_quencher_DF.py for statistical testing of surround effects on fano-factor
@@ -27,13 +32,8 @@ If you would like to use our spike-sorting or multi-unit thresholding, please fo
     - To plot the example network covariance matrices, run Figure4ABC_covariances.m
     - Run Figure4ABC-size-tuning.py
 11. **Shared variance population data. Figure 5.** <br /> 
+    - To perform factor analysis on all data and save analysis files, run do_FA.m. This will create outputs such as netvariance_all_SG.npy, netvariance_GMK366P1.npy, this depends on the Gaussian-process factor analysis toolbox v0203
     - Run Figure5A.py, Figure5BCD.py, Figure5CD-scatterplots.py, Figure5E.py
-
-
-
-
-
-
-
+12. **Supplementary Figures.** <br /> 
 
 
