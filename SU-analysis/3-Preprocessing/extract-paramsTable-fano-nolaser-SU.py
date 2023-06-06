@@ -25,15 +25,13 @@ plot_rasters = False
 cont_wndw_length = 100
 boot_num = int(1e3)
 
-plotter = 'contrast'
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 # path to where the extracted parameters are stored
-S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
+S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+SUdatfile = 'selectedData_macaque_July2020.pkl'
 
-SUdatfile = 'selectedData_lenient_400ms_macaque_July-2020.pkl'
-
-# we were not able to fit this units and excluded it from the analysis
-excluded_fits = [72]
+# we were not able to fit these units
+excluded_fits = []
 
 with open(F_dir + SUdatfile,'rb') as f:
     data = pkl.load(f)
@@ -80,6 +78,7 @@ params_df = pd.DataFrame(columns=['RFdiam',
                                   'fit_fano_near_SUR',
                                   'spikeWidth',
                                   'spikeSNR'])
+
 mean_PSTHs = {}
 vari_PSTHs = {}
 mean_PSTHs_SG = {}
@@ -364,7 +363,9 @@ for unit in range(len(data)):
                                 'fit_fano_MAX':fit_fano_MAX,
                                 'fit_fano_MIN_diam':fit_fano_MIN_diam,
                                 'fit_fano_MAX_diam':fit_fano_MAX_diam,
-                                'fit_fano_near_SUR':fit_fano_near_SUR}
+                                'fit_fano_near_SUR':fit_fano_near_SUR,
+                                'spikeWidth':data[unit]['info']['spikewidth1'],
+                                'spikeSNR':data[unit]['info']['SNR1']}
 
                     tmp_df = pd.DataFrame(para_tmp, index=[indx])
                     params_df = params_df.append(tmp_df,sort=True)
