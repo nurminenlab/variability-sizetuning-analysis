@@ -7,11 +7,11 @@ Many of the scripts depend on several standard python packages. Please refer to 
 
 To install pytables in Windows using conda, you will need to add conda-forge
 
-'''
+```
 
 conda config --add channels conda-forge
 
-'''
+```
 
 If you would like to use our spike-sorting or multi-unit thresholding, please follow the instructions below from point 4. If you would like to perform the analysis from the scratch, please start from point 1.
 
