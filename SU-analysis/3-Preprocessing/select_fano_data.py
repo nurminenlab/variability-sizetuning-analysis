@@ -5,9 +5,9 @@ import itertools as it
 import scipy.stats as sts
 from matplotlib.backends.backend_pdf import PdfPages
 import sys
-sys.path.append('/home/lauri/code/DataPreprocess/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/DataPreprocess')
 import datapreprocesslib as dpl
-os.sys.path.append('/home/lauri/code/DataAnalysis')
+os.sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis')
 import data_analysislib as dalib
 import itertools
 #from sklearn import linear_model as lm
@@ -21,7 +21,7 @@ import scipy as sc
 import pickle as pkl
 
 # open file with the data tables
-results_root = '/home/lauri/projects/CorrelatedVariability/results/'
+results_root = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 file_name    = results_root+'collated_correlation_data_combinedsorting_400ms_MK-July2020.h5'
 data_file    = tb.open_file(file_name,'r')
 
@@ -34,7 +34,7 @@ that_contrast = 100.0
 boot_num = int(1e3)
 eps = np.finfo(float).eps
 
-F_dir   = '/home/lauri/projects/CorrelatedVariability/results/'
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 outfile = 'selectedData_lenient_400ms_macaque_July2020.pkl'
 
 w_dir = os.getcwd()

@@ -21,7 +21,7 @@ import scipy as sc
 import pickle as pkl
 
 # open file with the data tables
-results_root = '/home/lauri/projects/CorrelatedVariability/results/'
+results_root = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 file_name    = results_root+'collated_correlation_data_combinedsorting_MUA400ms_MK-July2020.h5'
 data_file    = tb.open_file(file_name,'r')
 
