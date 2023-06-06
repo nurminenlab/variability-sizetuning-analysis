@@ -23,7 +23,12 @@ From https://github.com/nurminenlab/Preprocessing, run Kilosorted2Pytable_macaqu
 5. **Data selection** <br /> 
 For multi-unit analysis, run select_fano_data_MUA.py. For single-unit analysis, run select_fano_data.py. These scripts produce as outputs, selectedData_MUA_lenient_400ms_macaque_July-2020.pkl, and selectedData_lenient_400ms_macaque_July-2020.pkl, respectively. 
 6. **Parameter extraction** <br /> 
-Run extract-paramsTable-fano-nolaser-MUonly.py to fit firing-rate and fano-factor data with DOiG functions and extract the parameters we report in the paper. This step produces as output a CSV files extracted_params-Oct-2022.csv which contains extracted parameters for all recorded multi-units. The script also outputs PSTHs for variance and firing rate. These are stored in files called 'mean_PSTHs_SG-MK-MU-'+month+year+'.pkl' and 'vari_PSTHs_SG-MK-MU-'+month+year+'.pkl'. These files are produced for all layers. *Note to self. Modify this file for single-units analysis*.
+*Multi-units analysis*
+    - Run extract-paramsTable-fano-nolaser-MUonly.py 
+        - Outputs extracted_params-Oct-2022.csv
+        - Outputs PSTHs for variance and firing rate
+*Single-units analysis*
+    - 
 8. **Analyses for variability size tuning, Figures 1-2.** <br /> 
     - Generate example plots by running Figure1_examples_SG.py, Figure1_examples_G.py, Figure1_examples_IG.py
     - Run generate_quencher_DF.py for statistical testing of surround effects on fano-factor

@@ -10,13 +10,10 @@ import datapreprocesslib as dpl
 os.sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis')
 import data_analysislib as dalib
 import itertools
-#from sklearn import linear_model as lm
-#from sklearn import preprocessing as prepro
 from matplotlib.gridspec import GridSpec
 import pandas as pd
 from statsmodels.formula.api import ols
 from scipy.optimize import curve_fit
-#from lmfit import Model
 import scipy as sc
 import pickle as pkl
 

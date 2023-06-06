@@ -30,7 +30,7 @@ F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 # path to where the extracted parameters are stored
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 
-SUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
+SUdatfile = 'selectedData_lenient_400ms_macaque_July-2020.pkl'
 
 # we were not able to fit this units and excluded it from the analysis
 excluded_fits = [72]
@@ -62,15 +62,24 @@ virgin = True
 eps = 0.0000001
 
 # this dataframe holds params for each unit
-params_df = pd.DataFrame(columns=['RFdiam','maxResponse','SI','baseline',
-                                  'layer','anipe','center_slope','surround_slope','centerSIG',
-                                  'center_slope_fano','surround_slope_fano','ntrials','surroundSIG_fano',
-                                  'center_slope_narrow_window','surround_slope_narrow_window',
-                                  'fit_fano_SML','fit_fano_RF',
-                                  'fit_fano_SUR','fit_fano_LAR',
-                                  'fit_fano_BSL','fit_fano_MIN',
-                                  'fit_fano_MAX','fit_fano_MAX_diam',
-                                  'fit_fano_MIN_diam', 'fit_fano_near_SUR'])
+params_df = pd.DataFrame(columns=['RFdiam',
+                                  'maxResponse',
+                                  'SI',
+                                  'baseline',
+                                  'layer',
+                                  'anipe',                                  
+                                  'fit_fano_SML',
+                                  'fit_fano_RF',
+                                  'fit_fano_SUR',
+                                  'fit_fano_LAR',
+                                  'fit_fano_BSL',
+                                  'fit_fano_MIN',
+                                  'fit_fano_MAX',
+                                  'fit_fano_MAX_diam',
+                                  'fit_fano_MIN_diam', 
+                                  'fit_fano_near_SUR',
+                                  'spikeWidth',
+                                  'spikeSNR'])
 mean_PSTHs = {}
 vari_PSTHs = {}
 mean_PSTHs_SG = {}
@@ -365,27 +374,27 @@ month = datetime.now().strftime('%b')
 year = datetime.now().strftime('%Y')
 
 # save data
-params_df.to_csv(S_dir+'extracted_params-'+month+year+'.csv')
+params_df.to_csv(S_dir+'SU-extracted_params-'+month+year+'.csv')
 
-with open(S_dir + 'mean_PSTHs-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
-with open(S_dir + 'vari_PSTHs-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
 # layer resolved
 # SG
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
 # G
-with open(S_dir + 'mean_PSTHs_G-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
 # IG
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-SU-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
