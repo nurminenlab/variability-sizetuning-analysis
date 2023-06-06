@@ -8,9 +8,9 @@ import scipy.stats as sts
 
 save_figures = False
 
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
-params = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
+params = pd.read_csv(F_dir + 'SU-extracted_params-Jun2023.csv')
 
 params['RFnormed_maxQuenchDiam'] = params['fit_fano_MIN_diam'] / params['RFdiam']
 
@@ -42,9 +42,6 @@ ax.set_ylim(0.01,100)
 if save_figures:
     plt.savefig(fig_dir + 'F2G.svg')
 
-
-params_FANO = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
-params['RFdiam'] = params_FANO['RFdiam']
 
 print('RF_normed_maxQuenchDiam medians')
 params.groupby('layer')['RFnormed_maxQuenchDiam'].median()

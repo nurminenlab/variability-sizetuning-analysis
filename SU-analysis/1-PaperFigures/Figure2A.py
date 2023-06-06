@@ -16,8 +16,8 @@ import scipy.stats as sts
 
 save_figures = False
 
-S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
+S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 
 # analysis done between these timepoints
 anal_duration = 400
@@ -46,19 +46,19 @@ with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
 diams = np.array(list(diams_data.keys()))
 del(diams_data)
     
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
     G_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
     G_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
     IG_mn_data = pkl.load(f)    
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
     IG_vr_data = pkl.load(f)    
 
 # param tables

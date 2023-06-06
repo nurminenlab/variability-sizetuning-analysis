@@ -7,10 +7,10 @@ from statsmodels.formula.api import ols
 
 save_figures = False
 
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 
-params = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
+params = pd.read_csv(F_dir + 'SU-extracted_params-Jun2023.csv')
 
 plt.figure()
 ax = plt.subplot(111)
