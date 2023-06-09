@@ -28,7 +28,10 @@ boot_num = int(1e3)
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 # path to where the extracted parameters are stored
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 SUdatfile = 'selectedData_macaque_Jun2023.pkl'
+
+pdf = PdfPages(fig_dir + 'size_tuning_FF-FR.pdf')
 
 # we were not able to fit these units
 excluded_fits = []
@@ -59,26 +62,6 @@ bins = np.arange(-100,600,1)
 virgin = True
 eps = 0.0000001
 
-# this dataframe holds params for each unit
-params_df = pd.DataFrame(columns=['RFdiam',
-                                  'maxResponse',
-                                  'SI',
-                                  'baseline',
-                                  'layer',
-                                  'anipe',                                  
-                                  'fit_fano_SML',
-                                  'fit_fano_RF',
-                                  'fit_fano_SUR',
-                                  'fit_fano_LAR',
-                                  'fit_fano_BSL',
-                                  'fit_fano_MIN',
-                                  'fit_fano_MAX',
-                                  'fit_fano_MAX_diam',
-                                  'fit_fano_MIN_diam', 
-                                  'fit_fano_near_SUR',
-                                  'spikeWidth',
-                                  'spikeSNR'])
-
 mean_PSTHs = {}
 vari_PSTHs = {}
 mean_PSTHs_SG = {}
@@ -93,7 +76,7 @@ vari_PSTHs_narrow = {}
 mean_PSTHs_broad = {}
 vari_PSTHs_broad = {}
 
-indx = 0
+indx = 1
 
 # analysis done between these timepoints
 anal_time = 400
@@ -121,6 +104,16 @@ for unit in range(len(data)):
                 # bootstrapped fano
                 fano_boot = data[unit][cont]['boot_fano_NoL'][0:np.argmax(response)+1,:]
 
+                # suppressive region
+                fano_tailing     = data[unit][cont]['fano_NoL'][np.argmax(response):]
+                fano_tailing_LB  = fano_tailing - np.percentile(data[unit][cont]['boot_fano_NoL'][np.argmax(response):,:],16,axis=1)
+                fano_tailing_UB  = np.percentile(data[unit][cont]['boot_fano_NoL'][np.argmax(response):,:],84,axis=1) - fano_tailing
+                fano_tailing_SE_boot = np.vstack((fano_tailing_LB, fano_tailing_UB))
+                
+                response_SE_tailing = response_SE[np.argmax(response):]
+                response_tailing = response[np.argmax(response):]
+
+                response = response[0:np.argmax(response)+1]
 
                 L = data[unit]['info']['layer'].decode('utf-8')
 
@@ -149,16 +142,17 @@ for unit in range(len(data)):
 
                 bsl      = np.mean(data[unit][cont]['baseline'])
                 bsl_vari = np.var(data[unit][cont]['baseline'])
-                
-                # analyze only the units that are tuned 
-                if tuned and data[unit]['info']['SNR1'] >=2.5:
+                # remove marmoset data
+                if fano_tailing.shape[0] > 1 and SI >= SI_crit and anipe != 'MM385P1' and anipe != 'MM385P2' and tuned:
 
                     fano_container = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
+                    fano_ERR       = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
                     fano_ERR_container = np.nan * np.ones((2,data[unit][cont]['spkR_NoL'].shape[1]))
                     mean_container    = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
                     mean_SE           = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
                     bsl_container     = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
-                    
+                    mn_bsl_container  = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
+
                     mean_PSTH_allstim = np.nan * np.ones((data[unit][cont]['spkR_NoL'].shape[1],1000))
                     vari_PSTH_allstim = np.nan * np.ones((data[unit][cont]['spkR_NoL'].shape[1],1000))
                     
@@ -179,11 +173,13 @@ for unit in range(len(data)):
                         vari_PSTH_allstim[stim_diam,:] = vari_PSTH
 
                         CI = np.percentile(fano_booted,[16,84])
+                        fano_ERR[stim_diam] = np.std(fano_booted)
                         fano_ERR_container[0,stim_diam] = fano_container[stim_diam] - CI[0]
                         fano_ERR_container[1,stim_diam] = CI[1] - fano_container[stim_diam]
                         mean_container[stim_diam] = np.mean(binned_data[:,first_tp:last_tp][:,0:-1:count_window]/(count_window/1000.0))
                         bsl_container[stim_diam]  = np.mean(vari_PSTH[bsl_begin:bsl_end][0:-1:count_window] / (eps + mean_PSTH[bsl_begin:bsl_end][0:-1:count_window]))
-                        
+                        mn_bsl_container[stim_diam]  = np.mean(mean_PSTH[bsl_begin:bsl_end][0:-1:count_window])
+
                         if data[unit]['info']['diam'][stim_diam] in mean_PSTHs.keys():
                             mean_PSTHs[unit] = np.concatenate((mean_PSTHs[data[unit]['info']['diam'][stim_diam]],
                                                                                                 np.reshape(mean_PSTH,(1,mean_PSTH.shape[0]))), axis=0)
@@ -211,7 +207,6 @@ for unit in range(len(data)):
 
 
                     max_ind = np.argmax(mean_container)
-                    
                         
                     if virgin:
                         fano = np.reshape(fano, (1,fano.shape[0]))
@@ -253,16 +248,19 @@ for unit in range(len(data)):
                             vari_all = np.concatenate((vari_all,vari),axis=0)
                             
                     ##########################
-                   
+
+                    
+                    # fano-vs-size for small count window
+                    surr_narrow,surr_ind_narrow = dalib.saturation_point(mean_container,data[unit]['info']['diam'],criteria=1.3)
 
                     # ROG fit spike-count data 
-                    """ try:
+                    try:
                         popt,pcov = curve_fit(dalib.ROG,data[unit]['info']['diam'],mean_container,bounds=(0,np.inf),maxfev=100000)
-                    except: """
-                    args = (data[unit]['info']['diam'],mean_container)
-                    bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
-                    res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
-                    popt = res.x
+                    except:
+                        args = (data[unit]['info']['diam'],mean_container)
+                        bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+                        res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+                        popt = res.x
                         
                     diams_tight = np.logspace(np.log10(data[unit]['info']['diam'][0]),np.log10(data[unit]['info']['diam'][-1]),1000)
                     Rhat = dalib.ROG(diams_tight,*popt)
@@ -321,59 +319,30 @@ for unit in range(len(data)):
                     surr,surr_ind = dalib.saturation_point(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1),data[unit]['info']['diam'],criteria=1.3)
                     ntrials = data[unit][cont]['spkC_NoL'].shape[0]
                     mx_ind = np.argmax(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1))
-                    spkC = np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)                    
-
-                    # place unit parameters to a dataframe for later analysis
-                    para_tmp = np.ones((1,10),dtype=object)*np.nan
-                    para_tmp = {'RFdiam':data[unit]['info']['diam'][mx_ind],
-                                'maxResponse':np.max(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)),
-                                'SI':(np.max(spkC) - spkC[-1]) / np.max(spkC),
-                                'baseline':np.mean(data[unit][100.0]['baseline']),
-                                'layer':L,
-                                'anipe':anipe,
-                                'ntrials':ntrials,                                
-                                'fit_fano_SML':fit_fano_SML,
-                                'fit_fano_RF':fit_fano_RF,
-                                'fit_fano_SUR':fit_fano_SUR,
-                                'fit_fano_LAR':fit_fano_LAR,
-                                'fit_fano_BSL':fit_fano_BSL,
-                                'fit_fano_MIN':fit_fano_MIN,
-                                'fit_fano_MAX':fit_fano_MAX,
-                                'fit_fano_MIN_diam':fit_fano_MIN_diam,
-                                'fit_fano_MAX_diam':fit_fano_MAX_diam,
-                                'fit_fano_near_SUR':fit_fano_near_SUR,
-                                'spikeWidth':data[unit]['info']['spikewidth1'],
-                                'spikeSNR':data[unit]['info']['SNR1']}
-
-                    tmp_df = pd.DataFrame(para_tmp, index=[indx])
-                    params_df = params_df.append(tmp_df,sort=True)
+                    spkC = np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)                                     
                     indx = indx + 1
-                    
-month = datetime.now().strftime('%b') 
-year = datetime.now().strftime('%Y')
 
-# save data
-params_df.to_csv(S_dir+'SU-extracted_params-'+month+year+'.csv')
+                    ax = plt.subplot(111)
+                    ax2 = ax.twinx()
+                    ax.errorbar(data[unit]['info']['diam'],mean_container,mean_SE,fmt='o',color='k',markersize=5)
+                    ax.plot(diams_tight,Rhat,'k-')
+                    ax.plot([diams_tight[0],diams_tight[-1]],[mn_bsl_container.mean(),mn_bsl_container.mean()],'k--')
+                    ax2.errorbar(data[unit]['info']['diam'],fano_container,fano_ERR,fmt='o',color='r',markersize=5) 
+                    ax2.plot(diams_tight,Fhat,'r-')
+                    ax2.plot([diams_tight[0],diams_tight[-1]],[bsl_container.mean(),bsl_container.mean()],'r--')
 
-with open(S_dir + 'mean_PSTHs-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)
+                    ax.set_xscale('log')
+                    ax.spines['right'].set_color('red')
+                    ax.set_ylabel('spike count',color='k')
 
-with open(S_dir + 'vari_PSTHs-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(vari_PSTHs,f,pkl.HIGHEST_PROTOCOL)
+                    ax2.set_xscale('log')
+                    ax2.tick_params(axis='y',color='red')
+                    ax2.spines['right'].set_color('red')
+                    ax2.set_ylabel('fano factor',color='red')                    
 
-# layer resolved
-# SG
-with open(S_dir + 'mean_PSTHs_SG-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(mean_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_SG-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(vari_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-# G
-with open(S_dir + 'mean_PSTHs_G-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(mean_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_G-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(vari_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-# IG
-with open(S_dir + 'mean_PSTHs_IG-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(mean_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_IG-MK-SU-'+month+year+'.pkl','wb') as f:
-    pkl.dump(vari_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
+                    ax.set_title('unit: ' + str(unit) + ' layer: ' + L)
+                    pdf.savefig()
+                    ax.cla()
+                    ax2.cla()
+
+pdf.close()

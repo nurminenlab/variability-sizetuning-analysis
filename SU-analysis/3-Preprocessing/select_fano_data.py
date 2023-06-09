@@ -32,7 +32,7 @@ boot_num = int(1e3)
 eps = np.finfo(float).eps
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
-outfile = 'selectedData_lenient_400ms_macaque_July2020.pkl'
+outfile = 'selectedData_macaque_Jun2023.pkl'
 
 w_dir = os.getcwd()
 # loop through penetrations and animals

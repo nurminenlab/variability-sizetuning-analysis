@@ -13,7 +13,7 @@ from datetime import datetime
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 #_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
-MUdatfile = 'selectedData_macaque_July2020.pkl'
+MUdatfile = 'selectedData_macaque_Jun2023.pkl'
 
 # analysis done between these timepoints
 anal_duration = 400

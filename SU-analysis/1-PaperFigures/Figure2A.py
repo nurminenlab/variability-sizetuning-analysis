@@ -16,8 +16,8 @@ import scipy.stats as sts
 
 save_figures = False
 
-S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
+S_dir   = 'c:/users/lonurmin/desktop/correlatedvariability/results/SU-preprocessed/'
+fig_dir   = 'c:/users/lonurmin/desktop/correlatedvariability/results/SU-figures/'
 
 # analysis done between these timepoints
 anal_duration = 400
@@ -107,7 +107,10 @@ for unit in list(SG_mn_data.keys()):
         FR   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)    
         bsl_FF = np.mean(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window] / (eps + mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]))
         bsl_FR = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
-                
+        if bsl_FF == 0:
+            print('Unit:',unit)
+
+
         if mn_mtrx.shape[0] == 18:
             diam = diams[stim+1]
         else:

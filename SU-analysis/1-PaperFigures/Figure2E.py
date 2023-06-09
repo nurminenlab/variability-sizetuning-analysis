@@ -5,7 +5,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 anal_root = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'

@@ -5,7 +5,7 @@ import seaborn as sns
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
