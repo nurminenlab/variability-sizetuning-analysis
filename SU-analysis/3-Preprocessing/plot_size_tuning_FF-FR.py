@@ -102,13 +102,7 @@ for unit in range(len(data)):
                 fano_peak_stim = np.argmax(data[unit][cont]['fano_NoL'])+1
 
                 # bootstrapped fano
-                fano_boot = data[unit][cont]['boot_fano_NoL'][0:np.argmax(response)+1,:]
-
-                # suppressive region
-                fano_tailing     = data[unit][cont]['fano_NoL'][np.argmax(response):]
-                fano_tailing_LB  = fano_tailing - np.percentile(data[unit][cont]['boot_fano_NoL'][np.argmax(response):,:],16,axis=1)
-                fano_tailing_UB  = np.percentile(data[unit][cont]['boot_fano_NoL'][np.argmax(response):,:],84,axis=1) - fano_tailing
-                fano_tailing_SE_boot = np.vstack((fano_tailing_LB, fano_tailing_UB))
+                fano_boot = data[unit][cont]['boot_fano_NoL'][0:np.argmax(response)+1,:]                
                 
                 response_SE_tailing = response_SE[np.argmax(response):]
                 response_tailing = response[np.argmax(response):]
@@ -142,8 +136,9 @@ for unit in range(len(data)):
 
                 bsl      = np.mean(data[unit][cont]['baseline'])
                 bsl_vari = np.var(data[unit][cont]['baseline'])
+                
                 # remove marmoset data
-                if fano_tailing.shape[0] > 1 and SI >= SI_crit and anipe != 'MM385P1' and anipe != 'MM385P2' and tuned:
+                if SI >= SI_crit and tuned and data[unit]['info']['SNR1'] >=2.5:
 
                     fano_container = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
                     fano_ERR       = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])

@@ -149,9 +149,9 @@ for unit in range(len(data)):
 
                 bsl      = np.mean(data[unit][cont]['baseline'])
                 bsl_vari = np.var(data[unit][cont]['baseline'])
-                
+                 
                 # analyze only the units that are tuned 
-                if tuned and data[unit]['info']['SNR1'] >=2.5:
+                if SI >= SI_crit and tuned and data[unit]['info']['SNR1'] >=2.5:
 
                     fano_container = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
                     fano_ERR_container = np.nan * np.ones((2,data[unit][cont]['spkR_NoL'].shape[1]))

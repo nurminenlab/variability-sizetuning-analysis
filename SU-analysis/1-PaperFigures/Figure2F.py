@@ -40,7 +40,7 @@ ax.set_yscale('log')
 ax.set_ylim(0.01,100)
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2G.svg')
+    plt.savefig(fig_dir + 'F2F.svg')
 
 
 print('RF_normed_maxQuenchDiam medians')

@@ -11,17 +11,16 @@ save_figures = True
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 
-params_df = pd.read_csv(F_dir + 'SU-extracted_params-Jun2023.csv')
+params = pd.read_csv(F_dir + 'SU-extracted_params-Jun2023.csv')
 
-params = params_df[['layer','fit_fano_SML','fit_fano_RF','fit_fano_SUR','fit_fano_LAR','fit_fano_MIN','fit_fano_MAX','fit_fano_BSL','SI']]
-params = params.dropna()
+#params = params.dropna()
 
-indx = params[params['fit_fano_MIN'] == 0].index
+#indx = params[params['fit_fano_MIN'] == 0].index
 #params.drop(indx,inplace=True)
 params['utype'] = ['multi'] * len(params.index)
 
-FFsuppression = -100 *(1-(params['fit_fano_RF'] / params['fit_fano_BSL']))
-FFsurfac = 100 * (params['fit_fano_LAR'] - params['fit_fano_RF'])/ params['fit_fano_RF']
+FFsuppression = -100*((params['fit_fano_BSL']-params['fit_fano_RF'])) / params['fit_fano_BSL']
+FFsurfac =  100*(params['fit_fano_LAR'] - params['fit_fano_RF']) / params['fit_fano_RF']
 params.insert(3,'FFchange_BSL_RF',FFsuppression.values)
 params.insert(3,'FFchange_RF_large',FFsurfac.values)
 
@@ -31,10 +30,10 @@ params.drop(inds,inplace=True)
 ax = plt.subplot(121)
 SEM = params.groupby('layer')['FFchange_BSL_RF'].sem()
 params.groupby('layer')['FFchange_BSL_RF'].mean().plot(kind='bar',ax=ax,yerr=SEM,color='white',edgecolor='red')
-ax.set_ylim(-80,90)
+ax.set_ylim(-80,250)
 ax = plt.subplot(122)
 sns.swarmplot(x='layer',y='FFchange_BSL_RF',data=params,ax=ax,size=3,color='red')
-ax.set_ylim(-80,90)
+ax.set_ylim(-80,250)
 if save_figures:
     plt.savefig(fig_dir + 'F2C-left.svg',bbox_inches='tight',pad_inches=0)
 
@@ -100,12 +99,12 @@ IG_results = sm.OLS(Y,X).fit()
 plt.figure()
 ax = plt.subplot(111)
 sns.scatterplot(x='SI',y='FFchange_RF_large',hue='layer',data=params,ax=ax)
-ax.plot([np.min(SG['SI']),np.max(SG['SI'])],
+""" ax.plot([np.min(SG['SI']),np.max(SG['SI'])],
         SG_results.params[0] + SG_results.params[1]*np.array([np.min(SG['SI']),np.max(SG['SI'])]),'b-')
 ax.plot([np.min(G['SI']),np.max(G['SI'])],
         G_results.params[0] + G_results.params[1]*np.array([np.min(G['SI']),np.max(G['SI'])]),'r-')
 ax.plot([np.min(IG['SI']),np.max(IG['SI'])],
-        IG_results.params[0] + IG_results.params[1]*np.array([np.min(IG['SI']),np.max(IG['SI'])]),'g-')
+        IG_results.params[0] + IG_results.params[1]*np.array([np.min(IG['SI']),np.max(IG['SI'])]),'g-') """
 ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
 ax.set_xlabel('Suppression Index')
 ax.set_ylabel('Fano Factor change (%)')

@@ -32,4 +32,4 @@ ax.set_ylim(0,7)
 ax.set_aspect('equal')
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2D_fano-scatters-RF-26.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'F2C_fano-scatters-RF-26.svg',bbox_inches='tight',pad_inches=0)

@@ -14,7 +14,7 @@ from scipy.optimize import basinhopping, curve_fit
 
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
 S_dir   = 'c:/users/lonurmin/desktop/correlatedvariability/results/SU-preprocessed/'
 fig_dir   = 'c:/users/lonurmin/desktop/correlatedvariability/results/SU-figures/'
@@ -233,7 +233,7 @@ ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
 if save_figures:
-    plt.savefig(fig_dir + 'F2_SG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'F2A_SG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = SG_params.groupby('diam')['FR'].mean()
 D = SG_params['diam'].unique()[FR.argmax()]
@@ -288,7 +288,7 @@ ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
 if save_figures:
-    plt.savefig(fig_dir + 'F2_G_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'F2A_G_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = G_params.groupby('diam')['FR'].mean()
 D = G_params['diam'].unique()[FR.argmax()]
@@ -334,7 +334,6 @@ ax.plot([IG_params['diam'].min(),IG_params['diam'].max()],[IG_bsl_FF,IG_bsl_FF],
 # fits
 ax.plot(diams_tight, Fhat, 'r-',lw=1)
 
-
 SEM_FR = IG_params.groupby(['diam'])['FR'].sem()
 IG_params.groupby(['diam'])['FR'].mean().plot(yerr=SEM_FR,ax=ax2,kind='line',fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.plot([IG_params['diam'].min(),IG_params['diam'].max()],[IG_bsl_FR,IG_bsl_FR],'k--')
@@ -346,7 +345,7 @@ ax.spines['left'].set_color('red')
 ax2.spines['left'].set_color('red')
 ax.tick_params(axis='y',colors='red')
 if save_figures:
-    plt.savefig(fig_dir + 'F2_IG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'F2A_IG_ASFs-average.svg',bbox_inches='tight',pad_inches=0)
 
 FR = IG_params.groupby('diam')['FR'].mean()
 D = IG_params['diam'].unique()[FR.argmax()]
