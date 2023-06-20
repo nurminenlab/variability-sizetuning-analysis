@@ -15,7 +15,7 @@ S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-M
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 save_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
 
-MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
+MUdatfile = 'selectedData_macaque_July2020.pkl'
 
 # analysis done between these timepoints
 anal_duration = 300

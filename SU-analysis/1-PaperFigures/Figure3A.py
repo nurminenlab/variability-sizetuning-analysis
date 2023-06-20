@@ -80,9 +80,8 @@ def process(data,mean_data,bsl_begin,t,diams):
             mean_PSTH = mean_PSTH/0.1
             # raster
             plt.figure(fig1)
-            dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax1[count],color='black')        
+            dalib.rasters(np.squeeze(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:]), t, ax1[count],color='black')
             
-
             plt.figure(fig2)
             # PSTH
             ax2[0,count].fill_between(t,mean_PSTH-PSTH_SE,mean_PSTH+PSTH_SE,color='gray')

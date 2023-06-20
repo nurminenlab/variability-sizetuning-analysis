@@ -7,10 +7,10 @@ from statsmodels.formula.api import ols
 
 save_figures = False
 
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
 
-params = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
+params = pd.read_csv(F_dir + 'extracted_params-newselection-Jun2023.csv')
 
 FF_size = pd.DataFrame(columns=['fano','size','layer'])
 FF_size_all = pd.DataFrame(columns=['fano','size','layer'])
@@ -61,3 +61,14 @@ print(params.groupby('layer')[['fit_fano_RF','fit_fano_LAR']].mean())
 
 print('\n SEM fano-factor RF vs LAR across layers')
 print(params.groupby('layer')[['fit_fano_RF','fit_fano_LAR']].sem())
+
+
+print('\n t-test for fano-factor in RF vs near-surround across layers')
+print(params.groupby('layer').apply(lambda df: sts.ttest_rel(df['fit_fano_SUR'],df['fit_fano_RF'],nan_policy='omit')))
+
+print('\n mean fano-factor RF vs LAR across layers')
+print(params.groupby('layer')[['fit_fano_RF','fit_fano_SUR']].mean())
+
+print('\n SEM fano-factor RF vs LAR across layers')
+print(params.groupby('layer')[['fit_fano_RF','fit_fano_SUR']].sem())
+
