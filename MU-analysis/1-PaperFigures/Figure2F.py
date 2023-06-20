@@ -1,58 +1,51 @@
-import numpy as np
+import sys
 import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
 from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
 save_figures = False
 
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
-params = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
+anal_root = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/'
 
-params['RFnormed_maxQuenchDiam'] = params['fit_fano_MIN_diam'] / params['RFdiam']
+# to generate quencher_DF run generate_quencher_DF.py
+quencher_DF = pd.read_csv(anal_root+'quencher_DF.csv')
 
-SG_df = params.query('layer == "LSG"')
-G_df  = params.query('layer == "L4C"')
-IG_df = params.query('layer == "LIG"')
-
-SG_medians = np.nanmedian(np.random.choice(SG_df['RFnormed_maxQuenchDiam'].values,
-                            size=(10000,SG_df['RFnormed_maxQuenchDiam'].values.shape[0]),replace=True),axis=1)
-
-G_medians = np.nanmedian(np.random.choice(G_df['RFnormed_maxQuenchDiam'].values,
-                            size=(10000,G_df['RFnormed_maxQuenchDiam'].values.shape[0]),replace=True),axis=1)
-
-IG_medians = np.nanmedian(np.random.choice(IG_df['RFnormed_maxQuenchDiam'].values,
-                            size=(10000,IG_df['RFnormed_maxQuenchDiam'].values.shape[0]),replace=True),axis=1)
-
-medians = [np.std(G_medians),np.std(IG_medians),np.std(SG_medians)]
-
-ax = plt.subplot(121)
-params.groupby('layer')['RFnormed_maxQuenchDiam'].median().plot(kind='bar',yerr=medians,ax=ax,color='white',edgecolor='red')
-ax.set_yscale('log')
-ax.set_ylim(0.01,100)
-
-ax = plt.subplot(122)
-sns.swarmplot(x='layer',y='RFnormed_maxQuenchDiam',data=params,ax=ax,size=3,color='red')
-ax.set_yscale('log')
-ax.set_ylim(0.01,100)
+# bar graph of the proportion of quenchers in each layer
+ax = plt.subplot(111)
+quencher_DF.groupby(['layer','FF_sup']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()).unstack().plot(kind='bar', stacked=True, ax=ax,color=['red','grey','blue'])
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2G.svg')
+    plt.savefig(fig_dir + 'F2E.svg',bbox_inches='tight',pad_inches=0)
 
+# the proportion of quenchers 
+print('\n The proportion of quenchers:')
+print(quencher_DF.groupby(['FF_sup']).size() / len(quencher_DF))
+# the number of quenchers 
+print('\n The number of quenchers:')
+print(quencher_DF.groupby(['FF_sup']).size())
 
-params_FANO = pd.read_csv(F_dir + 'extracted_params-Dec-2021.csv')
-params['RFdiam'] = params_FANO['RFdiam']
+# print out the percentage of quenchers in each layer
+print(quencher_DF.groupby(['layer','FF_sup']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()))
 
-print('RF_normed_maxQuenchDiam medians')
-params.groupby('layer')['RFnormed_maxQuenchDiam'].median()
+# main effect of FF_sup
+print('\n The main effect of FF_sup:')
+lm = ols('SI ~ C(FF_sup)',data=quencher_DF).fit()
+print(sm.stats.anova_lm(lm,typ=1))
 
-print('RF_normed_maxQuenchDiam bootstrapper errors for medians')
-print('SG: ', medians[2])
-print('G: ',medians[0])
-print('IG: ',medians[1])
+# means of SI for each FF_sup class
+print('\n The means of SI for each FF_sup class:')
+print(quencher_DF.groupby('FF_sup')['SI'].mean())
+print(quencher_DF.groupby('FF_sup')['SI'].sem())
 
+print('\n Mean change of fano factor for each FF_sup class in different layers')
+print(quencher_DF.groupby(['FF_sup','layer'])['FF_sup_magn'].mean())
+print('\n SEM ')
+print(quencher_DF.groupby(['FF_sup','layer'])['FF_sup_magn'].sem())
 
-
+FAC = quencher_DF.query('FF_sup == "facilitator"')
+SUP = quencher_DF.query('FF_sup == "suppresser"')
+print('\n t-test aggregated for across layers for Fano-suppression vs. Fano-facilitation magnitude')
+print(sts.ttest_ind(FAC['FF_sup_magn'],SUP['FF_sup_magn'].abs()))
