@@ -21,8 +21,10 @@ params['utype'] = ['multi'] * len(params.index)
 
 FFsuppression = -100 *(1-(params['fit_fano_RF'] / params['fit_fano_BSL']))
 FFsurfac = 100 * (params['fit_fano_LAR'] - params['fit_fano_RF'])/ params['fit_fano_RF']
+FFsurfac_SUR = 100 * (params['fit_fano_SUR'] - params['fit_fano_RF'])/ params['fit_fano_RF']
 params.insert(3,'FFsuppression',FFsuppression.values)
 params.insert(3,'FFsurfac',FFsurfac.values)
+params.insert(3,'FFsurfac_SUR',FFsurfac_SUR.values)
 
 plt.figure()
 inds = params[params['FFsuppression'] < -300].index
@@ -96,6 +98,8 @@ X = IG['SI'].values
 X = sm.add_constant(X)
 IG_results = sm.OLS(Y,X).fit()
 
+
+
 plt.figure()
 ax = plt.subplot(111)
 sns.scatterplot(x='SI',y='FFsurfac',hue='layer',data=params,ax=ax)
@@ -114,3 +118,45 @@ if save_figures:
 print('\n test on correlation between FFsurfac and SI')
 print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI'],df['FFsurfac'])))
 
+
+plt.figure()
+
+ax = plt.subplot(121)
+SEM = params.groupby('layer')['FFsurfac_SUR'].sem()
+params.groupby('layer')['FFsurfac_SUR'].mean().plot(kind='bar',ax=ax,yerr=SEM,color='white',edgecolor='red')
+ax.set_ylim(-70,160)
+ax = plt.subplot(122)
+sns.swarmplot(x='layer',y='FFsurfac_SUR',data=params,ax=ax,size=3,color='red')
+ax.set_ylim(-70,160)
+
+if save_figures:
+    plt.savefig(fig_dir + 'F2E-top.svg',bbox_inches='tight',pad_inches=0)
+
+print(params.groupby('layer')['FFsurfac_SUR'].mean())
+print(params.groupby('layer')['FFsurfac_SUR'].sem())
+
+print('\n ANOVA: the effect of layer on FFfacilitation')
+lm = ols('FFsurfac_SUR ~ C(layer)',data=params).fit()
+print(sm.stats.anova_lm(lm,typ=1))
+
+print('\n t-test FFsurfac_SUR different from zero')
+print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac_SUR'],0)))
+
+SG = params.query('layer == "LSG"')
+G  = params.query('layer == "L4C"')
+IG = params.query('layer == "LIG"')
+
+Y = SG['FFsurfac_SUR'].values
+X = SG['SI_SUR'].values
+X = sm.add_constant(X)
+SG_results = sm.OLS(Y,X).fit()
+
+Y = G['FFsurfac_SUR'].values
+X = G['SI_SUR'].values
+X = sm.add_constant(X)
+G_results = sm.OLS(Y,X).fit()
+
+Y = IG['FFsurfac_SUR'].values
+X = IG['SI_SUR'].values
+X = sm.add_constant(X)
+IG_results = sm.OLS(Y,X).fit()

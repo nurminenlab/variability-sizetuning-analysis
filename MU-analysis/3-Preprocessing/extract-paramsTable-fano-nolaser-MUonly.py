@@ -310,8 +310,7 @@ for unit in range(len(data)):
                         fit_fano_LAR = Fhat[-1]
                         fit_fano_BSL = np.mean(bsl_container)
                         fit_fano_MIN = np.max((np.min(Fhat),0)) # in case of negative values resulting from bad fits
-                        fit_fano_MAX = np.max(Fhat)
-                        fit_fano_near_SUR = dalib.doubleROG(diams_tight[np.argmax(Rhat)]*2,*res.x)
+                        fit_fano_MAX = np.max(Fhat)                        
 
                         fit_fano_MAX_diam = diams_tight[np.argmax(Fhat)]
                         fit_fano_MIN_diam = diams_tight[np.argmin(Fhat)]
@@ -329,7 +328,8 @@ for unit in range(len(data)):
                     para_tmp = np.ones((1,10),dtype=object)*np.nan
                     para_tmp = {'RFdiam':data[unit]['info']['diam'][mx_ind],
                                 'maxResponse':np.max(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)),
-                                'SI':(np.max(spkC) - spkC[-1]) / np.max(spkC),
+                                'SI':(np.max(Rhat) - Rhat[-1]) / np.max(Rhat),
+                                'SI_SUR':(np.max(Rhat) - Rhat[surr_ind_narrow_new]) / np.max(Rhat),
                                 'baseline':np.mean(data[unit][100.0]['baseline']),
                                 'layer':L,
                                 'anipe':anipe,
@@ -343,8 +343,7 @@ for unit in range(len(data)):
                                 'fit_fano_MIN':fit_fano_MIN,
                                 'fit_fano_MAX':fit_fano_MAX,
                                 'fit_fano_MIN_diam':fit_fano_MIN_diam,
-                                'fit_fano_MAX_diam':fit_fano_MAX_diam,
-                                'fit_fano_near_SUR':fit_fano_near_SUR}
+                                'fit_fano_MAX_diam':fit_fano_MAX_diam}
 
                     tmp_df = pd.DataFrame(para_tmp, index=[indx])
                     params_df = params_df.append(tmp_df,sort=True)
