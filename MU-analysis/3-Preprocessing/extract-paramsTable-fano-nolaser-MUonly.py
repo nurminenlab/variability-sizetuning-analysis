@@ -280,7 +280,7 @@ for unit in range(len(data)):
                             surr_ind_narrow_new = -1
 
                     surr_narrow_new = diams_tight[surr_ind_narrow_new]
-                    # ROG fit fano data 
+                    # double ROG fit fano data 
                     args = (data[unit]['info']['diam'],fano_container)
                     
                     bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
