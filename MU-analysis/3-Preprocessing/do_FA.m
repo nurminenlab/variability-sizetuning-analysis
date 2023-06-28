@@ -6,6 +6,8 @@ addpath(genpath('C:\Users\lonurmin\Desktop\code\npy-matlab'));
 F_dir = 'C:\Users\lonurmin\Desktop\CorrelatedVariability\results\paper_v9\MK-MU\GPFA-long-rasters\';
 penetrations = {'MK366P1','MK366P3','MK366P8','MK374P1','MK374P2'};
 
+
+
 rindx = 0;
 C_final  = []
 rr_final = []
@@ -35,6 +37,10 @@ bsl_privatevariance_all_SG = [];
 bsl_privatevariance_all_G  = [];
 bsl_privatevariance_all_IG = [];
 
+n_penetrations = 5;
+n_diameters    = 19;
+n_eigen        = 20;
+
 n_SG = 0;
 n_G = 0;
 n_IG = 0;
@@ -52,8 +58,7 @@ for i = 1:length(penetrations)
     C  = [];
     rr = [];
     C_bsl  = [];
-    rr_bsl = [];   
-    
+    rr_bsl = [];       
 
     stim_ind = 0;
     for stim = 1:length(fls)
@@ -79,7 +84,8 @@ for i = 1:length(penetrations)
             bsl_mean_response_IG = NaN * ones(sum(layers==3),length(bls));
         end
         
-        % layers loop
+        % layers loop, for cross-validating FA dimensionality, we do the
+        % analysis layer-by-layer
         for l = 1:3
             for tr = 1:size(spkR,3)
                 D(tr).spikes = [spkR(layers==l,first_tp:last_tp,tr)]; %#ok<*SAGROW> 
@@ -88,7 +94,8 @@ for i = 1:length(penetrations)
                 D_bsl(tr).trialId = tr;
             end          
             % estimate gpfa for evoked responses
-            results = neuralTraj(rindx,D);
+            results = neuralTraj(rindx,D,1);
+            E = sort(sum(results.kern(1).estParams.L.^2,1),'descend');
             CC = diag(results.kern(1).estParams.L*results.kern(1).estParams.L');
             R  = diag(results.kern(1).estParams.Ph);
             spk = results.kern(1).estParams.d;
@@ -107,6 +114,12 @@ for i = 1:length(penetrations)
                 mean_response_SG(:,stim_ind) = spk;
                 bsl_netvariance_SG(:,stim_ind) = bsl_CC;                
                 bsl_mean_response_SG(:,stim_ind) = bsl_spk;
+                if length(fls) == 18
+                    si = stim +1;
+                else
+                    si = stim;
+                end
+                SG_eigenvalues(i,1:size(D(1).spikes,1),si) = E; 
             elseif l == 2
                 netvariance_G(:,stim_ind)  = CC;
                 mean_response_G(:,stim_ind)  = spk;
@@ -126,14 +139,15 @@ for i = 1:length(penetrations)
 
     end
     
+    if false
+        writeNPY(netvariance_SG,['netvariance_SG',penetrations{i},'.npy']);
+        writeNPY(netvariance_G,['netvariance_G',penetrations{i},'.npy']);
+        writeNPY(netvariance_IG,['netvariance_IG',penetrations{i},'.npy']);
 
-    writeNPY(netvariance_SG,['netvariance_SG',penetrations{i},'.npy']);
-    writeNPY(netvariance_G,['netvariance_G',penetrations{i},'.npy']);
-    writeNPY(netvariance_IG,['netvariance_IG',penetrations{i},'.npy']);
-
-    writeNPY(bsl_netvariance_SG,['bsl_netvariance_SG',penetrations{i},'.npy']);
-    writeNPY(bsl_netvariance_G,['bsl_netvariance_G',penetrations{i},'.npy']);
-    writeNPY(bsl_netvariance_IG,['bsl_netvariance_IG',penetrations{i},'.npy']);
+        writeNPY(bsl_netvariance_SG,['bsl_netvariance_SG',penetrations{i},'.npy']);
+        writeNPY(bsl_netvariance_G,['bsl_netvariance_G',penetrations{i},'.npy']);
+        writeNPY(bsl_netvariance_IG,['bsl_netvariance_IG',penetrations{i},'.npy']);
+    end
 
     if size(netvariance_SG,2 ) == 18
         netvariance_SG = [nan*ones(size(netvariance_SG,1),1), netvariance_SG]; %#ok<*AGROW> 
@@ -177,18 +191,19 @@ mean_response_all_SG = mean_response_all_SG./0.08;
 mean_response_all_IG = mean_response_all_IG./0.08;
 mean_response_all_G  = mean_response_all_G./0.08;
 
-writeNPY(netvariance_all_SG,'netvariance_all_SG.npy');
-writeNPY(mean_response_all_SG,'mean_response_all_SG.npy');
-writeNPY(bsl_netvariance_all_SG,'bsl_netvariance_all_SG.npy');
-writeNPY(bsl_mean_response_all_SG,'bsl_mean_response_all_SG.npy');
+if false
+    writeNPY(netvariance_all_SG,'netvariance_all_SG.npy');
+    writeNPY(mean_response_all_SG,'mean_response_all_SG.npy');
+    writeNPY(bsl_netvariance_all_SG,'bsl_netvariance_all_SG.npy');
+    writeNPY(bsl_mean_response_all_SG,'bsl_mean_response_all_SG.npy');
 
-writeNPY(netvariance_all_G,'netvariance_all_G.npy');
-writeNPY(mean_response_all_G,'mean_response_all_G.npy');
-writeNPY(bsl_netvariance_all_G,'bsl_netvariance_all_G.npy');
-writeNPY(bsl_mean_response_all_G,'bsl_mean_response_all_G.npy');
+    writeNPY(netvariance_all_G,'netvariance_all_G.npy');
+    writeNPY(mean_response_all_G,'mean_response_all_G.npy');
+    writeNPY(bsl_netvariance_all_G,'bsl_netvariance_all_G.npy');
+    writeNPY(bsl_mean_response_all_G,'bsl_mean_response_all_G.npy');
 
-writeNPY(netvariance_all_IG,'netvariance_all_IG.npy');
-writeNPY(mean_response_all_IG,'mean_response_all_IG.npy');
-writeNPY(bsl_netvariance_all_IG,'bsl_netvariance_all_IG.npy');
-writeNPY(bsl_mean_response_all_IG,'bsl_mean_response_all_IG.npy');
-
+    writeNPY(netvariance_all_IG,'netvariance_all_IG.npy');
+    writeNPY(mean_response_all_IG,'mean_response_all_IG.npy');
+    writeNPY(bsl_netvariance_all_IG,'bsl_netvariance_all_IG.npy');
+    writeNPY(bsl_mean_response_all_IG,'bsl_mean_response_all_IG.npy');
+end
