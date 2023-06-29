@@ -9,9 +9,9 @@ penetrations = {'MK366P1','MK366P3','MK366P8','MK374P1','MK374P2'};
 n_factors = 3;
 n_diameters = 19;
 
-SG_RMSEs = NaN * ones(length(penetrations),n_diameters,4);
-G_RMSEs  = NaN * ones(length(penetrations),n_diameters,3);
-IG_RMSEs = NaN * ones(length(penetrations),n_diameters, 7);
+SG_RMSEs = NaN * ones(length(penetrations),n_diameters,n_factors);
+G_RMSEs  = NaN * ones(length(penetrations),n_diameters,n_factors);
+IG_RMSEs = NaN * ones(length(penetrations),n_diameters, n_factors);
 
 rindx = 0;
 C_final  = []
@@ -52,17 +52,9 @@ for i = 1:length(penetrations)
         % layers loop, for cross-validating FA dimensionality, we do the
         % analysis layer-by-layer
         for l = 1:3
-            if l == 1
-                n_factors = 4;
-            elseif l == 2
-                n_factors = 3;
-            else
-                n_factors = 7;
-            end           
+            for f = 1:n_factors
 
-
-            for f = 1:n_factors            
-
+            
                 for tr = 1:size(spkR,3)
                     D(tr).spikes = [spkR(layers==l,first_tp:last_tp,tr)]; %#ok<*SAGROW> 
                     D(tr).trialId = tr;

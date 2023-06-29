@@ -1,8 +1,0 @@
-function plot_eigens(eigens)
-
-for i = 1:size(eigens,3)
-        EG = mean(E,1);
-    figure
-    plot(EG)
-end
-
