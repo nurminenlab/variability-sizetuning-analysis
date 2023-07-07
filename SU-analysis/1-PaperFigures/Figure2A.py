@@ -14,7 +14,7 @@ from scipy.optimize import basinhopping, curve_fit
 
 import scipy.stats as sts
 
-save_figures = True
+save_figures = False
 
 S_dir   = 'c:/users/lonurmin/desktop/correlatedvariability/results/SU-preprocessed/'
 fig_dir   = 'c:/users/lonurmin/desktop/correlatedvariability/results/SU-figures/'
@@ -97,6 +97,20 @@ IG_params = pd.DataFrame(columns=['fano',
 # loop SG units
 indx   = 0
 q_indx = 0
+
+# we clean up units without much fano factor tuning
+SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
+IG_units_to_remove = [20,46,81]
+
+# 
+for unit in SG_units_to_remove:
+    SG_mn_data.pop(unit)
+    SG_vr_data.pop(unit)
+
+for unit in IG_units_to_remove:
+    IG_mn_data.pop(unit)
+    IG_vr_data.pop(unit)
+
 for unit in list(SG_mn_data.keys()):
     # loop diams
     mn_mtrx = SG_mn_data[unit]
@@ -214,7 +228,8 @@ ax2 = ax.twinx()
 SG_bsl_FR = SG_params['bsl_FR'].apply(lambda x: x/(count_window/1000.0)).mean()
 SG_bsl_FF = SG_params['bsl'].mean()
 
-SEM = SG_params.groupby(['diam'])['fano'].sem()
+SG_params['log_fano'] = SG_params['fano'].apply(lambda x: np.log(x))
+SEM = SG_params.groupby(['diam'])['log_fano'].sem().apply(lambda x: np.exp(x))
 SG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro',markersize=4,mfc='None',lw=1)
 
 ax.set_xlabel('')
@@ -354,4 +369,4 @@ FF_RF = IG_params[IG_params['diam'] == D]
 FF_LAR = IG_params[IG_params['diam'] == D_max]
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
-# just some garbage
+# just some garbage 

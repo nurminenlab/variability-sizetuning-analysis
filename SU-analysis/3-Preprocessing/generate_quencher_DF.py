@@ -55,6 +55,18 @@ quencher_DF = pd.DataFrame(columns=['FF_sup',
                                     'FF_sup_magn',
                                     'unit'])
 
+# we clean up units without much fano factor tuning
+SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
+IG_units_to_remove = [20,46,81]
+
+for unit in SG_units_to_remove:
+    SG_mn_data.pop(unit)
+    SG_vr_data.pop(unit)
+
+for unit in IG_units_to_remove:
+    IG_mn_data.pop(unit)
+    IG_vr_data.pop(unit)
+
 # loop SG units
 indx  = 0
 qindx = 0
@@ -247,4 +259,4 @@ for unit in list(IG_mn_data.keys()):
 
 month = datetime.now().strftime('%b') 
 year = datetime.now().strftime('%Y')
-quencher_DF.to_csv(S_dir+'quencher_DF-'+month+year+'.csv')
+quencher_DF.to_csv(S_dir+'quencher_DF-no-noisy-'+month+year+'.csv')

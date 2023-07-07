@@ -16,8 +16,8 @@ import scipy.stats as sts
 
 save_figures = False
 
-S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
+S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 
 # analysis done between these timepoints
 anal_duration = 400
@@ -40,25 +40,26 @@ def cost_fano(params,xdata,ydata):
 
 eps = 0.0000001
 
+
 with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
     diams_data = pkl.load(f)
 
 diams = np.array(list(diams_data.keys()))
 del(diams_data)
     
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-newselection-Jun2023.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-newselection-Jun2023.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_G-MK-MU-newselection-Jun2023.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
     G_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-newselection-Jun2023.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
     G_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-newselection-Jun2023.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
     IG_mn_data = pkl.load(f)    
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-newselection-Jun2023.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
     IG_vr_data = pkl.load(f)    
 
 # param tables
@@ -93,6 +94,19 @@ IG_params = pd.DataFrame(columns=['fano',
                                 'bsl_FR',
                                 'layer',
                                 'FR'])
+
+
+# we clean up units without much fano factor tuning
+SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
+IG_units_to_remove = [20,46,81]
+
+for unit in SG_units_to_remove:
+    SG_mn_data.pop(unit)
+    SG_vr_data.pop(unit)
+
+for unit in IG_units_to_remove:
+    IG_mn_data.pop(unit)
+    IG_vr_data.pop(unit)
 
 # loop SG units
 indx   = 0
@@ -189,8 +203,8 @@ IG_params['RFnormed_bslFR'] = IG_params['bsl_FR'] / IG_params['FR']
 # loop units
 my_sizes = np.array([0.25, 0.5, 0.75, 
                      1.5, 2, 2.5, 3, 
-                     4, 5, 6, 7, 8,
-                     10, 15, 20, 30])
+                     4, 5, 6, 7,
+                     10])
 
 
 units = SG_params['unit'].unique()
@@ -214,7 +228,7 @@ for ui, unit in enumerate(units):
     Rhat = dalib.ROG(diams_tight,*popt)
     RF   = diams_tight[np.argmax(Rhat)]
     RF   = unit_params['diam'].values[np.argmin(np.abs(unit_params['diam'].values - RF))]
-    RFnormed = np.append(RFnormed,unit_params['diam'].values/RF)
+    RFnormed = unit_params['diam'].values/RF
     FR       = unit_params['FR'].values    
     FF       = unit_params['fano'].values    
     RFi = np.argmin(np.abs(RFnormed-1))
@@ -224,29 +238,33 @@ for ui, unit in enumerate(units):
     RFnormed = np.delete(RFnormed,RFi)
     FR = np.delete(FR,RFi)
     FF = np.delete(FF,RFi)
+    normed_FR = np.delete(normed_FR,RFi)
 
     for s in range(len(RFnormed)):
         si = np.argmin(np.abs(my_sizes - RFnormed[s]))
         if si >= 3:
             si = si + 1
-    
-      
-        RFnormed_FR[ui,si] = normed_FR[s]
-        RFnormed_FF[ui,si] = FF[s]
-        
+
+        if np.isnan(RFnormed_FR[ui,si]):
+            RFnormed_FR[ui,si] = normed_FR[s]
+            RFnormed_FF[ui,si] = FF[s]
+        else:
+            RFnormed_FR[ui,si] = np.mean([RFnormed_FR[ui,si],normed_FR[s]])
+            RFnormed_FF[ui,si] = np.mean([RFnormed_FF[ui,si],FF[s]])
 
 
 my_sizes = np.insert(my_sizes,3,1)
 
 # ROG fit normalized spike-count data 
 SG_normed_FR = np.nanmean(RFnormed_FR,axis=0)
-#SG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
 SG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
 diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
 try:
-    popt,pcov = curve_fit(dalib.ROG,my_sizes[~np.isnan(SG_normed_FR)],SG_normed_FR,bounds=(0,np.inf),maxfev=100000)
+    th_inds = ~np.isnan(SG_normed_FR)
+    popt,pcov = curve_fit(dalib.ROG,my_sizes[th_inds],SG_normed_FR[th_inds],bounds=(0,np.inf),maxfev=100000)
 except:
-    args = (my_sizes[~np.isnan(SG_normed_FR)],SG_normed_FR)
+    th_inds = ~np.isnan(SG_normed_FR)
+    args = (my_sizes[th_inds],SG_normed_FR[th_inds])
     bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
     res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
     popt = res.x
@@ -254,7 +272,7 @@ except:
 Rhat = dalib.ROG(diams_tight,*popt)
 
 # double ROG fit fano data 
-args = (my_sizes[~np.isnan(SG_normed_FR)],SG_normed_FF)
+args = (my_sizes[th_inds],SG_normed_FF[th_inds])
 bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
 res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
 
@@ -271,10 +289,10 @@ ax2 = ax.twinx()
 ax.set_title('SG')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko')
+
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-#YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro')
 ax.set_xscale('log')
@@ -288,116 +306,16 @@ ax.tick_params(axis='y',labelcolor='red')
 ax2.plot(diams_tight,Rhat,'k-')
 ax.plot(diams_tight,Fhat,'r-')
 
-# granular layer
+# IG
 # loop units
 my_sizes = np.array([0.25, 0.5, 0.75, 
                      1.5, 2, 2.5, 3, 
-                     4, 5, 6, 7, 8,
-                     10, 15, 20, 30])
+                     4, 5, 6, 7,10])
 
-units = G_params['unit'].unique()
-RFnormed_FR = np.nan * np.ones((len(units),len(my_sizes)+1))
-RFnormed_FF = np.nan * np.ones((len(units),len(my_sizes)+1))
-diams_tight = np.logspace(np.log10(G_params['diam'].values[0]),np.log10(G_params['diam'].values[-1]),1000)
-
-for ui, unit in enumerate(units):
-    RFnormed = np.array([])
-    # get unit params
-    unit_params = G_params[G_params['unit']==unit]
-    # fit data
-    try:
-        popt,pcov = curve_fit(dalib.ROG,unit_params['diam'].values,unit_params['FR'].values,bounds=(0,np.inf),maxfev=100000)
-    except:
-        args = (unit_params['diam'].values,unit_params['FR'].values)
-        bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
-        res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
-        popt = res.x
-
-    Rhat = dalib.ROG(diams_tight,*popt)
-    RF   = diams_tight[np.argmax(Rhat)]
-    RF   = unit_params['diam'].values[np.argmin(np.abs(unit_params['diam'].values - RF))]
-    RFnormed = np.append(RFnormed,unit_params['diam'].values/RF)
-    FR       = unit_params['FR'].values    
-    FF       = unit_params['fano'].values    
-    RFi = np.argmin(np.abs(RFnormed-1))
-    normed_FR = FR/np.max(FR)
-    RFnormed_FR[ui,3] = 1
-    RFnormed_FF[ui,3] = FF[RFi]
-    RFnormed = np.delete(RFnormed,RFi)
-    FR = np.delete(FR,RFi)
-    FF = np.delete(FF,RFi)
-
-    for s in range(len(RFnormed)):
-        si = np.argmin(np.abs(my_sizes - RFnormed[s]))
-        if si >= 3:
-            si = si + 1
-
-        RFnormed_FR[ui,si] = normed_FR[s]
-        RFnormed_FF[ui,si] = FF[s]
-
-my_sizes = np.insert(my_sizes,3,1)
-
-# ROG fit normalized spike-count data 
-G_normed_FR = np.nanmean(RFnormed_FR,axis=0)
-G_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
-#G_normed_FF = np.nanmean(RFnormed_FF,axis=0)
-diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
-try:
-    popt,pcov = curve_fit(dalib.ROG,my_sizes[~np.isnan(G_normed_FR)],G_normed_FR,bounds=(0,np.inf),maxfev=100000)
-except:
-    args = (my_sizes[~np.isnan(G_normed_FR)],G_normed_FR)
-    bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
-    res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
-    popt = res.x
-
-Rhat = dalib.ROG(diams_tight,*popt)
-
-# double ROG fit fano data 
-args = (my_sizes[~np.isnan(G_normed_FR)],G_normed_FF)
-bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
-res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
-
-Fhat = dalib.doubleROG(diams_tight,*res.x)
-
-RFnormed_FF_divg = np.nan * np.ones(RFnormed_FF.shape)
-for i in range(RFnormed_FF.shape[1]):
-    RFnormed_FF_divg[:,i] = RFnormed_FF[:,i]/G_normed_FF[i]
-
-plt.figure()
-#plt.figure(figsize=(1.335, 1.115))
-
-ax = plt.subplot(1,1,1)
-ax2 = ax.twinx()
-ax.set_title('G')
-YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
-ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko')
-ax2.set_xscale('log')
-ax2.set_ylabel('Normalized firing rate')
-
-#YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
-ax.set_xscale('log')
-ax.set_ylabel('Fano factor')
-ax.yaxis.label.set_color('red')
-ax.tick_params(axis='y',color='red')
-ax.spines['left'].set_color('red')
-ax2.spines['left'].set_color('red')
-ax.tick_params(axis='y',labelcolor='red')
-
-ax2.plot(diams_tight,Rhat,'k-')
-ax.plot(diams_tight,Fhat,'r-')
-
-# infra-granular layer
-# loop units
-my_sizes = np.array([0.25, 0.5, 0.75, 
-                     1.5, 2, 2.5, 3, 
-                     4, 5, 6, 7, 8, 9,
-                     10, 15, 20, 25, 30, 40])
 
 units = IG_params['unit'].unique()
-RFnormed_FR = np.nan * np.ones((len(units),len(my_sizes)+1))
-RFnormed_FF = np.nan * np.ones((len(units),len(my_sizes)+1))
+RFnormed_FR = np.nan * np.ones((len(units),len(my_sizes)+1)) # +1 for RF
+RFnormed_FF = np.nan * np.ones((len(units),len(my_sizes)+1)) # +1 for RF
 diams_tight = np.logspace(np.log10(IG_params['diam'].values[0]),np.log10(IG_params['diam'].values[-1]),1000)
 
 for ui, unit in enumerate(units):
@@ -416,7 +334,7 @@ for ui, unit in enumerate(units):
     Rhat = dalib.ROG(diams_tight,*popt)
     RF   = diams_tight[np.argmax(Rhat)]
     RF   = unit_params['diam'].values[np.argmin(np.abs(unit_params['diam'].values - RF))]
-    RFnormed = np.append(RFnormed,unit_params['diam'].values/RF)
+    RFnormed = unit_params['diam'].values/RF
     FR       = unit_params['FR'].values    
     FF       = unit_params['fano'].values    
     RFi = np.argmin(np.abs(RFnormed-1))
@@ -426,27 +344,33 @@ for ui, unit in enumerate(units):
     RFnormed = np.delete(RFnormed,RFi)
     FR = np.delete(FR,RFi)
     FF = np.delete(FF,RFi)
+    normed_FR = np.delete(normed_FR,RFi)
 
     for s in range(len(RFnormed)):
         si = np.argmin(np.abs(my_sizes - RFnormed[s]))
         if si >= 3:
             si = si + 1
         
+        if np.isnan(RFnormed_FR[ui,si]):
+            RFnormed_FR[ui,si] = normed_FR[s]
+            RFnormed_FF[ui,si] = FF[s]
+        else:
+            RFnormed_FR[ui,si] = np.mean([RFnormed_FR[ui,si],normed_FR[s]])
+            RFnormed_FF[ui,si] = np.mean([RFnormed_FF[ui,si],FF[s]])
         
-        RFnormed_FR[ui,si] = normed_FR[s]
-        RFnormed_FF[ui,si] = FF[s]
 
 my_sizes = np.insert(my_sizes,3,1)
 
 # ROG fit normalized spike-count data 
 IG_normed_FR = np.nanmean(RFnormed_FR,axis=0)
 IG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
-#IG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
 diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
 try:
-    popt,pcov = curve_fit(dalib.ROG,my_sizes[~np.isnan(IG_normed_FR)],IG_normed_FR,bounds=(0,np.inf),maxfev=100000)
+    th_inds = ~np.isnan(IG_normed_FR)
+    popt,pcov = curve_fit(dalib.ROG,my_sizes[th_inds],IG_normed_FR[th_inds],bounds=(0,np.inf),maxfev=100000)
 except:
-    args = (my_sizes[~np.isnan(IG_normed_FR)],IG_normed_FR)
+    th_inds = ~np.isnan(IG_normed_FR)
+    args = (my_sizes[th_inds],IG_normed_FR[th_inds])
     bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
     res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
     popt = res.x
@@ -454,7 +378,7 @@ except:
 Rhat = dalib.ROG(diams_tight,*popt)
 
 # double ROG fit fano data 
-args = (my_sizes[~np.isnan(IG_normed_FR)],IG_normed_FF)
+args = (my_sizes[th_inds],IG_normed_FF[th_inds])
 bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
 res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
 
@@ -471,12 +395,12 @@ ax.set_title('IG')
 ax2 = ax.twinx()
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko')
+
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-#YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
+ax.errorbar(my_sizes, IG_normed_FF,yerr=YERR,fmt='ro')
 ax.set_xscale('log')
 ax.set_ylabel('Fano factor')
 ax.yaxis.label.set_color('red')

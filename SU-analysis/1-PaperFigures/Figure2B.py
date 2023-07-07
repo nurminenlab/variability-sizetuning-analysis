@@ -10,15 +10,33 @@ save_figures = True
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 
-params = pd.read_csv(F_dir + 'SU-extracted_params-Jun2023.csv')
+params = pd.read_csv(F_dir + 'SU-extracted_params-Jul2023.csv')
+
+# we clean up units without much fano factor tuning
+SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
+IG_units_to_remove = [20,46,81]
+
+idx_to_remove = []
+for unit in SG_units_to_remove:
+    idx_to_remove.append(params[params['unit'] == unit].index[0])
+
+for unit in IG_units_to_remove:
+    idx_to_remove.append(params[params['unit'] == unit].index[0])
+
+params.drop(idx_to_remove,axis=0,inplace=True)
+params.drop(params[params['layer'] == 'L4C'].index,axis=0,inplace=True) # just one L4C unit
 
 FF_size = pd.DataFrame(columns=['fano','size','layer'])
 FF_size_all = pd.DataFrame(columns=['fano','size','layer'])
 
+FF_SML = pd.DataFrame(data={'fano':params['fit_fano_SML'].values,'size':['SML']*len(params.index),'layer':params['layer'].values})
 FF_RF = pd.DataFrame(data={'fano':params['fit_fano_RF'].values,'size':['RF']*len(params.index),'layer':params['layer'].values})
 FF_LAR = pd.DataFrame(data={'fano':params['fit_fano_LAR'].values,'size':['LAR']*len(params.index),'layer':params['layer'].values})
+FF_SUR = pd.DataFrame(data={'fano':params['fit_fano_SUR'].values,'size':['SUR']*len(params.index),'layer':params['layer'].values})
 
+FF_size = FF_size.append(FF_SML)
 FF_size = FF_size.append(FF_RF)
+FF_size = FF_size.append(FF_SUR)
 FF_size = FF_size.append(FF_LAR)
 
 plt.figure()

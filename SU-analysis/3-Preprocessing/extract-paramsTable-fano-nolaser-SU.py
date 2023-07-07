@@ -63,9 +63,11 @@ eps = 0.0000001
 params_df = pd.DataFrame(columns=['RFdiam',
                                   'maxResponse',
                                   'SI',
+                                  'SI_SUR',
                                   'baseline',
                                   'layer',
-                                  'anipe',                                  
+                                  'anipe',
+                                  'animal',                                  
                                   'fit_fano_SML',
                                   'fit_fano_RF',
                                   'fit_fano_SUR',
@@ -77,7 +79,8 @@ params_df = pd.DataFrame(columns=['RFdiam',
                                   'fit_fano_MIN_diam', 
                                   'fit_fano_near_SUR',
                                   'spikeWidth',
-                                  'spikeSNR'])
+                                  'spikeSNR',
+                                  'unit'])
 
 mean_PSTHs = {}
 vari_PSTHs = {}
@@ -130,7 +133,7 @@ for unit in range(len(data)):
                 fano_SE = np.vstack((fano_LB, fano_UB))
 
                 anipe = data[unit]['info']['animal'].decode('utf-8') + data[unit]['info']['penetr'].decode('utf-8')
-
+                animal = data[unit]['info']['animal'].decode('utf-8')
                 # perform quick anova to see if tuned
                 dd = data[unit][100.0]['spkC_NoL']
                 dd2 = np.ones((dd.shape[0] * dd.shape[1],2)) * np.nan
@@ -327,10 +330,12 @@ for unit in range(len(data)):
                     para_tmp = np.ones((1,10),dtype=object)*np.nan
                     para_tmp = {'RFdiam':data[unit]['info']['diam'][mx_ind],
                                 'maxResponse':np.max(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)),
-                                'SI':(np.max(spkC) - spkC[-1]) / np.max(spkC),
+                                'SI':(np.max(Rhat) - Rhat[-1]) / np.max(Rhat),
+                                'SI_SUR':(np.max(Rhat) - Rhat[surr_ind_narrow_new]) / np.max(Rhat),
                                 'baseline':np.mean(data[unit][100.0]['baseline']),
                                 'layer':L,
                                 'anipe':anipe,
+                                'animal':animal,
                                 'ntrials':ntrials,                                
                                 'fit_fano_SML':fit_fano_SML,
                                 'fit_fano_RF':fit_fano_RF,
@@ -343,7 +348,8 @@ for unit in range(len(data)):
                                 'fit_fano_MAX_diam':fit_fano_MAX_diam,
                                 'fit_fano_near_SUR':fit_fano_near_SUR,
                                 'spikeWidth':data[unit]['info']['spikewidth1'],
-                                'spikeSNR':data[unit]['info']['SNR1']}
+                                'spikeSNR':data[unit]['info']['SNR1'],
+                                'unit':unit}
 
                     tmp_df = pd.DataFrame(para_tmp, index=[indx])
                     params_df = params_df.append(tmp_df,sort=True)
