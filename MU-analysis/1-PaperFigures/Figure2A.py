@@ -142,7 +142,7 @@ for unit in list(G_mn_data.keys()):
             diam = diams[stim]
 
         
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
+        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'G','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
         params    = params.append(tmp_df,sort=True)
         
@@ -170,7 +170,7 @@ for unit in list(IG_mn_data.keys()):
         else:
             diam = diams[stim]
 
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
+        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'IG','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
         params    = params.append(tmp_df,sort=True)
 

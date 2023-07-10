@@ -99,9 +99,11 @@ indx   = 0
 q_indx = 0
 
 # we clean up units without much fano factor tuning
-SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
-IG_units_to_remove = [20,46,81]
+# AA SG_units_to_remove = [1,7,14,51,53,58,80]
+# AA IG_units_to_remove = [20,31,32,34,46,77,81]
 
+SG_units_to_remove = [1,6,7,11,14,51,53,58,72,79,80]
+IG_units_to_remove = [3,17,20,31,32,34,46,67,73,75,77,81,82]
 # 
 for unit in SG_units_to_remove:
     SG_mn_data.pop(unit)
@@ -159,7 +161,7 @@ for unit in list(G_mn_data.keys()):
             diam = diams[stim]
 
         
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
+        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'IG','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
         params    = params.append(tmp_df,sort=True)
         
@@ -187,7 +189,7 @@ for unit in list(IG_mn_data.keys()):
         else:
             diam = diams[stim]
 
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
+        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'IG','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
         params    = params.append(tmp_df,sort=True)
 
@@ -229,7 +231,8 @@ SG_bsl_FR = SG_params['bsl_FR'].apply(lambda x: x/(count_window/1000.0)).mean()
 SG_bsl_FF = SG_params['bsl'].mean()
 
 SG_params['log_fano'] = SG_params['fano'].apply(lambda x: np.log(x))
-SEM = SG_params.groupby(['diam'])['log_fano'].sem().apply(lambda x: np.exp(x))
+#SEM = SG_params.groupby(['diam'])['log_fano'].sem().apply(lambda x: np.exp(x))
+SEM = SG_params.groupby(['diam'])['fano'].sem()
 SG_params.groupby(['diam'])['fano'].mean().plot(yerr=SEM,ax=ax,kind='line',fmt='ro',markersize=4,mfc='None',lw=1)
 
 ax.set_xlabel('')
@@ -313,6 +316,7 @@ FF_LAR = G_params[G_params['diam'] == D_max]
 
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
+# IG layer
 plt.figure(figsize=(1.335, 1.115))
 IG_params['FR'] = IG_params['FR'].apply(lambda x: x/(count_window/1000))
 

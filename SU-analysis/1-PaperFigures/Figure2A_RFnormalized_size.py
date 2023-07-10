@@ -15,6 +15,7 @@ from scipy.optimize import basinhopping, curve_fit
 import scipy.stats as sts
 
 save_figures = False
+geo_mean     = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
@@ -39,7 +40,6 @@ def cost_fano(params,xdata,ydata):
     return err
 
 eps = 0.0000001
-
 
 with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
     diams_data = pkl.load(f)
@@ -97,8 +97,14 @@ IG_params = pd.DataFrame(columns=['fano',
 
 
 # we clean up units without much fano factor tuning
+#AA SG_units_to_remove = [1,7,14,51,53,58,80]
+#AA IG_units_to_remove = [20,31,32,34,46,77,81]
+
 SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
 IG_units_to_remove = [20,46,81]
+
+#SG_units_to_remove = [1,6,7,11,14,51,53,58,72,79,80] # without positive correlaton to FR size tuning
+#IG_units_to_remove = [20,31,32,34,46,77,81] # without positive correlaton to FR size tuning
 
 for unit in SG_units_to_remove:
     SG_mn_data.pop(unit)
@@ -156,7 +162,7 @@ for unit in list(G_mn_data.keys()):
             diam = diams[stim]
 
         
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
+        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'G','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
         params    = params.append(tmp_df,sort=True)
         
@@ -184,7 +190,7 @@ for unit in list(IG_mn_data.keys()):
         else:
             diam = diams[stim]
 
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
+        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'IG','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
         params    = params.append(tmp_df,sort=True)
 
@@ -203,8 +209,13 @@ IG_params['RFnormed_bslFR'] = IG_params['bsl_FR'] / IG_params['FR']
 # loop units
 my_sizes = np.array([0.25, 0.5, 0.75, 
                      1.5, 2, 2.5, 3, 
+                     4, 5, 6, 7, 8,
+                     10, 15, 20, 30])
+
+""" my_sizes = np.array([0.25, 0.5, 0.75, 
+                     1.5, 2, 2.5, 3, 
                      4, 5, 6, 7,
-                     10])
+                     10]) """
 
 
 units = SG_params['unit'].unique()
@@ -233,6 +244,7 @@ for ui, unit in enumerate(units):
     FF       = unit_params['fano'].values    
     RFi = np.argmin(np.abs(RFnormed-1))
     normed_FR = FR/np.max(FR)
+    FF = FF/FF[RFi]
     RFnormed_FR[ui,3] = 1
     RFnormed_FF[ui,3] = FF[RFi]
     RFnormed = np.delete(RFnormed,RFi)
@@ -257,7 +269,11 @@ my_sizes = np.insert(my_sizes,3,1)
 
 # ROG fit normalized spike-count data 
 SG_normed_FR = np.nanmean(RFnormed_FR,axis=0)
-SG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+if geo_mean:
+    SG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+else:
+    SG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
+   
 diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
 try:
     th_inds = ~np.isnan(SG_normed_FR)
@@ -282,21 +298,23 @@ RFnormed_FF_divg = np.nan * np.ones(RFnormed_FF.shape)
 for i in range(RFnormed_FF.shape[1]):
     RFnormed_FF_divg[:,i] = RFnormed_FF[:,i]/SG_normed_FF[i]
 
-plt.figure()
-#plt.figure(figsize=(1.335, 1.115))
+plt.figure(figsize=(1.335, 1.115))
 ax = plt.subplot(1,1,1)
 ax2 = ax.twinx()
 ax.set_title('SG')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
-ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko')
-
+ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro')
+if geo_mean:
+    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+else:
+    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+
+ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xscale('log')
-ax.set_ylabel('Fano factor')
+ax.set_ylabel('Normalized FF')
 ax.yaxis.label.set_color('red')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
@@ -310,7 +328,12 @@ ax.plot(diams_tight,Fhat,'r-')
 # loop units
 my_sizes = np.array([0.25, 0.5, 0.75, 
                      1.5, 2, 2.5, 3, 
-                     4, 5, 6, 7,10])
+                     4, 5, 6, 7, 8,
+                     10, 15, 20, 30])
+
+""" my_sizes = np.array([0.25, 0.5, 0.75, 
+                     1.5, 2, 2.5, 3, 
+                     4, 5, 6, 7,10]) """
 
 
 units = IG_params['unit'].unique()
@@ -338,9 +361,10 @@ for ui, unit in enumerate(units):
     FR       = unit_params['FR'].values    
     FF       = unit_params['fano'].values    
     RFi = np.argmin(np.abs(RFnormed-1))
+    FF = FF/FF[RFi]
     normed_FR = FR/np.max(FR)
     RFnormed_FR[ui,3] = 1
-    RFnormed_FF[ui,3] = FF[RFi]
+    RFnormed_FF[ui,3] = 1
     RFnormed = np.delete(RFnormed,RFi)
     FR = np.delete(FR,RFi)
     FF = np.delete(FF,RFi)
@@ -363,7 +387,11 @@ my_sizes = np.insert(my_sizes,3,1)
 
 # ROG fit normalized spike-count data 
 IG_normed_FR = np.nanmean(RFnormed_FR,axis=0)
-IG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+if geo_mean:
+    IG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+else:
+    IG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
+
 diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
 try:
     th_inds = ~np.isnan(IG_normed_FR)
@@ -388,21 +416,25 @@ RFnormed_FF_divg = np.nan * np.ones(RFnormed_FF.shape)
 for i in range(RFnormed_FF.shape[1]):
     RFnormed_FF_divg[:,i] = RFnormed_FF[:,i]/IG_normed_FF[i]
 
-plt.figure()
-#plt.figure(figsize=(1.335, 1.115))
+
+plt.figure(figsize=(1.335, 1.115))
 ax = plt.subplot(1,1,1)
 ax.set_title('IG')
 ax2 = ax.twinx()
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
-ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko')
+ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko',markersize=4,mfc='None',lw=1)
 
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-ax.errorbar(my_sizes, IG_normed_FF,yerr=YERR,fmt='ro')
+if geo_mean:
+    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+else:
+    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+
+ax.errorbar(my_sizes, IG_normed_FF,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xscale('log')
-ax.set_ylabel('Fano factor')
+ax.set_ylabel('Normalized FF')
 ax.yaxis.label.set_color('red')
 ax.tick_params(axis='y',color='red')
 ax.spines['left'].set_color('red')
