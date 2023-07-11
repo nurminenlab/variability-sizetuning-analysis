@@ -29,6 +29,7 @@ bsl_end   = bsl_begin + anal_duration
 
 count_window = 100
 
+
 def cost_response(params,xdata,ydata):
     Rhat = dalib.ROG(xdata,*params)
     err  = np.sum(np.power(Rhat - ydata,2))
@@ -294,10 +295,6 @@ res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B',
 
 Fhat = dalib.doubleROG(diams_tight,*res.x)
 
-RFnormed_FF_divg = np.nan * np.ones(RFnormed_FF.shape)
-for i in range(RFnormed_FF.shape[1]):
-    RFnormed_FF_divg[:,i] = RFnormed_FF[:,i]/SG_normed_FF[i]
-
 plt.figure(figsize=(1.335, 1.115))
 ax = plt.subplot(1,1,1)
 ax2 = ax.twinx()
@@ -307,8 +304,17 @@ ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko',markersize=4,mfc='None',lw
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-if geo_mean:
-    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+if geo_mean:    
+    YERR = np.nan * np.ones((2,RFnormed_FF.shape[1]))
+    for i in range(RFnormed_FF.shape[1]):
+        not_nans = ~np.isnan(RFnormed_FF[:,i])        
+        try:
+            ci  = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean,confidence_level=0.68)
+        except:
+            ci.confidence_interval = np.zeros(2) # because bootstrap fails if all values are the same, which happens for the 1xRF condition
+
+        YERR[0,i] = ci.confidence_interval[0]
+        YERR[1,i] = ci.confidence_interval[1]
 else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 
