@@ -62,6 +62,7 @@ eps = 0.0000001
 
 # holds params for each unit
 params_df = pd.DataFrame(columns=['RFdiam',
+                                  'fit_RF'
                                   'maxResponse',
                                   'SI',
                                   'baseline',
@@ -78,7 +79,18 @@ params_df = pd.DataFrame(columns=['RFdiam',
                                   'fit_fano_MAX',
                                   'fit_fano_MAX_diam',
                                   'fit_fano_MIN_diam', 
-                                  'fit_fano_near_SUR'])
+                                  'fit_fano_near_SUR_200',
+                                  'fit_fano_near_SUR_225',
+                                  'fit_fano_near_SUR_250',
+                                  'fit_fano_near_SUR_275',
+                                  'fit_fano_near_SUR_300',
+                                  'fit_fano_far_SUR_400',
+                                  'fit_fano_far_SUR_500',
+                                  'fit_fano_far_SUR_600',
+                                  'fit_fano_far_SUR_700',
+                                  'fit_fano_far_SUR_800',
+                                  'sur_MAX_diam'])
+
 mean_PSTHs = {}
 vari_PSTHs = {}
 mean_PSTHs_SG = {}
@@ -288,6 +300,23 @@ for unit in range(len(data)):
 
                     Fhat = dalib.doubleROG(diams_tight,*res.x)                   
                     
+                    Fhat_temp = Fhat[np.argmax(Rhat):]
+                    diams_tight_temp = diams_tight[np.argmax(Rhat):]                    #     
+                    sur_MAX_diam = diams_tight_temp[np.argmax(Fhat_temp)]
+
+                    RFdiam  = diams_tight[np.argmax(Rhat)]
+                    near200_i = np.argmin(np.abs(RFdiam*2 - diams_tight))
+                    near225_i = np.argmin(np.abs(RFdiam*2.25 - diams_tight))
+                    near250_i = np.argmin(np.abs(RFdiam*2.5 - diams_tight))
+                    near275_i = np.argmin(np.abs(RFdiam*2.75 - diams_tight))
+                    near300_i = np.argmin(np.abs(RFdiam*3 - diams_tight))
+                    
+                    far400_i = np.argmin(np.abs(RFdiam*4 - diams_tight))
+                    far500_i = np.argmin(np.abs(RFdiam*5 - diams_tight))
+                    far600_i = np.argmin(np.abs(RFdiam*6 - diams_tight))
+                    far700_i = np.argmin(np.abs(RFdiam*7 - diams_tight))
+                    far800_i = np.argmin(np.abs(RFdiam*8 - diams_tight))
+
                     # collect parameters from the fits and set bg to gray for shitty fits
                     if unit in excluded_fits:                        
                         fit_fano_SML = np.nan
@@ -303,6 +332,20 @@ for unit in range(len(data)):
                         fit_fano_MIN_diam = np.nan
                         fit_RF            = np.nan
                         fit_surr          = np.nan
+
+                        fit_fano_near_SUR_200 = np.nan
+                        fit_fano_near_SUR_225 = np.nan
+                        fit_fano_near_SUR_250 = np.nan
+                        fit_fano_near_SUR_275 = np.nan
+                        fit_fano_near_SUR_300 = np.nan
+                        
+                        fit_fano_far_SUR_400 = np.nan
+                        fit_fano_far_SUR_500 = np.nan
+                        fit_fano_far_SUR_600 = np.nan
+                        fit_fano_far_SUR_700 = np.nan
+                        fit_fano_far_SUR_800 = np.nan
+
+                        sur_MAX_diam = np.nan
                     else:                        
                         fit_fano_SML = Fhat[0]
                         fit_fano_RF  = Fhat[np.argmax(Rhat)]
@@ -314,8 +357,20 @@ for unit in range(len(data)):
 
                         fit_fano_MAX_diam = diams_tight[np.argmax(Fhat)]
                         fit_fano_MIN_diam = diams_tight[np.argmin(Fhat)]
-                        fit_RF            = diams_tight[np.argmax(Rhat)]
+                        fit_RF            = RFdiam
                         fit_surr          = diams_tight[surr_ind_narrow_new]
+
+                        fit_fano_near_SUR_200 = Fhat[near200_i]
+                        fit_fano_near_SUR_225 = Fhat[near225_i]
+                        fit_fano_near_SUR_250 = Fhat[near250_i]
+                        fit_fano_near_SUR_275 = Fhat[near275_i]
+                        fit_fano_near_SUR_300 = Fhat[near300_i]
+
+                        fit_fano_far_SUR_400 = Fhat[far400_i]
+                        fit_fano_far_SUR_500 = Fhat[far500_i]
+                        fit_fano_far_SUR_600 = Fhat[far600_i]
+                        fit_fano_far_SUR_700 = Fhat[far700_i]
+                        fit_fano_far_SUR_800 = Fhat[far800_i]
 
 
                     ##########################
@@ -327,6 +382,7 @@ for unit in range(len(data)):
                     # place unit parameters to a dataframe for later analysis
                     para_tmp = np.ones((1,10),dtype=object)*np.nan
                     para_tmp = {'RFdiam':data[unit]['info']['diam'][mx_ind],
+                                'fit_RF':fit_RF,
                                 'maxResponse':np.max(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)),
                                 'SI':(np.max(Rhat) - Rhat[-1]) / np.max(Rhat),
                                 'SI_SUR':(np.max(Rhat) - Rhat[surr_ind_narrow_new]) / np.max(Rhat),
@@ -343,7 +399,18 @@ for unit in range(len(data)):
                                 'fit_fano_MIN':fit_fano_MIN,
                                 'fit_fano_MAX':fit_fano_MAX,
                                 'fit_fano_MIN_diam':fit_fano_MIN_diam,
-                                'fit_fano_MAX_diam':fit_fano_MAX_diam}
+                                'fit_fano_MAX_diam':fit_fano_MAX_diam,
+                                'fit_fano_near_SUR_200':fit_fano_near_SUR_200,
+                                'fit_fano_near_SUR_225':fit_fano_near_SUR_225,
+                                'fit_fano_near_SUR_250':fit_fano_near_SUR_250,
+                                'fit_fano_near_SUR_275':fit_fano_near_SUR_275,
+                                'fit_fano_near_SUR_300':fit_fano_near_SUR_300,
+                                'fit_fano_far_SUR_400':fit_fano_far_SUR_400,
+                                'fit_fano_far_SUR_500':fit_fano_far_SUR_500,
+                                'fit_fano_far_SUR_600':fit_fano_far_SUR_600,
+                                'fit_fano_far_SUR_700':fit_fano_far_SUR_700,
+                                'fit_fano_far_SUR_800':fit_fano_far_SUR_800,                            
+                                'sur_MAX_diam':sur_MAX_diam}
 
                     tmp_df = pd.DataFrame(para_tmp, index=[indx])
                     params_df = params_df.append(tmp_df,sort=True)
@@ -353,27 +420,27 @@ month = datetime.now().strftime('%b')
 year = datetime.now().strftime('%Y')
 
 # save data
-params_df.to_csv(S_dir+'extracted_params-newselection-'+month+year+'.csv')
+params_df.to_csv(S_dir+'extracted_params-nearsurrounds-'+month+year+'.csv')
 
-with open(S_dir + 'mean_PSTHs-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
-with open(S_dir + 'vari_PSTHs-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
 # layer resolved
 # SG
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
 # G
-with open(S_dir + 'mean_PSTHs_G-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
 # IG
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-newselection-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)

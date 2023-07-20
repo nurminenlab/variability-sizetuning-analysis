@@ -15,6 +15,7 @@ from scipy.optimize import basinhopping, curve_fit
 import scipy.stats as sts
 
 save_figures = False
+geo_mean = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -219,6 +220,7 @@ for ui, unit in enumerate(units):
     FF       = unit_params['fano'].values    
     RFi = np.argmin(np.abs(RFnormed-1))
     normed_FR = FR/np.max(FR)
+    FF = FF/FF[RFi]
     RFnormed_FR[ui,3] = 1
     RFnormed_FF[ui,3] = FF[RFi]
     RFnormed = np.delete(RFnormed,RFi)
@@ -228,8 +230,7 @@ for ui, unit in enumerate(units):
     for s in range(len(RFnormed)):
         si = np.argmin(np.abs(my_sizes - RFnormed[s]))
         if si >= 3:
-            si = si + 1
-    
+            si = si + 1    
       
         RFnormed_FR[ui,si] = normed_FR[s]
         RFnormed_FF[ui,si] = FF[s]
@@ -240,8 +241,12 @@ my_sizes = np.insert(my_sizes,3,1)
 
 # ROG fit normalized spike-count data 
 SG_normed_FR = np.nanmean(RFnormed_FR,axis=0)
-#SG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
-SG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+
+if geo_mean:
+    SG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+else:
+    SG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
+
 diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
 try:
     popt,pcov = curve_fit(dalib.ROG,my_sizes[~np.isnan(SG_normed_FR)],SG_normed_FR,bounds=(0,np.inf),maxfev=100000)
@@ -274,8 +279,11 @@ ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko')
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-#YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+if geo_mean:
+    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(RFnormed_FF_divg.shape[0])
+else:
+    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+
 ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro')
 ax.set_xscale('log')
 ax.set_ylabel('Fano factor')
@@ -320,6 +328,7 @@ for ui, unit in enumerate(units):
     FR       = unit_params['FR'].values    
     FF       = unit_params['fano'].values    
     RFi = np.argmin(np.abs(RFnormed-1))
+    FF = FF/FF[RFi]
     normed_FR = FR/np.max(FR)
     RFnormed_FR[ui,3] = 1
     RFnormed_FF[ui,3] = FF[RFi]
@@ -339,8 +348,11 @@ my_sizes = np.insert(my_sizes,3,1)
 
 # ROG fit normalized spike-count data 
 G_normed_FR = np.nanmean(RFnormed_FR,axis=0)
-G_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
-#G_normed_FF = np.nanmean(RFnormed_FF,axis=0)
+if geo_mean:
+    G_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+else:
+    G_normed_FF = np.nanmean(RFnormed_FF,axis=0)
+
 diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
 try:
     popt,pcov = curve_fit(dalib.ROG,my_sizes[~np.isnan(G_normed_FR)],G_normed_FR,bounds=(0,np.inf),maxfev=100000)
@@ -374,8 +386,11 @@ ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko')
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-#YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+if geo_mean:
+    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(RFnormed_FF_divg.shape[0])
+else:
+    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(RFnormed_FF.shape[0])
+    
 ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
 ax.set_xscale('log')
 ax.set_ylabel('Fano factor')
@@ -420,6 +435,7 @@ for ui, unit in enumerate(units):
     FR       = unit_params['FR'].values    
     FF       = unit_params['fano'].values    
     RFi = np.argmin(np.abs(RFnormed-1))
+    FF = FF/FF[RFi]
     normed_FR = FR/np.max(FR)
     RFnormed_FR[ui,3] = 1
     RFnormed_FF[ui,3] = FF[RFi]
@@ -440,8 +456,11 @@ my_sizes = np.insert(my_sizes,3,1)
 
 # ROG fit normalized spike-count data 
 IG_normed_FR = np.nanmean(RFnormed_FR,axis=0)
-IG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
-#IG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
+if geo_mean:
+    IG_normed_FF = np.exp(np.nanmean(np.log(RFnormed_FF),axis=0)) # per reviewer suggestion, we use geometric mean
+else:   
+    IG_normed_FF = np.nanmean(RFnormed_FF,axis=0)
+
 diams_tight = np.logspace(np.log10(my_sizes[0]),np.log10(my_sizes[-1]),1000)
 try:
     popt,pcov = curve_fit(dalib.ROG,my_sizes[~np.isnan(IG_normed_FR)],IG_normed_FR,bounds=(0,np.inf),maxfev=100000)
@@ -474,8 +493,11 @@ ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko')
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-#YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
-YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+if geo_mean:
+    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(RFnormed_FF_divg.shape[0])
+else:
+    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(RFnormed_FF.shape[0])
+
 ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
 ax.set_xscale('log')
 ax.set_ylabel('Fano factor')

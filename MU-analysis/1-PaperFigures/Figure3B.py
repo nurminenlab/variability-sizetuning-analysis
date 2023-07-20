@@ -48,7 +48,7 @@ with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
     G_vr_data = pkl.load(f)
     
 with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
-    IG_mn_data = pkl.load(f)    
+    IG_mn_data = pkl.load(f)
 with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
     IG_vr_data = pkl.load(f)    
 

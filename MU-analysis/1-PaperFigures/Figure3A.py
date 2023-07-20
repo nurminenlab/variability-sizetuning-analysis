@@ -43,29 +43,20 @@ nboots = 3000
 
 t = np.arange(-150,600,1)
 
-def process(data,mean_data,bsl_begin,t,diams):
+def process(data,mean_data,bsl_begin,t):
     anal_duration = 400
     first_tp  = 450
     last_tp   = first_tp + anal_duration
 
     for unit in [77]:
-        # loop diams
-        mn_mtrx = mean_data[unit]
         
-        Resp       = np.nan * np.ones((mn_mtrx.shape[0]))
-        for stim in range(mn_mtrx.shape[0]):
-            Resp[stim] = np.mean(mn_mtrx[stim,first_tp:last_tp])
+        
 
         fig1, ax1 = plt.subplots(1,2,figsize=(8,4))
         fig2, ax2 = plt.subplots(2,2,figsize=(8,4))
 
         for count, stim in enumerate(np.array([0,6])):
             
-            if mn_mtrx.shape[0] == 18:
-                diam = diams[stim+1]
-            else:
-                diam = diams[stim]
-
             mean_PSTH, vari_PSTH,binned_data,mean_PSTH_booted,vari_PSTH_booted = dalib.meanvar_PSTH(data[unit][cont]['spkR_NoL'][:,stim,bsl_begin:],
                                                                                                     count_window=100,
                                                                                                     style='same',
@@ -97,7 +88,7 @@ def process(data,mean_data,bsl_begin,t,diams):
     
     return fig1,fig2
 
-fig1,fig2 = process(data,IG_mn_data,bsl_begin,t,diams)
+fig1,fig2 = process(data,IG_mn_data,bsl_begin,t)
 
 plt.figure(fig1)
 if save_figures:
