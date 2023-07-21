@@ -16,8 +16,6 @@ params = pd.read_csv(F_dir + 'extracted_params-nearsurrounds-Jul2023.csv')
 FF_size = pd.DataFrame(columns=['fano','size','layer'])
 FF_size_all = pd.DataFrame(columns=['fano','size','layer'])
 
-
-
 params['fit_fano_SML_nrmd'] = params['fit_fano_SML'] / params['fit_fano_RF']
 params['fit_fano_near_SUR_200_nrmd'] = params['fit_fano_near_SUR_200'] / params['fit_fano_RF']
 params['fit_fano_far_SUR_400_nrmd'] = params['fit_fano_far_SUR_400'] / params['fit_fano_RF']
@@ -52,7 +50,7 @@ params.groupby('layer')[['fit_fano_SML_nrmd',
                         'fit_fano_near_SUR_200_nrmd',                        
                         'fit_fano_far_SUR_400_nrmd',                        
                         'fit_fano_far_SUR_800_nrmd',
-                        'fit_fano_LAR_nrmd']].mean().plot(ax=ax,kind='bar',yerr=SEM)
+                        'fit_fano_LAR_nrmd']].median().plot(ax=ax,kind='bar',yerr=SEM)
     
 
 plt.figure()
