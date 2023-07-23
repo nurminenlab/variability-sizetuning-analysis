@@ -15,7 +15,7 @@ from scipy.optimize import basinhopping, curve_fit
 import scipy.stats as sts
 
 save_figures = False
-geo_mean = False
+geo_mean = True
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -279,8 +279,16 @@ ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko')
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
+
 if geo_mean:
-    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(RFnormed_FF_divg.shape[0])
+    YERR = np.nan * np.ones((RFnormed_FF.shape[1],))
+    print('using geometric mean')        
+    for i in range(RFnormed_FF.shape[1]):
+        not_nans = ~np.isnan(RFnormed_FF[:,i])
+        if i == 3:
+            YERR[i] = 0
+        else:    
+            YERR[i] = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean ,confidence_level=0.68).standard_error
 else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 
@@ -387,9 +395,16 @@ ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
 if geo_mean:
-    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(RFnormed_FF_divg.shape[0])
+    YERR = np.nan * np.ones((RFnormed_FF.shape[1],))
+    print('using geometric mean')        
+    for i in range(RFnormed_FF.shape[1]):
+        not_nans = ~np.isnan(RFnormed_FF[:,i])
+        if i == 3:
+            YERR[i] = 0
+        else:    
+            YERR[i] = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean ,confidence_level=0.68).standard_error
 else:
-    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(RFnormed_FF.shape[0])
+    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
     
 ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
 ax.set_xscale('log')
@@ -494,9 +509,17 @@ ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
 if geo_mean:
-    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(RFnormed_FF_divg.shape[0])
+    YERR = np.nan * np.ones((RFnormed_FF.shape[1],))
+    print('using geometric mean')        
+    for i in range(RFnormed_FF.shape[1]):
+        not_nans = ~np.isnan(RFnormed_FF[:,i])
+        if i == 3:
+            YERR[i] = 0
+        else:    
+            YERR[i] = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean ,confidence_level=0.68).standard_error
 else:
-    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(RFnormed_FF.shape[0])
+    YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+
 
 ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
 ax.set_xscale('log')

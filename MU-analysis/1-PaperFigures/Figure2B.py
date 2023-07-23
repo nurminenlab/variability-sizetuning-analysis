@@ -50,7 +50,7 @@ params.groupby('layer')[['fit_fano_SML_nrmd',
                         'fit_fano_near_SUR_200_nrmd',                        
                         'fit_fano_far_SUR_400_nrmd',                        
                         'fit_fano_far_SUR_800_nrmd',
-                        'fit_fano_LAR_nrmd']].median().plot(ax=ax,kind='bar',yerr=SEM)
+                        'fit_fano_LAR_nrmd']].mean().plot(ax=ax,kind='bar',yerr=SEM)
     
 
 plt.figure()

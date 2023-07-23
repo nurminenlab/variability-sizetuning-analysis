@@ -15,6 +15,7 @@ anal_root = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preproce
 
 # to generate quencher_DF run generate_quencher_DF.py
 quencher_DF = pd.read_csv(anal_root+'quencher_DF-Jun2023.csv')
+quencher_DF = quencher_DF[quencher_DF['layer'] != 'G']
 
 # bar graph of the proportion of quenchers in each layer
 ax = plt.subplot(111)
