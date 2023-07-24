@@ -5,10 +5,10 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
-anal_root = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
+anal_root = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/2-PrecomputedAnalysis/'
 
 # to generate quencher_DF run generate_quencher_DF.py
 quencher_DF = pd.read_csv(anal_root+'quencher_DF.csv')
@@ -18,7 +18,7 @@ ax = plt.subplot(111)
 quencher_DF.groupby(['layer','FF_sup']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()).unstack().plot(kind='bar', stacked=True, ax=ax,color=['red','grey','blue'])
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2E.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'F2F.svg',bbox_inches='tight',pad_inches=0)
 
 # the proportion of quenchers 
 print('\n The proportion of quenchers:')

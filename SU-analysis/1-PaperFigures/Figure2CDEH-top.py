@@ -90,22 +90,6 @@ ax.set_ylim(-70,160)
 if save_figures:
     plt.savefig(fig_dir + 'F2C-right.svg',bbox_inches='tight',pad_inches=0)
 
-# point stats and tests for each layer
-print(params.groupby('layer')['FFsuppression'].mean())
-print(params.groupby('layer')['FFsuppression'].sem())
-
-print(params.groupby('layer')['FFsurfac'].mean())
-print(params.groupby('layer')['FFsurfac'].sem())
-
-print('\n ANOVA: the effect of layer on FFfacilitation')
-lm = ols('FFsurfac ~ C(layer)',data=params).fit()
-print(sm.stats.anova_lm(lm,typ=1))
-
-print('\n t-test FFsurfac different from zero')
-print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac'],0)))
-
-SG = params.query('layer == "LSG"')
-IG = params.query('layer == "LIG"')
 
 Y = SG['FFsurfac'].values
 X = SG['SI'].values

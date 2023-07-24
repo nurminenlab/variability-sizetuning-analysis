@@ -14,8 +14,8 @@ from scipy.optimize import basinhopping, curve_fit
 
 import scipy.stats as sts
 
-save_figures = False
-geo_mean     = False
+save_figures = True
+geo_mean     = True
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
@@ -98,11 +98,11 @@ IG_params = pd.DataFrame(columns=['fano',
 
 
 # we clean up units without much fano factor tuning
-#AA SG_units_to_remove = [1,7,14,51,53,58,80]
-#AA IG_units_to_remove = [20,31,32,34,46,77,81]
+SG_units_to_remove = [1,7,14,51,53,58,80]
+IG_units_to_remove = [20,31,32,34,46,77,81]
 
-SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
-IG_units_to_remove = [20,46,81]
+#SG_units_to_remove = [7,14,26,50,51,53,58,68,80]
+#IG_units_to_remove = [20,46,81]
 
 #SG_units_to_remove = [1,6,7,11,14,51,53,58,72,79,80] # without positive correlaton to FR size tuning
 #IG_units_to_remove = [20,31,32,34,46,77,81] # without positive correlaton to FR size tuning
@@ -136,10 +136,10 @@ for unit in list(SG_mn_data.keys()):
 
         para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
-        params     = params.append(tmp_df,sort=True)
+        params    = pd.concat([params,tmp_df],sort=True)
 
-        SG_tmp_df    = pd.DataFrame(para_tmp, index=[q_indx])
-        SG_params  = SG_params.append(SG_tmp_df,sort=True)
+        SG_tmp_df  = pd.DataFrame(para_tmp, index=[q_indx])
+        SG_params  = pd.concat([SG_params,SG_tmp_df],sort=True)
 
         indx += 1
         q_indx += 1
@@ -165,10 +165,10 @@ for unit in list(G_mn_data.keys()):
         
         para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'G','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
-        params    = params.append(tmp_df,sort=True)
+        params    = pd.concat([params,tmp_df],sort=True)
         
         G_tmp_df  = pd.DataFrame(para_tmp, index=[q_indx])
-        G_params  = G_params.append(G_tmp_df,sort=True)
+        G_params  = pd.concat([G_params,G_tmp_df],sort=True)
 
         indx += 1
         q_indx += 1
@@ -193,10 +193,10 @@ for unit in list(IG_mn_data.keys()):
 
         para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'IG','FR':FR,'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
-        params    = params.append(tmp_df,sort=True)
+        params    = pd.concat([params,tmp_df],sort=True)
 
         IG_tmp_df  = pd.DataFrame(para_tmp, index=[q_indx])
-        IG_params  = IG_params.append(IG_tmp_df,sort=True)
+        IG_params  = pd.concat([IG_params,IG_tmp_df],sort=True)
 
         indx += 1
         q_indx += 1
@@ -304,19 +304,19 @@ ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko',markersize=4,mfc='None',lw
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
-if geo_mean:    
-    YERR = np.nan * np.ones((2,RFnormed_FF.shape[1]))
+if geo_mean:
+    YERR = np.nan * np.ones((RFnormed_FF.shape[1],))
+    print('using geometric mean')        
     for i in range(RFnormed_FF.shape[1]):
-        not_nans = ~np.isnan(RFnormed_FF[:,i])        
-        try:
-            ci  = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean,confidence_level=0.68)
-        except:
-            ci.confidence_interval = np.zeros(2) # because bootstrap fails if all values are the same, which happens for the 1xRF condition
-
-        YERR[0,i] = ci.confidence_interval[0]
-        YERR[1,i] = ci.confidence_interval[1]
+        not_nans = ~np.isnan(RFnormed_FF[:,i])
+        if i == 3: # because every value is 1 we can't compute the error, so we define it to be 0
+            YERR[i] = 0
+        else:    
+            YERR[i] = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean ,confidence_level=0.68).standard_error
 else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+
+
 
 ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xscale('log')
@@ -330,6 +330,9 @@ ax.tick_params(axis='y',labelcolor='red')
 ax2.plot(diams_tight,Rhat,'k-')
 ax.plot(diams_tight,Fhat,'r-')
 
+if save_figures:
+    plt.savefig(fig_dir + 'SG_RFnormed_size_allunits.svg',bbox_inches='tight')
+    
 # IG
 # loop units
 my_sizes = np.array([0.25, 0.5, 0.75, 
@@ -434,9 +437,17 @@ ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
 if geo_mean:
-    YERR = np.exp(np.sqrt(np.nanmean(np.log(RFnormed_FF_divg)**2,axis=0)))/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+    YERR = np.nan * np.ones((RFnormed_FF.shape[1],))
+    print('using geometric mean')        
+    for i in range(RFnormed_FF.shape[1]):
+        not_nans = ~np.isnan(RFnormed_FF[:,i])
+        if i == 3: # because every value is 1 we can't compute the error, so we define it to be 0
+            YERR[i] = 0
+        else:    
+            YERR[i] = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean ,confidence_level=0.68).standard_error
 else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
+
 
 ax.errorbar(my_sizes, IG_normed_FF,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xscale('log')
@@ -449,3 +460,6 @@ ax.tick_params(axis='y',labelcolor='red')
 
 ax2.plot(diams_tight,Rhat,'k-')
 ax.plot(diams_tight,Fhat,'r-')
+
+if save_figures:
+    plt.savefig(fig_dir + 'IG_RFnormed_size_allunits.svg',bbox_inches='tight')

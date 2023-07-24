@@ -269,13 +269,17 @@ RFnormed_FF_divg = np.nan * np.ones(RFnormed_FF.shape)
 for i in range(RFnormed_FF.shape[1]):
     RFnormed_FF_divg[:,i] = RFnormed_FF[:,i]/SG_normed_FF[i]
 
-plt.figure()
-#plt.figure(figsize=(1.335, 1.115))
+
+if save_figures:
+    plt.figure(figsize=(1.335, 1.115))
+else:
+    plt.figure()
+
 ax = plt.subplot(1,1,1)
 ax2 = ax.twinx()
 ax.set_title('SG')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
-ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko')
+ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko', markersize=4,mfc='None',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -285,14 +289,14 @@ if geo_mean:
     print('using geometric mean')        
     for i in range(RFnormed_FF.shape[1]):
         not_nans = ~np.isnan(RFnormed_FF[:,i])
-        if i == 3:
+        if i == 3: # because every value is 1 we can't compute the error, so we define it to be 0
             YERR[i] = 0
         else:    
             YERR[i] = sts.bootstrap((RFnormed_FF[not_nans,i],),sts.mstats.gmean ,confidence_level=0.68).standard_error
 else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 
-ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro')
+ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xscale('log')
 ax.set_ylabel('Fano factor')
 ax.yaxis.label.set_color('red')
@@ -303,6 +307,9 @@ ax.tick_params(axis='y',labelcolor='red')
 
 ax2.plot(diams_tight,Rhat,'k-')
 ax.plot(diams_tight,Fhat,'r-')
+
+if save_figures:    
+    plt.savefig(fig_dir + 'Figure2A_RFnormalized_size-SG.svg',bbox_inches='tight',dpi=300)
 
 # granular layer
 # loop units
@@ -383,14 +390,17 @@ RFnormed_FF_divg = np.nan * np.ones(RFnormed_FF.shape)
 for i in range(RFnormed_FF.shape[1]):
     RFnormed_FF_divg[:,i] = RFnormed_FF[:,i]/G_normed_FF[i]
 
-plt.figure()
-#plt.figure(figsize=(1.335, 1.115))
+
+if save_figures:
+    plt.figure(figsize=(1.335, 1.115))
+else:
+    plt.figure()
 
 ax = plt.subplot(1,1,1)
 ax2 = ax.twinx()
 ax.set_title('G')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
-ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko')
+ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -406,7 +416,7 @@ if geo_mean:
 else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
     
-ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
+ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xscale('log')
 ax.set_ylabel('Fano factor')
 ax.yaxis.label.set_color('red')
@@ -417,6 +427,9 @@ ax.tick_params(axis='y',labelcolor='red')
 
 ax2.plot(diams_tight,Rhat,'k-')
 ax.plot(diams_tight,Fhat,'r-')
+
+if save_figures:    
+    plt.savefig(fig_dir + 'Figure2A_RFnormalized_size-G.svg',bbox_inches='tight',dpi=300)
 
 # infra-granular layer
 # loop units
@@ -498,13 +511,17 @@ RFnormed_FF_divg = np.nan * np.ones(RFnormed_FF.shape)
 for i in range(RFnormed_FF.shape[1]):
     RFnormed_FF_divg[:,i] = RFnormed_FF[:,i]/IG_normed_FF[i]
 
-plt.figure()
-#plt.figure(figsize=(1.335, 1.115))
+
+if save_figures:
+    plt.figure(figsize=(1.335, 1.115))
+else:
+    plt.figure()
+
 ax = plt.subplot(1,1,1)
 ax.set_title('IG')
 ax2 = ax.twinx()
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
-ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko')
+ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko',markersize=4,mfc='None',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -521,7 +538,7 @@ else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 
 
-ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro')
+ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
 ax.set_xscale('log')
 ax.set_ylabel('Fano factor')
 ax.yaxis.label.set_color('red')
@@ -532,3 +549,6 @@ ax.tick_params(axis='y',labelcolor='red')
 
 ax2.plot(diams_tight,Rhat,'k-')
 ax.plot(diams_tight,Fhat,'r-')
+
+if save_figures:    
+    plt.savefig(fig_dir + 'Figure2A_RFnormalized_size-IG.svg',bbox_inches='tight',dpi=300)

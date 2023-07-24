@@ -6,7 +6,7 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import numpy as np
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -48,7 +48,9 @@ funk_switch = 0
 functions_list = [sts.mstats.gmean,np.median]
 agg_dict_gmean = {key: functions_list[funk_switch] for key in var_dict}
 
+
 plt.figure()
+
 ax = plt.subplot(111)
 # this is a placeholder for the bootstrapped SEM
 SEM = params.groupby('layer')[var_dict].sem()
@@ -65,8 +67,12 @@ for l in layer_list:
 
 params.groupby('layer').agg(agg_dict_gmean).plot(ax=ax,kind='bar',yerr=SEM)
 ax.set_ylabel('Normalized fano-factor')    
+if save_figures:
+    plt.savefig(fig_dir + 'F2B-top.svg',bbox_inches='tight',pad_inches=0)
+
 
 plt.figure()
+
 ax = plt.subplot(111)
 sns.swarmplot(x='layer',y='fano',hue='size',data=FF_size,ax=ax,size=3,dodge=True)
 PROPS = {
