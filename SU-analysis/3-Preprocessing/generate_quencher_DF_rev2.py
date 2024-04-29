@@ -11,9 +11,9 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
 
-S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
+S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
-MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
+MUdatfile = 'selectedData_macaque_Jun2023.pkl'
 
 # analysis done between these timepoints
 anal_duration = 400
@@ -29,7 +29,7 @@ def cost_response(params,xdata,ydata):
     err  = np.sum(np.power(Rhat - ydata,2))
     return err
 
-with open(F_dir + MUdatfile,'rb') as f:
+with open(S_dir + MUdatfile,'rb') as f:
     data = pkl.load(f)
 
 with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
@@ -38,20 +38,20 @@ with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
 diams = np.array(list(diams_data.keys()))
 del(diams_data)
     
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
     G_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
     G_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
     IG_mn_data = pkl.load(f)    
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
-    IG_vr_data = pkl.load(f)    
+with open(S_dir + 'vari_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
+    IG_vr_data = pkl.load(f)
 
 # param table
 quencher_DF = pd.DataFrame(columns=['FF_sup',
@@ -476,4 +476,4 @@ for unit in list(IG_mn_data.keys()):
     quencher_DF = pd.concat([quencher_DF,tmp_df],sort=True)
     indx += 1
 
-quencher_DF.to_csv('quencher_DF.csv')
+quencher_DF.to_csv(S_dir+'quencher_DF_rev2.csv')

@@ -6,35 +6,25 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = True
+save_figures = False
 
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
-params = pd.read_csv(F_dir + 'extracted_params-nearsurrounds-Jul2023.csv')
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
+params = pd.read_csv(F_dir + 'SU-extracted_params-nosuppression-Apr2024.csv')
 
 params['RFnormed_maxFacilDiam'] = params['sur_MAX_diam'] / params['fit_RF']
+#params = params[params['layer'] != 'L4C']
 
 SG_df = params.query('layer == "LSG"')
-G_df  = params.query('layer == "L4C"')
+#G_df  = params.query('layer == "L4C"')
 IG_df = params.query('layer == "LIG"')
 
-SG_ci  = sts.bootstrap((SG_df['RFnormed_maxFacilDiam'].values,),np.nanmedian,confidence_level=0.68)
-G_ci   = sts.bootstrap((G_df['RFnormed_maxFacilDiam'].values,),np.nanmedian,confidence_level=0.68)
-IG_ci  = sts.bootstrap((IG_df['RFnormed_maxFacilDiam'].values,),np.nanmedian,confidence_level=0.68)
-
-medians = np.nan * np.ones((2,3))
-# G
-medians[0,0] = G_ci.confidence_interval[0]
-medians[1,0] = G_ci.confidence_interval[1]
-# IG 
-medians[0,1] = IG_ci.confidence_interval[0]
-medians[1,1] = IG_ci.confidence_interval[1]
-# SG 
-medians[0,2] = SG_ci.confidence_interval[0]
-medians[1,2] = SG_ci.confidence_interval[1]
+SEM = params.groupby('layer')['RFnormed_maxFacilDiam'].sem()
+SEM['LSG']  = sts.bootstrap((SG_df['RFnormed_maxFacilDiam'].values,),np.nanmedian).standard_error
+SEM['LIG']  = sts.bootstrap((IG_df['RFnormed_maxFacilDiam'].values,),np.nanmedian).standard_error
 
 ax = plt.subplot(121)
-params.groupby('layer')['RFnormed_maxFacilDiam'].median().plot(kind='bar',yerr=medians,ax=ax,color='white',edgecolor='red')
+params.groupby('layer')['RFnormed_maxFacilDiam'].median().plot(kind='bar',yerr=SEM,ax=ax,color='white',edgecolor='red')
 ax.set_yscale('log')
 ax.set_ylim(0.01,100)
 
@@ -45,4 +35,10 @@ ax.set_ylim(0.01,100)
 
 if save_figures:
     plt.savefig(fig_dir + 'F2Gii.svg')
+
+print('RF_normed_maxFacilDiam medians')
+print(params.groupby('layer')['RFnormed_maxFacilDiam'].median())
+
+print('RF_normed_maxQuenchDiam bootstrapper errors for medians')
+print(SEM)
 

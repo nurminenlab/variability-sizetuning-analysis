@@ -46,19 +46,19 @@ with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
 diams = np.array(list(diams_data.keys()))
 del(diams_data)
     
-with open(S_dir + 'mean_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-suppression-fit-Apr2024.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-suppression-fit-Apr2024.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-SU-suppression-fit-Apr2024.pkl','rb') as f:
     G_mn_data = pkl.load(f)
-with open(S_dir + 'vari_PSTHs_G-MK-SU-Jun2023.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-SU-suppression-fit-Apr2024.pkl','rb') as f:
     G_vr_data = pkl.load(f)
     
-with open(S_dir + 'mean_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-SU-suppression-fit-Apr2024.pkl','rb') as f:
     IG_mn_data = pkl.load(f)    
-with open(S_dir + 'vari_PSTHs_IG-MK-SU-Jun2023.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-SU-suppression-fit-Apr2024.pkl','rb') as f:
     IG_vr_data = pkl.load(f)    
 
 # param tables
@@ -102,7 +102,7 @@ q_indx = 0
 # AA SG_units_to_remove = [1,7,14,51,53,58,80]
 # AA IG_units_to_remove = [20,31,32,34,46,77,81]
 
-SG_units_to_remove = [1,6,7,11,14,16,18,19,22,23,24,27,28,33,36,38,42,43,44,45,47,50,51,53,58,61,66,68,72,79,80]
+""" SG_units_to_remove = [1,6,7,11,14,16,18,19,22,23,24,27,28,33,36,38,42,43,44,45,47,50,51,53,58,61,66,68,72,79,80]
 IG_units_to_remove = [3,17,20,31,32,34,46,67,73,75,77,81,82]
 # 
 for unit in SG_units_to_remove:
@@ -111,7 +111,7 @@ for unit in SG_units_to_remove:
 
 for unit in IG_units_to_remove:
     IG_mn_data.pop(unit)
-    IG_vr_data.pop(unit)
+    IG_vr_data.pop(unit) """
 
 for unit in list(SG_mn_data.keys()):
     # loop diams
@@ -142,7 +142,7 @@ for unit in list(SG_mn_data.keys()):
         indx += 1
         q_indx += 1
     
-# loop G units
+""" # loop G units
 q_indx = 0
 for unit in list(G_mn_data.keys()):
     # loop diams
@@ -169,7 +169,7 @@ for unit in list(G_mn_data.keys()):
         G_params  = G_params.append(G_tmp_df,sort=True)
 
         indx += 1
-        q_indx += 1
+        q_indx += 1 """
 
 # loop IG units
 q_indx = 0
@@ -260,7 +260,7 @@ FF_RF = SG_params[SG_params['diam'] == D]
 FF_LAR = SG_params[SG_params['diam'] == D_max]
 print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
 
-# granular layer
+""" # granular layer
 plt.figure(figsize=(1.335, 1.115))
 G_params['FR'] = G_params['FR'].apply(lambda x: x/(count_window/1000))
 
@@ -314,7 +314,7 @@ D_max = G_params['diam'].max()
 FF_RF = G_params[G_params['diam'] == D]
 FF_LAR = G_params[G_params['diam'] == D_max]
 
-print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values))
+print(sts.ttest_rel(FF_RF['fano'].values,FF_LAR['fano'].values)) """
 
 # IG layer
 plt.figure(figsize=(1.335, 1.115))

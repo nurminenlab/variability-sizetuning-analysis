@@ -10,7 +10,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from datetime import datetime
 
 # please download this library from www.github.com/nurminenlab/Analysis
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 
 #import pdb
 
@@ -25,14 +25,13 @@ plot_rasters = False
 cont_wndw_length = 100
 boot_num = int(1e3)
 
-plotter = 'contrast'
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 # path to where the extracted parameters are stored
-S_dir   = F_dir
+S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 SUdatfile = 'selectedData_macaque_Jun2023.pkl'
 
-# we were not able to fit this units and excluded it from the analysis
-excluded_fits = [72]
+# we were not able to fit these units
+excluded_fits = []
 
 with open(F_dir + SUdatfile,'rb') as f:
     data = pkl.load(f)
@@ -41,7 +40,7 @@ def select_data(spkC, baseline):
     spkC_mean = np.mean(spkC,axis=1)
     baseline_mean = np.mean(baseline)
     
-    return (np.max(spkC_mean) - baseline_mean) > 3
+    return (np.max(spkC_mean) - baseline_mean) > 2
 
 def cost_fano(params,xdata,ydata):
     Rhat = dalib.doubleROG(xdata,*params)
@@ -55,23 +54,21 @@ def cost_response(params,xdata,ydata):
 
 # unit loop
 contrast = [100.0]
-SI_crit = 0.0
+SI_crit = 0.05
 bins = np.arange(-100,600,1)
 virgin = True
 eps = 0.0000001
 
-# holds params for each unit
+# this dataframe holds params for each unit
 params_df = pd.DataFrame(columns=['RFdiam',
-                                  'fit_RF'
+                                  'fit_RF',
                                   'maxResponse',
                                   'SI',
                                   'SI_SUR',
-                                  'SI_SUR_2RF',
                                   'baseline',
                                   'layer',
                                   'anipe',
-                                  'animal',
-                                  'ntrials',                                  
+                                  'animal',                                  
                                   'fit_fano_SML',
                                   'fit_fano_RF',
                                   'fit_fano_SUR',
@@ -91,7 +88,9 @@ params_df = pd.DataFrame(columns=['RFdiam',
                                   'fit_fano_far_SUR_600',
                                   'fit_fano_far_SUR_700',
                                   'fit_fano_far_SUR_800',
-                                  'sur_MAX_diam'])
+                                  'spikeWidth',
+                                  'spikeSNR',
+                                  'unit'])
 
 mean_PSTHs = {}
 vari_PSTHs = {}
@@ -123,7 +122,15 @@ for unit in range(len(data)):
         if cont in data[unit].keys():
             # data selection
             Y = np.mean(data[unit][cont]['spkC_NoL'].T,axis=1)
-            SI = (np.max(Y) - Y[-1]) / np.max(Y)
+            
+            args = (data[unit]['info']['diam'],Y)
+            bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+            res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+            popt = res.x
+            diams_tight = np.logspace(np.log10(data[unit]['info']['diam'][0]),np.log10(data[unit]['info']['diam'][-1]),1000)
+            Rhat = dalib.ROG(diams_tight,*popt)
+            # here fit and compute SI from the fit
+            SI = (np.max(Rhat) - Rhat[-1]) / np.max(Rhat)
             if select_data(data[unit][cont]['spkC_NoL'].T,data[unit][cont]['baseline']):
                 # no-laser
                 response    = np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)
@@ -135,6 +142,7 @@ for unit in range(len(data)):
                 # bootstrapped fano
                 fano_boot = data[unit][cont]['boot_fano_NoL'][0:np.argmax(response)+1,:]
 
+
                 L = data[unit]['info']['layer'].decode('utf-8')
 
                 fano     = data[unit][cont]['fano_NoL']
@@ -142,9 +150,8 @@ for unit in range(len(data)):
                 fano_UB = np.percentile(data[unit][cont]['boot_fano_NoL'],84,axis=1) - fano
                 fano_SE = np.vstack((fano_LB, fano_UB))
 
-                anipe  = data[unit]['info']['animal'].decode('utf-8') + data[unit]['info']['penetr'].decode('utf-8')
+                anipe = data[unit]['info']['animal'].decode('utf-8') + data[unit]['info']['penetr'].decode('utf-8')
                 animal = data[unit]['info']['animal'].decode('utf-8')
-
                 # perform quick anova to see if tuned
                 dd = data[unit][100.0]['spkC_NoL']
                 dd2 = np.ones((dd.shape[0] * dd.shape[1],2)) * np.nan
@@ -163,9 +170,9 @@ for unit in range(len(data)):
 
                 bsl      = np.mean(data[unit][cont]['baseline'])
                 bsl_vari = np.var(data[unit][cont]['baseline'])
-                
-                # remove multi-units that are not tuned
-                if SI >= SI_crit and tuned:
+                 
+                # analyze only the units that are tuned 
+                if SI >= SI_crit and tuned and data[unit]['info']['SNR1'] >=2.5:
 
                     fano_container = np.nan * np.ones(data[unit][cont]['spkR_NoL'].shape[1])
                     fano_ERR_container = np.nan * np.ones((2,data[unit][cont]['spkR_NoL'].shape[1]))
@@ -225,6 +232,7 @@ for unit in range(len(data)):
 
 
                     max_ind = np.argmax(mean_container)
+                    
                         
                     if virgin:
                         fano = np.reshape(fano, (1,fano.shape[0]))
@@ -266,19 +274,16 @@ for unit in range(len(data)):
                             vari_all = np.concatenate((vari_all,vari),axis=0)
                             
                     ##########################
-
-                    
-                    # fano-vs-size for small count window
-                    surr_narrow,surr_ind_narrow = dalib.saturation_point(mean_container,data[unit]['info']['diam'],criteria=1.3)
+                   
 
                     # ROG fit spike-count data 
-                    try:
+                    """ try:
                         popt,pcov = curve_fit(dalib.ROG,data[unit]['info']['diam'],mean_container,bounds=(0,np.inf),maxfev=100000)
-                    except:
-                        args = (data[unit]['info']['diam'],mean_container)
-                        bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
-                        res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
-                        popt = res.x
+                    except: """
+                    args = (data[unit]['info']['diam'],mean_container)
+                    bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
+                    res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
+                    popt = res.x
                         
                     diams_tight = np.logspace(np.log10(data[unit]['info']['diam'][0]),np.log10(data[unit]['info']['diam'][-1]),1000)
                     Rhat = dalib.ROG(diams_tight,*popt)
@@ -294,7 +299,7 @@ for unit in range(len(data)):
                             surr_ind_narrow_new = -1
 
                     surr_narrow_new = diams_tight[surr_ind_narrow_new]
-                    # double ROG fit fano data 
+                    # ROG fit fano data 
                     args = (data[unit]['info']['diam'],fano_container)
                     
                     bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
@@ -327,8 +332,7 @@ for unit in range(len(data)):
                         fit_fano_LAR = np.nan
                         fit_fano_BSL = np.nan
                         fit_fano_MIN = np.nan
-                        fit_fano_MAX = np.nan
-                        fit_fano_near_SUR = np.nan
+                        fit_fano_MAX = np.nan                        
 
                         fit_fano_MAX_diam = np.nan
                         fit_fano_MIN_diam = np.nan
@@ -355,11 +359,12 @@ for unit in range(len(data)):
                         fit_fano_LAR = Fhat[-1]
                         fit_fano_BSL = np.mean(bsl_container)
                         fit_fano_MIN = np.max((np.min(Fhat),0)) # in case of negative values resulting from bad fits
-                        fit_fano_MAX = np.max(Fhat)                        
+                        fit_fano_MAX = np.max(Fhat)
+                        fit_fano_near_SUR = dalib.doubleROG(diams_tight[np.argmax(Rhat)]*2,*res.x)
 
                         fit_fano_MAX_diam = diams_tight[np.argmax(Fhat)]
                         fit_fano_MIN_diam = diams_tight[np.argmin(Fhat)]
-                        fit_RF            = RFdiam
+                        fit_RF            = diams_tight[np.argmax(Rhat)]
                         fit_surr          = diams_tight[surr_ind_narrow_new]
 
                         fit_fano_near_SUR_200 = Fhat[near200_i]
@@ -387,8 +392,8 @@ for unit in range(len(data)):
                                 'fit_RF':fit_RF,
                                 'maxResponse':np.max(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)),
                                 'SI':(np.max(Rhat) - Rhat[-1]) / np.max(Rhat),
+                                'SI_data':(np.max(Y) - Y[-1]) / np.max(Y),
                                 'SI_SUR':(np.max(Rhat) - Rhat[surr_ind_narrow_new]) / np.max(Rhat),
-                                'SI_SUR_2RF':(np.max(Rhat) - Rhat[near200_i]) / np.max(Rhat),
                                 'baseline':np.mean(data[unit][100.0]['baseline']),
                                 'layer':L,
                                 'anipe':anipe,
@@ -402,7 +407,7 @@ for unit in range(len(data)):
                                 'fit_fano_MIN':fit_fano_MIN,
                                 'fit_fano_MAX':fit_fano_MAX,
                                 'fit_fano_MIN_diam':fit_fano_MIN_diam,
-                                'fit_fano_MAX_diam':fit_fano_MAX_diam,
+                                'fit_fano_MAX_diam':fit_fano_MAX_diam,                                
                                 'fit_fano_near_SUR_200':fit_fano_near_SUR_200,
                                 'fit_fano_near_SUR_225':fit_fano_near_SUR_225,
                                 'fit_fano_near_SUR_250':fit_fano_near_SUR_250,
@@ -413,37 +418,40 @@ for unit in range(len(data)):
                                 'fit_fano_far_SUR_600':fit_fano_far_SUR_600,
                                 'fit_fano_far_SUR_700':fit_fano_far_SUR_700,
                                 'fit_fano_far_SUR_800':fit_fano_far_SUR_800,                            
-                                'sur_MAX_diam':sur_MAX_diam}
+                                'sur_MAX_diam':sur_MAX_diam,
+                                'spikeWidth':data[unit]['info']['spikewidth1'],
+                                'spikeSNR':data[unit]['info']['SNR1'],
+                                'unit':unit}
 
                     tmp_df = pd.DataFrame(para_tmp, index=[indx])
-                    params_df = pd.concat([params_df,tmp_df],sort=True)
+                    params_df = params_df.append(tmp_df,sort=True)
                     indx = indx + 1
                     
 month = datetime.now().strftime('%b') 
 year = datetime.now().strftime('%Y')
 
 # save data
-params_df.to_csv(S_dir+'extracted_params-nearsurrounds-'+month+year+'.csv')
+params_df.to_csv(S_dir+'SU-extracted_params-suppression-fit-'+month+year+'.csv')
 
-with open(S_dir + 'mean_PSTHs-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
-with open(S_dir + 'vari_PSTHs-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
 # layer resolved
 # SG
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
 # G
-with open(S_dir + 'mean_PSTHs_G-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_G-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
 # IG
-with open(S_dir + 'mean_PSTHs_IG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_IG-MK-MU-nearsurrounds-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-SU-suppression5-fit-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)

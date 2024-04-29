@@ -10,24 +10,25 @@ from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
 import scipy.io as scio
 
-save_figures = False
+save_figures = True
 
-F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
-S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
-fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
-mat_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/PSTHmats/'
+F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
+S_dir   = F_dir
+fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
+mat_dir = F_dir
 
-MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
+MUdatfile = 'selectedData_macaque_Jun2023.pkl'
 
 with open(F_dir + MUdatfile,'rb') as f:
     data = pkl.load(f)
 
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
 
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-Jun2023.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
 
+# for stimulus diameters
 with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
     diams_data = pkl.load(f)
 
@@ -62,7 +63,9 @@ cont  = 100.0
 count_window = 100
 nboots = 3000
 
-unit = 71
+#unit = 79
+#unit = 9
+unit = 44
 mn_mtrx = SG_mn_data[unit]
 vr_mtrx = SG_vr_data[unit]
 
@@ -103,7 +106,7 @@ for stim in range(mn_mtrx.shape[0]):
                                 (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:last_tp])),axis=1)
     FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)/(count_window/1000)
 
-    if stim == 2 or stim == 18:
+    if False:#stim == 2 or stim == 18:
         
         fano_PSTH_RF = np.divide(vari_PSTH_booted[:,fano_PSTH_first_tp:], (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:]))
         fano_PSTH_RF_SD = np.std(fano_PSTH_RF,axis=0)
@@ -254,5 +257,5 @@ axb.spines['top'].set_visible(False)
 
 plt.figure(4)
 if save_figures:
-    plt.savefig(fig_dir + 'F1_SG_ASFs.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'SU-response-type3.svg',bbox_inches='tight',pad_inches=0)
 

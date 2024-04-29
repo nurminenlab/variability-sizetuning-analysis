@@ -28,7 +28,7 @@ ax.set_yscale('log')
 ax.set_ylim(0.01,100)
 
 ax = plt.subplot(122)
-sns.swarmplot(x='layer',y='RFnormed_maxQuenchDiam',data=params,ax=ax,size=3,color='red')
+sns.swarmplot(x='layer',y='RFnormed_maxQuenchDiam',hue='animal',data=params,ax=ax,size=3,color='red')
 ax.set_yscale('log')
 ax.set_ylim(0.01,100)
 
@@ -37,7 +37,7 @@ if save_figures:
 
 
 print('RF_normed_maxQuenchDiam medians')
-params.groupby('layer')['RFnormed_maxQuenchDiam'].median()
+print(params.groupby('layer')['RFnormed_maxQuenchDiam'].median())
 
 print('RF_normed_maxQuenchDiam bootstrapper errors for medians')
 print(SEM)

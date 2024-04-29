@@ -6,7 +6,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -23,6 +23,7 @@ params = params_df[['layer',
                     'fit_fano_BSL',
                     'SI',
                     'SI_SUR',
+                    'SI_SUR_2RF',
                     'animal']]
 params = params.dropna()
 
@@ -30,10 +31,12 @@ params['utype'] = ['multi'] * len(params.index)
 
 FFsuppression = -100 *(1-(params['fit_fano_RF'] / params['fit_fano_BSL']))
 FFsurfac = 100 * (params['fit_fano_LAR'] - params['fit_fano_RF'])/ params['fit_fano_RF']
-FFsurfac_SUR = 100 * (params['fit_fano_near_SUR_200'] - params['fit_fano_RF'])/ params['fit_fano_RF']
+FFsurfac_SUR_2RF = 100 * (params['fit_fano_near_SUR_200'] - params['fit_fano_RF'])/ params['fit_fano_RF']
+FFsurfac_SUR = 100 * (params['fit_fano_SUR'] - params['fit_fano_RF'])/ params['fit_fano_RF']
 params.insert(3,'FFsuppression',FFsuppression.values)
 params.insert(3,'FFsurfac',FFsurfac.values)
 params.insert(3,'FFsurfac_SUR',FFsurfac_SUR.values)
+params.insert(3,'FFsurfac_SUR_2RF',FFsurfac_SUR_2RF.values)
 
 # fano suppression RF
 plt.figure()
@@ -198,10 +201,8 @@ sns.swarmplot(x='layer',y='FFsurfac_SUR',hue='animal',data=params,ax=ax,size=3,c
 ax.set_ylim(-70,160)
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2E-top.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'F2E-top-SUR.svg',bbox_inches='tight',pad_inches=0)
 
-print(params.groupby('layer')['FFsurfac_SUR'].mean())
-print(params.groupby('layer')['FFsurfac_SUR'].sem())
 
 print('\n ANOVA: the effect of layer on FFfacilitation')
 lm = ols('FFsurfac_SUR ~ C(layer)',data=params).fit()
@@ -229,6 +230,8 @@ X = IG['SI_SUR'].values
 X = sm.add_constant(X)
 IG_results = sm.OLS(Y,X).fit()
 
+
+
 plt.figure()
 ax = plt.subplot(111)
 sns.scatterplot(x='SI_SUR',y='FFsurfac_SUR',hue='layer',style='animal',data=params,ax=ax)
@@ -242,7 +245,7 @@ ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
 ax.set_xlabel('Suppression Index')
 ax.set_ylabel('Fano Factor change (%)')
 if save_figures:
-    plt.savefig(fig_dir + 'F2G.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'F2G-SUR.svg',bbox_inches='tight',pad_inches=0)
 
 print('\n test on correlation between FFsurfac_SUR and SI_SUR')
 print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI_SUR'],df['FFsurfac_SUR'])))
@@ -252,8 +255,8 @@ print('FFsurfac_SUR SEM',SEM_ffsurfac_SUR)
 
 # set the same median for each layer
 SG['FFsurfac_SUR_zero_median'] = SG['FFsurfac_SUR'] - SG['FFsurfac_SUR'].median()
-G['FFsurfac_SUR_zero_median']  = G['FFsurfac'] - G['FFsurfac_SUR'].median()
-IG['FFsurfac_SUR_zero_median'] = IG['FFsurfac'] - IG['FFsurfac_SUR'].median()
+G['FFsurfac_SUR_zero_median']  = G['FFsurfac_SUR'] - G['FFsurfac_SUR'].median()
+IG['FFsurfac_SUR_zero_median'] = IG['FFsurfac_SUR'] - IG['FFsurfac_SUR'].median()
 
 SG_distr = sts.bootstrap((SG['FFsurfac_SUR_zero_median'].values,),np.median).bootstrap_distribution
 G_distr  = sts.bootstrap((G['FFsurfac_SUR_zero_median'].values,),np.median).bootstrap_distribution
@@ -267,3 +270,92 @@ print(np.sum(G_distr > np.abs(G['FFsurfac_SUR'].median())) / len(G_distr))
 
 print('FFsurfac_SUR IG > 0 : p-value')
 print(np.sum(IG_distr > np.abs(IG['FFsurfac_SUR'].median())) / len(IG_distr))
+
+plt.figure()
+ax = plt.subplot(121)
+ 
+G  = params.query('layer == "L4C"')
+IG = params.query('layer == "LIG"')
+SG = params.query('layer == "LSG"')
+
+# container for SEM
+SEM_ffsurfac_SUR = params.groupby('layer')['FFsurfac_SUR_2RF'].sem()
+SEM_ffsurfac_SUR['L4C'] = sts.bootstrap((G['FFsurfac_SUR_2RF'].values,),np.median).standard_error
+SEM_ffsurfac_SUR['LIG'] = sts.bootstrap((IG['FFsurfac_SUR_2RF'].values,),np.median,confidence_level=0.68).standard_error
+SEM_ffsurfac_SUR['LSG'] = sts.bootstrap((SG['FFsurfac_SUR_2RF'].values,),np.median,confidence_level=0.68).standard_error
+
+params.groupby('layer')['FFsurfac_SUR_2RF'].median().plot(kind='bar',ax=ax,yerr=SEM_ffsurfac_SUR,color='white',edgecolor='red')
+ax.set_ylim(-70,160)
+ax = plt.subplot(122)
+sns.swarmplot(x='layer',y='FFsurfac_SUR_2RF',hue='animal',data=params,ax=ax,size=3,color='red')
+ax.set_ylim(-70,160)
+
+if save_figures:
+    plt.savefig(fig_dir + 'F2E-top-SUR-2RF.svg',bbox_inches='tight',pad_inches=0)
+
+
+print('\n ANOVA: the effect of layer on FFfacilitation')
+lm = ols('FFsurfac_SUR ~ C(layer)',data=params).fit()
+print(sm.stats.anova_lm(lm,typ=1))
+
+print('\n t-test FFsurfac_SUR_2RF different from zero')
+print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac_SUR_2RF'],0)))
+
+SG = params.query('layer == "LSG"')
+G  = params.query('layer == "L4C"')
+IG = params.query('layer == "LIG"')
+
+Y = SG['FFsurfac_SUR_2RF'].values
+X = SG['SI_SUR_2RF'].values
+X = sm.add_constant(X)
+SG_results = sm.OLS(Y,X).fit()
+
+Y = G['FFsurfac_SUR_2RF'].values
+X = G['SI_SUR_2RF'].values
+X = sm.add_constant(X)
+G_results = sm.OLS(Y,X).fit()
+
+Y = IG['FFsurfac_SUR_2RF'].values
+X = IG['SI_SUR_2RF'].values
+X = sm.add_constant(X)
+IG_results = sm.OLS(Y,X).fit()
+
+plt.figure()
+ax = plt.subplot(111)
+sns.scatterplot(x='SI_SUR_2RF',y='FFsurfac_SUR_2RF',hue='layer',style='animal',data=params,ax=ax)
+ax.plot([np.min(SG['SI_SUR_2RF']),np.max(SG['SI_SUR_2RF'])],
+        SG_results.params[0] + SG_results.params[1]*np.array([np.min(SG['SI_SUR_2RF']),np.max(SG['SI_SUR_2RF'])]),'b-')
+ax.plot([np.min(G['SI_SUR_2RF']),np.max(G['SI_SUR_2RF'])],
+        G_results.params[0] + G_results.params[1]*np.array([np.min(G['SI_SUR_2RF']),np.max(G['SI_SUR_2RF'])]),'r-')
+ax.plot([np.min(IG['SI_SUR_2RF']),np.max(IG['SI_SUR_2RF'])],
+        IG_results.params[0] + IG_results.params[1]*np.array([np.min(IG['SI_SUR_2RF']),np.max(IG['SI_SUR_2RF'])]),'g-')
+ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
+ax.set_xlabel('Suppression Index')
+ax.set_ylabel('Fano Factor change (%)')
+if save_figures:
+    plt.savefig(fig_dir + 'F2G-SUR-2RF.svg',bbox_inches='tight',pad_inches=0)
+
+print('\n test on correlation between FFsurfac_SUR_2RF and SI_SUR_2RF')
+print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI_SUR_2RF'],df['FFsurfac_SUR_2RF'])))
+
+print('FFsurfac_SUR_2RF medians',params.groupby('layer')['FFsurfac_SUR_2RF'].median())
+print('FFsurfac_SUR_2RF SEM',SEM_ffsurfac_SUR)
+
+# set the same median for each layer
+SG['FFsurfac_SUR_2RF_zero_median'] = SG['FFsurfac_SUR_2RF'] - SG['FFsurfac_SUR_2RF'].median()
+G['FFsurfac_SUR_2RF_zero_median']  = G['FFsurfac_SUR_2RF'] - G['FFsurfac_SUR_2RF'].median()
+IG['FFsurfac_SUR_2RF_zero_median'] = IG['FFsurfac_SUR_2RF'] - IG['FFsurfac_SUR_2RF'].median()
+
+SG_distr = sts.bootstrap((SG['FFsurfac_SUR_2RF_zero_median'].values,),np.median).bootstrap_distribution
+G_distr  = sts.bootstrap((G['FFsurfac_SUR_2RF_zero_median'].values,),np.median).bootstrap_distribution
+IG_distr = sts.bootstrap((IG['FFsurfac_SUR_2RF_zero_median'].values,),np.median).bootstrap_distribution
+
+print('FFsurfac_SUR_2RF SG > 0 : p-value')
+print(np.sum(SG_distr > np.abs(SG['FFsurfac_SUR_2RF'].median())) / len(SG_distr))
+
+print('FFsurfac_SUR_2RF G > 0 : p-value')
+print(np.sum(G_distr > np.abs(G['FFsurfac_SUR_2RF'].median())) / len(G_distr))
+
+print('FFsurfac_SUR_2RF IG > 0 : p-value')
+print(np.sum(IG_distr > np.abs(IG['FFsurfac_SUR_2RF'].median())) / len(IG_distr))
+

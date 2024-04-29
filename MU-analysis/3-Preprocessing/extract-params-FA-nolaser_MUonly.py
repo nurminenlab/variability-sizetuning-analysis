@@ -19,7 +19,7 @@ save_figures = False
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
 
-data_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
+data_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/2-PrecomputedAnalysis/'
 
 SG_netvariance = np.load(data_dir+'netvariance_all_SG.npy')
 G_netvariance  = np.load(data_dir+'netvariance_all_G.npy')
@@ -32,6 +32,10 @@ bsl_IG_netvariance = np.load(data_dir+'bsl_netvariance_all_IG.npy')
 SG_meanresponses = np.load(data_dir+'mean_response_all_SG.npy')
 G_meanresponses  = np.load(data_dir+'mean_response_all_G.npy')
 IG_meanresponses = np.load(data_dir+'mean_response_all_IG.npy')
+
+SG_unit_animals = np.int16(np.load(data_dir+'SG_unit_animals.npy')).flatten()
+G_unit_animals  = np.int16(np.load(data_dir+'G_unit_animals.npy')).flatten()
+IG_unit_animals = np.int16(np.load(data_dir+'IG_unit_animals.npy')).flatten()
 
 count_window = 100
 
@@ -48,6 +52,7 @@ def cost_fano(params,xdata,ydata):
 # this dataframe holds params for each unit
 params_df = pd.DataFrame(columns=['layer',
                                 'anipe',
+                                'animal',
                                 'ntrials',                                  
                                 'fit_FA_SML',
                                 'fit_FA_RF',
@@ -108,7 +113,8 @@ for u in range(SG_netvariance.shape[0]):
     surr_narrow_new = diams_tight[surr_ind_narrow_new]
 
     BSL = np.nanmean(bsl_SG_netvariance[u,:])
-    para_tmp = {'layer':'SG',                                                               
+    para_tmp = {'layer':'SG',
+                'animal':'MK'+str(SG_unit_animals[u]),                                                               
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
@@ -167,7 +173,8 @@ for u in range(G_netvariance.shape[0]):
     # 
     surr_narrow_new = diams_tight[surr_ind_narrow_new]
     BSL = np.nanmean(bsl_G_netvariance[u,:])
-    para_tmp = {'layer':'G',                                                               
+    para_tmp = {'layer':'G',
+                'animal':'MK'+str(G_unit_animals[u]),
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
@@ -226,7 +233,8 @@ for u in range(IG_netvariance.shape[0]):
     # 
     surr_narrow_new = diams_tight[surr_ind_narrow_new]
     BSL = np.nanmean(bsl_IG_netvariance[u,:])
-    para_tmp = {'layer':'IG',                                                               
+    para_tmp = {'layer':'IG',
+                'animal':'MK'+str(IG_unit_animals[u]),                                                               
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
@@ -242,4 +250,4 @@ for u in range(IG_netvariance.shape[0]):
     indx = indx + 1
 
 # save data
-params_df.to_csv(S_dir+'FA-params-Oct-2022.csv')
+params_df.to_csv(S_dir+'FA-params-Aug-2023.csv')

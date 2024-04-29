@@ -10,7 +10,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from datetime import datetime
 
 # please download this library from www.github.com/nurminenlab/Analysis
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 
 #import pdb
 
@@ -122,6 +122,8 @@ for unit in range(len(data)):
         if cont in data[unit].keys():
             # data selection
             Y = np.mean(data[unit][cont]['spkC_NoL'].T,axis=1)
+            
+            # here fit and compute SI from the fit
             SI = (np.max(Y) - Y[-1]) / np.max(Y)
             if select_data(data[unit][cont]['spkC_NoL'].T,data[unit][cont]['baseline']):
                 # no-laser
@@ -384,6 +386,7 @@ for unit in range(len(data)):
                                 'fit_RF':fit_RF,
                                 'maxResponse':np.max(np.mean(data[unit][cont]['spkC_NoL'].T, axis=1)),
                                 'SI':(np.max(Rhat) - Rhat[-1]) / np.max(Rhat),
+                                'SI_data':(np.max(Y) - Y[-1]) / np.max(Y),
                                 'SI_SUR':(np.max(Rhat) - Rhat[surr_ind_narrow_new]) / np.max(Rhat),
                                 'baseline':np.mean(data[unit][100.0]['baseline']),
                                 'layer':L,
@@ -422,27 +425,27 @@ month = datetime.now().strftime('%b')
 year = datetime.now().strftime('%Y')
 
 # save data
-params_df.to_csv(S_dir+'SU-extracted_params-'+month+year+'.csv')
+params_df.to_csv(S_dir+'SU-extracted_params-nosuppression-'+month+year+'.csv')
 
-with open(S_dir + 'mean_PSTHs-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
-with open(S_dir + 'vari_PSTHs-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs,f,pkl.HIGHEST_PROTOCOL)
 
 # layer resolved
 # SG
-with open(S_dir + 'mean_PSTHs_SG-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_SG-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_SG-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_SG,f,pkl.HIGHEST_PROTOCOL)
 # G
-with open(S_dir + 'mean_PSTHs_G-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_G-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_G-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_G-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_G,f,pkl.HIGHEST_PROTOCOL)
 # IG
-with open(S_dir + 'mean_PSTHs_IG-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(mean_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)
-with open(S_dir + 'vari_PSTHs_IG-MK-SU-'+month+year+'.pkl','wb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-SU-nosuppression-'+month+year+'.pkl','wb') as f:
     pkl.dump(vari_PSTHs_IG,f,pkl.HIGHEST_PROTOCOL)

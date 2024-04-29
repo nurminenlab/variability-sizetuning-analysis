@@ -5,13 +5,15 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
-anal_root = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/2-PrecomputedAnalysis/'
+fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
+anal_root = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 
 # to generate quencher_DF run generate_quencher_DF.py
-quencher_DF = pd.read_csv(anal_root+'quencher_DF.csv')
+quencher_DF = pd.read_csv(anal_root+'quencher_DF_rev2.csv')
+G_index = quencher_DF[quencher_DF['layer'] == 'G'].index
+quencher_DF.drop(G_index,inplace=True)
 
 # bar graph of the proportion of quenchers in each layer
 plt.figure()
@@ -19,17 +21,16 @@ ax = plt.subplot(111)
 quencher_DF.groupby(['layer','FF_sup']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()).unstack().plot(kind='bar', stacked=True, ax=ax,color=['red','grey','blue'])
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2F.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'SU-F2F.svg',bbox_inches='tight',pad_inches=0)
 
 # the proportion of quenchers 
 print('\n The proportion of quenchers:')
 print(quencher_DF.groupby(['FF_sup']).size() / len(quencher_DF))
 # the number of quenchers 
-print('\n The number of quenchers:')
-print(quencher_DF.groupby(['FF_sup']).size())
-
-# print out the percentage of quenchers in each layer
+print('\n The proportion of quenchers grouped by layer:')
 print(quencher_DF.groupby(['layer','FF_sup']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()))
+
+
 
 # main effect of FF_sup
 print('\n The main effect of FF_sup:')
@@ -58,15 +59,14 @@ ax = plt.subplot(111)
 quencher_DF.groupby(['layer','FF_sup_2RF']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()).unstack().plot(kind='bar', stacked=True, ax=ax,color=['red','grey','blue'])
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2Fi.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'SU-F2F-2RF.svg',bbox_inches='tight',pad_inches=0)
 
 # the proportion of quenchers 
 print('\n The proportion of quenchers:')
 print(quencher_DF.groupby(['FF_sup_2RF']).size() / len(quencher_DF))
 # the number of quenchers 
-print('\n The number of quenchers:')
-print(quencher_DF.groupby(['FF_sup_2RF']).size())
-
+print('\n The proportion of quenchers grouoped by layer:')
+print(quencher_DF.groupby(['layer','FF_sup_2RF']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()))
 
 # bar graph of the proportion of quenchers in each layer
 plt.figure()
@@ -74,11 +74,11 @@ ax = plt.subplot(111)
 quencher_DF.groupby(['layer','FF_sup_SUR']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()).unstack().plot(kind='bar', stacked=True, ax=ax,color=['red','grey','blue'])
 
 if save_figures:
-    plt.savefig(fig_dir + 'F2Fii.svg',bbox_inches='tight',pad_inches=0)
+    plt.savefig(fig_dir + 'SU-F2F-SUR.svg',bbox_inches='tight',pad_inches=0)
 
 # the proportion of quenchers 
 print('\n The proportion of quenchers:')
 print(quencher_DF.groupby(['FF_sup_SUR']).size() / len(quencher_DF))
 # the number of quenchers 
-print('\n The number of quenchers:')
-print(quencher_DF.groupby(['FF_sup_SUR']).size())
+print('\n The proportion of quenchers grouped by layer:')
+print(quencher_DF.groupby(['layer','FF_sup_SUR']).size().groupby(level=0).apply(lambda x: 100 * x / x.sum()))
