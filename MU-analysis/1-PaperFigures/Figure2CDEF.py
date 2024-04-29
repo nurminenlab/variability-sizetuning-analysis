@@ -142,21 +142,6 @@ X = IG['SI'].values
 X = sm.add_constant(X)
 IG_results = sm.OLS(Y,X).fit()
 
-plt.figure()
-ax = plt.subplot(111)
-sns.scatterplot(x='SI',y='FFsurfac',hue='layer',style='animal',data=params,ax=ax)
-ax.plot([np.min(SG['SI']),np.max(SG['SI'])],
-        SG_results.params[0] + SG_results.params[1]*np.array([np.min(SG['SI']),np.max(SG['SI'])]),'b-')
-ax.plot([np.min(G['SI']),np.max(G['SI'])],
-        G_results.params[0] + G_results.params[1]*np.array([np.min(G['SI']),np.max(G['SI'])]),'r-')
-ax.plot([np.min(IG['SI']),np.max(IG['SI'])],
-        IG_results.params[0] + IG_results.params[1]*np.array([np.min(IG['SI']),np.max(IG['SI'])]),'g-')
-ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
-ax.set_xlabel('Suppression Index')
-ax.set_ylabel('Fano Factor change (%)')
-if save_figures:
-    plt.savefig(fig_dir + 'F2G.svg',bbox_inches='tight',pad_inches=0)
-
 print('\n test on correlation between FFsurfac and SI')
 print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI'],df['FFsurfac'])))
 
@@ -215,40 +200,6 @@ SG = params.query('layer == "LSG"')
 G  = params.query('layer == "L4C"')
 IG = params.query('layer == "LIG"')
 
-Y = SG['FFsurfac_SUR'].values
-X = SG['SI_SUR'].values
-X = sm.add_constant(X)
-SG_results = sm.OLS(Y,X).fit()
-
-Y = G['FFsurfac_SUR'].values
-X = G['SI_SUR'].values
-X = sm.add_constant(X)
-G_results = sm.OLS(Y,X).fit()
-
-Y = IG['FFsurfac_SUR'].values
-X = IG['SI_SUR'].values
-X = sm.add_constant(X)
-IG_results = sm.OLS(Y,X).fit()
-
-
-
-plt.figure()
-ax = plt.subplot(111)
-sns.scatterplot(x='SI_SUR',y='FFsurfac_SUR',hue='layer',style='animal',data=params,ax=ax)
-ax.plot([np.min(SG['SI_SUR']),np.max(SG['SI_SUR'])],
-        SG_results.params[0] + SG_results.params[1]*np.array([np.min(SG['SI_SUR']),np.max(SG['SI_SUR'])]),'b-')
-ax.plot([np.min(G['SI_SUR']),np.max(G['SI_SUR'])],
-        G_results.params[0] + G_results.params[1]*np.array([np.min(G['SI_SUR']),np.max(G['SI_SUR'])]),'r-')
-ax.plot([np.min(IG['SI_SUR']),np.max(IG['SI_SUR'])],
-        IG_results.params[0] + IG_results.params[1]*np.array([np.min(IG['SI_SUR']),np.max(IG['SI_SUR'])]),'g-')
-ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
-ax.set_xlabel('Suppression Index')
-ax.set_ylabel('Fano Factor change (%)')
-if save_figures:
-    plt.savefig(fig_dir + 'F2G-SUR.svg',bbox_inches='tight',pad_inches=0)
-
-print('\n test on correlation between FFsurfac_SUR and SI_SUR')
-print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI_SUR'],df['FFsurfac_SUR'])))
 
 print('FFsurfac_SUR medians',params.groupby('layer')['FFsurfac_SUR'].median())
 print('FFsurfac_SUR SEM',SEM_ffsurfac_SUR)
@@ -300,40 +251,6 @@ print(sm.stats.anova_lm(lm,typ=1))
 
 print('\n t-test FFsurfac_SUR_2RF different from zero')
 print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df['FFsurfac_SUR_2RF'],0)))
-
-SG = params.query('layer == "LSG"')
-G  = params.query('layer == "L4C"')
-IG = params.query('layer == "LIG"')
-
-Y = SG['FFsurfac_SUR_2RF'].values
-X = SG['SI_SUR_2RF'].values
-X = sm.add_constant(X)
-SG_results = sm.OLS(Y,X).fit()
-
-Y = G['FFsurfac_SUR_2RF'].values
-X = G['SI_SUR_2RF'].values
-X = sm.add_constant(X)
-G_results = sm.OLS(Y,X).fit()
-
-Y = IG['FFsurfac_SUR_2RF'].values
-X = IG['SI_SUR_2RF'].values
-X = sm.add_constant(X)
-IG_results = sm.OLS(Y,X).fit()
-
-plt.figure()
-ax = plt.subplot(111)
-sns.scatterplot(x='SI_SUR_2RF',y='FFsurfac_SUR_2RF',hue='layer',style='animal',data=params,ax=ax)
-ax.plot([np.min(SG['SI_SUR_2RF']),np.max(SG['SI_SUR_2RF'])],
-        SG_results.params[0] + SG_results.params[1]*np.array([np.min(SG['SI_SUR_2RF']),np.max(SG['SI_SUR_2RF'])]),'b-')
-ax.plot([np.min(G['SI_SUR_2RF']),np.max(G['SI_SUR_2RF'])],
-        G_results.params[0] + G_results.params[1]*np.array([np.min(G['SI_SUR_2RF']),np.max(G['SI_SUR_2RF'])]),'r-')
-ax.plot([np.min(IG['SI_SUR_2RF']),np.max(IG['SI_SUR_2RF'])],
-        IG_results.params[0] + IG_results.params[1]*np.array([np.min(IG['SI_SUR_2RF']),np.max(IG['SI_SUR_2RF'])]),'g-')
-ax.set_aspect(1.0/ax.get_data_ratio(), adjustable='box')
-ax.set_xlabel('Suppression Index')
-ax.set_ylabel('Fano Factor change (%)')
-if save_figures:
-    plt.savefig(fig_dir + 'F2G-SUR-2RF.svg',bbox_inches='tight',pad_inches=0)
 
 print('\n test on correlation between FFsurfac_SUR_2RF and SI_SUR_2RF')
 print(params.groupby('layer').apply(lambda df: sts.pearsonr(df['SI_SUR_2RF'],df['FFsurfac_SUR_2RF'])))
