@@ -27,13 +27,13 @@ MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 with open(F_dir + MUdatfile,'rb') as f:
     data = pkl.load(f)
 
-with open(S_dir + 'mean_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
     SG_mn_data = pkl.load(f)
 
-with open(S_dir + 'vari_PSTHs_SG-MK-MU-Dec-2021.pkl','rb') as f:
+with open(S_dir + 'vari_PSTHs_IG-MK-MU-Dec-2021.pkl','rb') as f:
     SG_vr_data = pkl.load(f)
 
-with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f:
+with open(S_dir + 'mean_PSTHs_SG-MK-MU.pkl','rb') as f: # just diameters
     diams_data = pkl.load(f)
 
 
@@ -138,57 +138,57 @@ this_row = 0
 this_col = 0
 axes[this_row,this_col].plot(t,mean_RFa/0.1,'-',color='grey',label='RF')
 axes[this_row,this_col].plot(t,mean_SR2/0.1,'-',color='orange',label='2RF')
-axes[this_row,this_col].set_ylim([0,135])
+axes[this_row,this_col].set_ylim([25,100])
 axes[this_row,this_col].set_ylabel('Firing rate (Hz)')
 
 this_row = 1
 this_col = 0
 axes[this_row,this_col].fill_between(t,(mean_RFa/0.1) - np.nanstd(bmeans_RFa/0.1,axis=0),(mean_RFa/0.1) + np.nanstd(bmeans_RFa/0.1,axis=0),color='grey',alpha=0.5)
 axes[this_row,this_col].fill_between(t,(mean_SR2/0.1) - np.nanstd(bmeans_SR2/0.1,axis=0),(mean_SR2/0.1) + np.nanstd(bmeans_SR2/0.1,axis=0),color='orange',alpha=0.5)
-axes[this_row,this_col].set_ylim([0,135])
+axes[this_row,this_col].set_ylim([25,100])
 
 this_row = 2
 this_col = 0
 axes[this_row,this_col].plot(t,fano_RFa,'-',color='grey',label='RF')
 axes[this_row,this_col].plot(t,fano_SR2,'-',color='orange',label='2RF')
-axes[this_row,this_col].set_ylim([0,3.75])
+axes[this_row,this_col].set_ylim([0.5,2])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
 this_col = 0
 axes[this_row,this_col].fill_between(t,(fano_RFa) - np.nanstd(fano_boot_RFa,axis=0),(fano_RFa) + np.nanstd(fano_boot_RFa,axis=0),color='grey',alpha=0.5)
 axes[this_row,this_col].fill_between(t,(fano_SR2) - np.nanstd(fano_boot_SR2,axis=0),(fano_SR2) + np.nanstd(fano_boot_SR2,axis=0),color='orange',alpha=0.5)
-axes[this_row,this_col].set_ylim([0,3.75])
+axes[this_row,this_col].set_ylim([0.5,2])
 
 ##
 this_row = 0
 this_col = 1
 axes[this_row,this_col].plot(t,mean_RFa_new/0.1,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,mean_SR3/0.1,'-',color='blue',label='2RF')
-axes[this_row,this_col].set_ylim([0,125])
+axes[this_row,this_col].set_ylim([25,100])
 axes[this_row,this_col].set_ylabel('Firing rate (Hz)')
 
 this_row = 1
 this_col = 1
 axes[this_row,this_col].fill_between(t,(mean_RFa_new/0.1) - np.nanstd(bmeans_RFa_new/0.1,axis=0),(mean_RFa_new/0.1) + np.nanstd(bmeans_RFa_new/0.1,axis=0),color='orange',alpha=0.5)
 axes[this_row,this_col].fill_between(t,(mean_SR3/0.1) - np.nanstd(bmeans_SR3/0.1,axis=0),(mean_SR3/0.1) + np.nanstd(bmeans_SR3/0.1,axis=0),color='blue',alpha=0.5)
-axes[this_row,this_col].set_ylim([0,125])
+axes[this_row,this_col].set_ylim([25,100])
 
 this_row = 2
 this_col = 1
 axes[this_row,this_col].plot(t,fano_RFa_new,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,fano_SR3,'-',color='blue',label='3RF')
-axes[this_row,this_col].set_ylim([0,4])
+axes[this_row,this_col].set_ylim([0.5,2])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
 this_col = 1
 axes[this_row,this_col].fill_between(t,(fano_RFa_new) - np.nanstd(fano_boot_RFa_new,axis=0),(fano_RFa_new) + np.nanstd(fano_boot_RFa_new,axis=0),color='orange',alpha=0.5)
 axes[this_row,this_col].fill_between(t,(fano_SR3) - np.nanstd(fano_boot_SR3,axis=0),(fano_SR3) + np.nanstd(fano_boot_SR3,axis=0),color='blue',alpha=0.5)
-axes[this_row,this_col].set_ylim([0,4])
+axes[this_row,this_col].set_ylim([0.5,2])
 
 if save_figures:
-    plt.savefig(fig_dir+'SG-mean-matched-PSTHs-nearSURROUND.svg')
+    plt.savefig(fig_dir+'IG-mean-matched-PSTHs-nearSURROUND.svg')
 
 plt.figure(2)
 ax = plt.subplot(2,2,1)
@@ -229,7 +229,7 @@ ax.set_xticks([1,2])
 ax.set_xticklabels(['RF','3RF'])
 
 if save_figures:
-    plt.savefig(fig_dir+'SG-mean-matched-averages-nearSURROUND.svg')
+    plt.savefig(fig_dir+'IG-mean-matched-averages-nearSURROUND.svg')
 
 
 print('Fano factor for RF: ' + str(np.mean(fano_RFa))+ ' +/- ' + str(np.std(fano_RFa)))
