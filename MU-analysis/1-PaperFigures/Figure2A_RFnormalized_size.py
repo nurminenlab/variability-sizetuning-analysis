@@ -18,7 +18,7 @@ save_figures = False
 geo_mean = True
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
-fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
+fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
 
 # analysis done between these timepoints
 anal_duration = 400
@@ -114,7 +114,13 @@ for unit in list(SG_mn_data.keys()):
         else:
             diam = diams[stim]
 
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'SG','FR':FR,'unit':unit}
+        para_tmp  = {'fano':fano,
+                     'bsl':bsl_FF,
+                     'bsl_FR':bsl_FR,
+                     'diam':diam,
+                     'layer':'SG',
+                     'FR':FR,
+                     'unit':unit}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
         params     = params.append(tmp_df,sort=True)
 
@@ -182,11 +188,51 @@ for unit in list(IG_mn_data.keys()):
         q_indx += 1
 
 
-SG_params['RFnormed_bslFR'] = SG_params['bsl_FR'] / SG_params['FR']
-G_params['RFnormed_bslFR']  = G_params['bsl_FR'] / G_params['FR']
-IG_params['RFnormed_bslFR'] = IG_params['bsl_FR'] / IG_params['FR']
+# baselines for FF and FR
+# SG
+SG_groups = SG_params.groupby('unit')
+SG_groups = dict(list(SG_groups))
+SG_bsl_fano = []
+SG_bsl_FR = []
+for i in SG_groups.keys():
+    A = SG_groups[i]    
+    SG_bsl_fano.append(A['bsl'].mean() / A.iloc[A['FR'].argmax()]['fano'])
+    SG_bsl_FR.append(A['bsl_FR'].mean() / A['FR'].max())
+
+SG_bsl_fano = np.exp(np.log(np.array(SG_bsl_fano)).mean())
+SG_bsl_FR = np.array(SG_bsl_FR).mean()
+
+# G
+G_groups = G_params.groupby('unit')
+G_groups = dict(list(G_groups))
+G_bsl_fano = []
+G_bsl_FR = []
+for i in G_groups.keys():
+    A = G_groups[i]    
+    G_bsl_fano.append(A['bsl'].mean() / A.iloc[A['FR'].argmax()]['fano'])
+    G_bsl_FR.append(A['bsl_FR'].mean() / A['FR'].max())
+
+G_bsl_fano = np.exp(np.log(np.array(G_bsl_fano)).mean())
+G_bsl_FR = np.array(G_bsl_FR).mean()
+
+# IG
+IG_groups = IG_params.groupby('unit')
+IG_groups = dict(list(IG_groups))
+IG_bsl_fano = []
+IG_bsl_FR = []
+for i in IG_groups.keys():
+    A = IG_groups[i]    
+    IG_bsl_fano.append(A['bsl'].mean() / A.iloc[A['FR'].argmax()]['fano'])
+    IG_bsl_FR.append(A['bsl_FR'].mean() / A['FR'].max())
+
+IG_bsl_fano = np.array(IG_bsl_fano).mean()
+IG_bsl_FR = np.exp(np.log(np.array(IG_bsl_FR)).mean())
 
 # supra-granular layer
+#
+sml = 0.2
+lrg = 50
+
 # loop units
 my_sizes = np.array([0.25, 0.5, 0.75, 
                      1.5, 2, 2.5, 3, 
@@ -280,6 +326,7 @@ ax2 = ax.twinx()
 ax.set_title('SG')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko', markersize=4,mfc='None',lw=1)
+ax2.plot([sml,lrg],[SG_bsl_FR,SG_bsl_FR],'k--')
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -297,7 +344,9 @@ else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
 
 ax.errorbar(my_sizes, SG_normed_FF,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
+ax.plot([sml,lrg],[SG_bsl_fano,SG_bsl_fano],'r--')
 ax.set_xscale('log')
+ax.set_xlim([0.2,50])
 ax.set_ylabel('Fano factor')
 ax.yaxis.label.set_color('red')
 ax.tick_params(axis='y',color='red')
@@ -401,6 +450,7 @@ ax2 = ax.twinx()
 ax.set_title('G')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko',markersize=4,mfc='None',lw=1)
+ax2.plot([sml,lrg],[G_bsl_FR,G_bsl_FR],'k--')
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -417,7 +467,9 @@ else:
     YERR = np.nanstd(RFnormed_FF,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FF),axis=0))
     
 ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
+ax.plot([sml,lrg],[G_bsl_fano,G_bsl_fano],'r--')
 ax.set_xscale('log')
+ax.set_xlim([0.2,50])
 ax.set_ylabel('Fano factor')
 ax.yaxis.label.set_color('red')
 ax.tick_params(axis='y',color='red')
@@ -522,6 +574,7 @@ ax.set_title('IG')
 ax2 = ax.twinx()
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,np.nanmean(RFnormed_FR,axis=0),yerr=YERR,fmt='ko',markersize=4,mfc='None',lw=1)
+ax2.plot([sml,lrg],[IG_bsl_FR,IG_bsl_FR],'k--')
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -539,7 +592,9 @@ else:
 
 
 ax.errorbar(my_sizes,np.nanmean(RFnormed_FF,axis=0),yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
+ax.plot([sml,lrg],[IG_bsl_fano,IG_bsl_fano],'r--')
 ax.set_xscale('log')
+ax.set_xlim([0.2,50])
 ax.set_ylabel('Fano factor')
 ax.yaxis.label.set_color('red')
 ax.tick_params(axis='y',color='red')

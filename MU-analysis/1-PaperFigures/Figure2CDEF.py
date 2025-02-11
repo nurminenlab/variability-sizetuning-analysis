@@ -12,6 +12,42 @@ F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocess
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
 params_df = pd.read_csv(F_dir + 'extracted_params-nearsurrounds-Jul2023.csv')
 
+def bootstrap_median_test(sample, num_bootstrap=10000, alpha=0.05):
+    """
+    Perform a bootstrap test to check if the median of the sample differs from zero.
+
+    Parameters:
+    sample (array-like): The data sample.
+    num_bootstrap (int): The number of bootstrap samples to generate.
+    alpha (float): The significance level for the confidence interval.
+
+    Returns:
+    bool: True if the median differs from zero, False otherwise.
+    float: The lower bound of the confidence interval.
+    float: The upper bound of the confidence interval.
+    float: The p-value of the test.
+    """
+    n = len(sample)
+    medians = np.zeros(num_bootstrap)
+
+    # Generate bootstrap samples and compute medians
+    for i in range(num_bootstrap):
+        bootstrap_sample = np.random.choice(sample, size=n, replace=True)
+        medians[i] = np.median(bootstrap_sample)
+
+    # Compute the confidence interval
+    lower_bound = np.percentile(medians, 100 * alpha / 2)
+    upper_bound = np.percentile(medians, 100 * (1 - alpha / 2))
+
+    # Check if zero is within the confidence interval
+    differs_from_zero = not (lower_bound <= 0 <= upper_bound)
+
+    # Compute the p-value
+    p_value = np.mean(medians <= 0) if np.median(sample) > 0 else np.mean(medians >= 0)
+
+    return differs_from_zero, p_value
+
+
 params = params_df[['layer',
                     'fit_fano_SML',
                     'fit_fano_RF',
@@ -60,6 +96,12 @@ sns.swarmplot(x='layer',y='FFsuppression',hue='animal',data=params,ax=ax,size=3,
 ax.set_ylim(-80,90)
 if save_figures:
     plt.savefig(fig_dir + 'F2C-left.svg',bbox_inches='tight',pad_inches=0)
+
+
+# computer significance of fano suppression in RF
+SG_differs_from_zero, SG_p_value = bootstrap_median_test(SG['FFsuppression'].values)
+G_differs_from_zero, G_p_value = bootstrap_median_test(G['FFsuppression'].values)
+IG_differs_from_zero, IG_p_value = bootstrap_median_test(IG['FFsuppression'].values)
 
 print('\n t-test FFsuppression LSG vs L4C')
 print(sts.ttest_ind(params[params['layer'] == 'L4C']['FFsuppression'],params[params['layer'] == 'LSG']['FFsuppression']))

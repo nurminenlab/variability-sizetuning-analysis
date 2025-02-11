@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pickle as pkl
 import pandas as pd
 import seaborn as sns
-#import pdb
 import statsmodels.api as sm
 
 import sys
@@ -14,7 +13,7 @@ from scipy.optimize import basinhopping, curve_fit
 
 import scipy.stats as sts
 
-save_figures = True
+save_figures = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'

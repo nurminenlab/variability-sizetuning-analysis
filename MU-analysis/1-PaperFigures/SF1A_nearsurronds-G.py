@@ -92,7 +92,7 @@ for i, u in enumerate(SG_mn_data.keys()):
     RFdiam_idx, nearSUR2_idx, nearSUR3_idx = fit_mean_response(meanR,diams)
 
     if mn_matrix.shape[0] != 19:
-        # nean responses 
+        # mean responses 
         mn_SML[i,:] = mn_matrix[0,first_tp:last_tp]
         mn_RF[i,:]  = mn_matrix[1,first_tp:last_tp]
         mn_RFa[i,:] = mn_matrix[RFdiam_idx-1,first_tp:last_tp]
@@ -125,7 +125,12 @@ for i, u in enumerate(SG_mn_data.keys()):
 
 count_bins = np.arange(0,30,1)
 
-fano_RFa, fano_SR2, mean_RFa, mean_SR2, fano_boot_RFa, fano_boot_SR2,bmeans_RFa, bmeans_SR2 = dalib.PSTH_meanmatch_twopopulations(mn_RFa, mn_SR2, vr_RFa, vr_SR2, count_bins,100)
+fano_RFa, fano_SR2, mean_RFa, mean_SR2, fano_boot_RFa, fano_boot_SR2,bmeans_RFa, bmeans_SR2 = dalib.PSTH_meanmatch_twopopulations(mn_RFa, 
+                                                                                                                                  mn_SR2, 
+                                                                                                                                  vr_RFa, 
+                                                                                                                                  vr_SR2, 
+                                                                                                                                  count_bins,
+                                                                                                                                  100)
 fano_RFa_new, fano_SR3, mean_RFa_new, mean_SR3, fano_boot_RFa_new, fano_boot_SR3,bmeans_RFa_new, bmeans_SR3 = dalib.PSTH_meanmatch_twopopulations(mn_RFa, mn_SR3, vr_RFa, vr_SR3, count_bins,100)
 
 # RUNS UP TO HERE, NOW PLOTTING!
@@ -191,38 +196,97 @@ if save_figures:
     plt.savefig(fig_dir+'G-mean-matched-PSTHs-nearSURROUND.svg')
 
 plt.figure(2)
+
 ax = plt.subplot(2,2,1)
+
+SE_mean_boot_RFa = np.nanmean(bmeans_RFa,axis=1)
+SE_mean_boot_SR2 = np.nanmean(bmeans_SR2,axis=1)
+# Compute the confidence interval
+alpha = 0.001
+RFa_lower_bound = np.percentile(SE_mean_boot_RFa, 100 * alpha / 2)
+RFa_upper_bound = np.percentile(SE_mean_boot_RFa, 100 * (1 - alpha / 2))
+SR2_lower_bound = np.percentile(SE_mean_boot_SR2, 100 * alpha / 2)
+SR2_upper_bound = np.percentile(SE_mean_boot_SR2, 100 * (1 - alpha / 2))
+# Compute the error bars
+RFa_error = np.array([np.mean(SE_mean_boot_RFa) - RFa_lower_bound, RFa_upper_bound - np.mean(SE_mean_boot_RFa)])
+SR2_error = np.array([np.mean(SE_mean_boot_SR2) - SR2_lower_bound, SR2_upper_bound - np.mean(SE_mean_boot_SR2)])
+
 ax.bar([1,2],
-    [np.mean(mean_RFa/0.1),np.mean(mean_SR2/0.1)],
-    yerr=[np.std(mean_RFa/0.1),np.std(mean_SR2/0.1)],
+    [np.mean(SE_mean_boot_RFa/0.1),np.mean(SE_mean_boot_SR2/0.1)],
+    yerr=[RFa_error/0.1,SR2_error/0.1],
     color=['grey','orange'])
 ax.set_xticks([1,2])
 ax.set_xticklabels(['RF','2RF'])
 ax.set_ylabel('Firing rate (Hz)')
 
 ax = plt.subplot(2,2,2)
+
+SE_mean_boot_RFa_new = np.nanmean(bmeans_RFa_new,axis=1)
+SE_mean_boot_SR3 = np.nanmean(bmeans_SR3,axis=1)
+# Compute the confidence interval
+alpha = 0.001
+RFa_new_lower_bound = np.percentile(SE_mean_boot_RFa_new, 100 * alpha / 2)
+RFa_new_upper_bound = np.percentile(SE_mean_boot_RFa_new, 100 * (1 - alpha / 2))
+SR3_lower_bound = np.percentile(SE_mean_boot_SR3, 100 * alpha / 2)
+SR3_upper_bound = np.percentile(SE_mean_boot_SR3, 100 * (1 - alpha / 2))
+# Compute the error bars
+RFa_new_error = np.array([np.mean(SE_mean_boot_RFa_new) - RFa_new_lower_bound, 
+                          RFa_new_upper_bound - np.mean(SE_mean_boot_RFa_new)])
+SR3_new_error = np.array([np.mean(SE_mean_boot_SR3) - SR3_lower_bound, 
+                          SR3_upper_bound - np.mean(SE_mean_boot_SR3)])
+
 ax.bar([1,2],
-    [np.mean(mean_RFa_new/0.1),np.mean(mean_SR3/0.1)],
-    yerr=[np.std(mean_RFa_new/0.1),np.std(mean_SR3/0.1)],
+    [np.mean(SE_mean_boot_RFa_new/0.1),np.mean(SE_mean_boot_SR3/0.1)],
+    yerr=[RFa_new_error/0.1,SR3_new_error/0.1],
     color=['orange','blue'])
 ax.set_xticks([1,2])
 ax.set_xticklabels(['RF','3RF'])
 #ax.set_ylabel('Firing rate (Hz)')
 
 ax = plt.subplot(2,2,3)
+
+SE_fano_boot_RFa = np.nanmean(fano_boot_RFa,axis=1)
+SE_fano_boot_SR2 = np.nanmean(fano_boot_SR2,axis=1)
+# Compute the confidence interval
+alpha = 0.001
+RFa_lower_bound = np.percentile(SE_fano_boot_RFa, 100 * alpha / 2)
+RFa_upper_bound = np.percentile(SE_fano_boot_RFa, 100 * (1 - alpha / 2))
+SR2_lower_bound = np.percentile(SE_fano_boot_SR2, 100 * alpha / 2)
+SR2_upper_bound = np.percentile(SE_fano_boot_SR2, 100 * (1 - alpha / 2))
+# Compute the error bars
+RFa_error = [np.mean(SE_fano_boot_RFa) - RFa_lower_bound, RFa_upper_bound - np.mean(SE_fano_boot_RFa)]
+SR2_error = [np.mean(SE_fano_boot_SR2) - SR2_lower_bound, SR2_upper_bound - np.mean(SE_fano_boot_SR2)]
+
 ax.bar([1,2],
-    [np.mean(fano_RFa),np.mean(fano_SR2)],
-    yerr=[np.std(fano_RFa),np.std(fano_SR2)],
+    [np.mean(SE_fano_boot_RFa),np.mean(SE_fano_boot_SR2)],
+    yerr=[RFa_error,SR2_error],
     color=['grey','orange'])
 
 ax.set_ylabel('Fano factor')
 ax.set_xticks([1,2])
 ax.set_xticklabels(['RF','2RF'])
 
+
 ax = plt.subplot(2,2,4)
+
+SE_fano_boot_RFa_new = np.nanmean(fano_boot_RFa_new,axis=1)
+SE_fano_boot_SR3 = np.nanmean(fano_boot_SR3,axis=1)
+# Compute the confidence interval
+alpha = 0.001
+RFa_new_lower_bound = np.percentile(SE_fano_boot_RFa_new, 100 * alpha / 2)
+RFa_new_upper_bound = np.percentile(SE_fano_boot_RFa_new, 100 * (1 - alpha / 2))
+SR3_lower_bound = np.percentile(SE_fano_boot_SR3, 100 * alpha / 2)
+SR3_upper_bound = np.percentile(SE_fano_boot_SR3, 100 * (1 - alpha / 2))
+# Compute the error bars
+RFa_new_error = [np.mean(SE_fano_boot_RFa_new) - RFa_new_lower_bound, 
+             RFa_new_upper_bound - np.mean(SE_fano_boot_RFa_new)]
+SR3_error = [np.mean(SE_fano_boot_SR3) - SR3_lower_bound, 
+             SR3_upper_bound - np.mean(SE_fano_boot_SR3)]
+
+
 ax.bar([1,2],
-    [np.mean(fano_RFa_new),np.mean(fano_SR3)],
-    yerr=[np.std(fano_RFa_new),np.std(fano_SR3)],
+    [np.mean(SE_fano_boot_RFa_new),np.mean(SE_fano_boot_SR3)],
+    yerr=[RFa_new_error,SR3_error],
     color=['orange','blue'])
 
 ax.set_xticks([1,2])
@@ -231,10 +295,11 @@ ax.set_xticklabels(['RF','3RF'])
 if save_figures:
     plt.savefig(fig_dir+'G-mean-matched-averages-nearSURROUND.svg')
 
-
+FF_RF  = np.nanmean(vr_RFa / mn_RFa, axis=1)
+FF_RF2 = np.nanmean(vr_SR2 / mn_SR2, axis=1)
 print('Fano factor for RF: ' + str(np.mean(fano_RFa))+ ' +/- ' + str(np.std(fano_RFa)))
 print('Fano factor for 2RF: ' + str(np.mean(fano_SR2))+ ' +/- ' + str(np.std(fano_SR2)))
-print('p :', sts.ttest_ind(fano_RFa,fano_SR2))
+print('p :', sts.ttest_ind(FF_RF,FF_RF2))
 print('####################')
 print('Fano factor for RF: ' + str(np.mean(fano_RFa_new))+ ' +/- ' + str(np.std(fano_RFa_new)))
 print('Fano factor for 3RF: ' + str(np.mean(fano_SR3))+ ' +/- ' + str(np.std(fano_SR3)))

@@ -6,7 +6,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -18,11 +18,18 @@ SG_df = params.query('layer == "LSG"')
 G_df  = params.query('layer == "L4C"')
 IG_df = params.query('layer == "LIG"')
 
-G_median = sts.bootstrap((G_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian).standard_error
-IG_median = sts.bootstrap((IG_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian).standard_error
-SG_median = sts.bootstrap((SG_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian).standard_error
+G_median = sts.bootstrap((G_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian,confidence_level=0.99).confidence_interval
+IG_median = sts.bootstrap((IG_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian,confidence_level=0.99).confidence_interval
+SG_median = sts.bootstrap((SG_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian,confidence_level=0.99).confidence_interval
 
-medians = [G_median,IG_median,SG_median]
+medians = np.nan * np.ones((2,3))
+medians[0,:] = np.array([G_median.low,IG_median.low,SG_median.low])
+medians[1,:] = np.array([G_median.high,IG_median.high,SG_median.high])
+
+for i in range(medians.shape[0]):
+    medians[i,:] = np.abs(medians[i,:]- np.array([G_df['RFnormed_maxQuenchDiam'].median(),
+                                                  IG_df['RFnormed_maxQuenchDiam'].median(),
+                                                  SG_df['RFnormed_maxQuenchDiam'].median()]))
 
 ax = plt.subplot(121)
 params.groupby('layer')['RFnormed_maxQuenchDiam'].median().plot(kind='bar',yerr=medians,ax=ax,color='white',edgecolor='red')

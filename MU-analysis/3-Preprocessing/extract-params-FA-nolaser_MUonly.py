@@ -57,6 +57,7 @@ params_df = pd.DataFrame(columns=['layer',
                                 'fit_FA_SML',
                                 'fit_FA_RF',
                                 'fit_FA_SUR',
+                                'fit_FA_NEAR_SUR',
                                 'fit_FA_LAR',
                                 'fit_FA_BSL',
                                 'fit_FA_MIN',
@@ -97,6 +98,8 @@ for u in range(SG_netvariance.shape[0]):
 
     Rhat  = dalib.ROG(diams_tight,*FR_popt)
     FAhat = dalib.doubleROG(diams_tight,*FA_popt)
+    RF2_i   = 2*diams_tight[np.argmax(Rhat)]
+    RF2_i   = np.argmin(np.abs(RF2_i - diams_tight))
 
     # compute gradient for surround size detection
     GG = np.gradient(Rhat,diams_tight)
@@ -117,6 +120,7 @@ for u in range(SG_netvariance.shape[0]):
                 'animal':'MK'+str(SG_unit_animals[u]),                                                               
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
+                'fit_FA_NEAR_SUR':FAhat[RF2_i],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
                 'fit_FA_LAR':FAhat[-1],                
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
@@ -158,6 +162,8 @@ for u in range(G_netvariance.shape[0]):
 
     Rhat  = dalib.ROG(diams_tight,*FR_popt)
     FAhat = dalib.doubleROG(diams_tight,*FA_popt)
+    RF2_i   = 2*diams_tight[np.argmax(Rhat)]
+    RF2_i   = np.argmin(np.abs(RF2_i - diams_tight))
 
     # compute gradient for surround size detection
     GG = np.gradient(Rhat,diams_tight)
@@ -177,6 +183,7 @@ for u in range(G_netvariance.shape[0]):
                 'animal':'MK'+str(G_unit_animals[u]),
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
+                'fit_FA_NEAR_SUR':FAhat[RF2_i],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
                 'fit_FA_LAR':FAhat[-1],                
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
@@ -218,6 +225,8 @@ for u in range(IG_netvariance.shape[0]):
 
     Rhat  = dalib.ROG(diams_tight,*FR_popt)
     FAhat = dalib.doubleROG(diams_tight,*FA_popt)
+    RF2_i   = 2*diams_tight[np.argmax(Rhat)]
+    RF2_i   = np.argmin(np.abs(RF2_i - diams_tight))
 
     # compute gradient for surround size detection
     GG = np.gradient(Rhat,diams_tight)
@@ -230,7 +239,7 @@ for u in range(IG_netvariance.shape[0]):
         else:
             surr_ind_narrow_new = -1
     
-    # 
+    #    
     surr_narrow_new = diams_tight[surr_ind_narrow_new]
     BSL = np.nanmean(bsl_IG_netvariance[u,:])
     para_tmp = {'layer':'IG',
@@ -238,6 +247,7 @@ for u in range(IG_netvariance.shape[0]):
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
+                'fit_FA_NEAR_SUR':FAhat[RF2_i],
                 'fit_FA_LAR':FAhat[-1],                
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
                 'fit_FA_MAX':np.max(FAhat),
@@ -250,4 +260,4 @@ for u in range(IG_netvariance.shape[0]):
     indx = indx + 1
 
 # save data
-params_df.to_csv(S_dir+'FA-params-Aug-2023.csv')
+params_df.to_csv(S_dir+'FA-params-May-2024.csv')

@@ -6,7 +6,7 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import numpy as np
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -119,6 +119,9 @@ print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df[var_dict[4]],1
 
 print('\n t-test for fano-factor in RF vs LAR across layers')
 print(params.groupby('layer').apply(lambda df: sts.ttest_1samp(df[var_dict[5]],1,nan_policy='omit')))
+
+print('\n t-test for fano-factor in 26 vs. near SUR 200 across layers')
+print(params.groupby('layer').apply(lambda df: sts.ttest_ind(df[var_dict[2]],df[var_dict[5]],nan_policy='omit')))
 
 print(params.groupby('layer').agg(agg_dict_gmean))
 print(SEM)
