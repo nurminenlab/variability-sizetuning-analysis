@@ -62,6 +62,19 @@ def fit_mean_response(meanR,diam):
     
     return RFdiam_idx, nearSUR2_idx, nearSUR3_idx
 
+def bootstrapped_p_for_sampled(sample1, sample2, mean1, mean2, n, n_boots = 1000):
+
+    combined_samples = np.hstack((sample1, sample2))
+    mean1_resampled  = np.random.choice(combined_samples, (n, n_boots), replace=True)
+    mean2_resampled  = np.random.choice(combined_samples, (n, n_boots), replace=True)
+
+    diffs = np.mean(mean1_resampled, axis=0) - np.mean(mean2_resampled, axis=0)
+    if mean1 > mean2:
+        p_value = np.sum(diffs > (mean1 - mean2)) / n_boots
+    else:
+        p_value = np.sum(diffs < (mean1 - mean2)) / n_boots
+
+    return p_value
 
 eps = 0.0000001
 # analysis done between these timepoints
@@ -125,8 +138,19 @@ for i, u in enumerate(SG_mn_data.keys()):
 
 count_bins = np.arange(0,30,1)
 
-fano_RFa, fano_SR2, mean_RFa, mean_SR2, fano_boot_RFa, fano_boot_SR2,bmeans_RFa, bmeans_SR2 = dalib.PSTH_meanmatch_twopopulations(mn_RFa, mn_SR2, vr_RFa, vr_SR2, count_bins,100)
-fano_RFa_new, fano_SR3, mean_RFa_new, mean_SR3, fano_boot_RFa_new, fano_boot_SR3,bmeans_RFa_new, bmeans_SR3 = dalib.PSTH_meanmatch_twopopulations(mn_RFa, mn_SR3, vr_RFa, vr_SR3, count_bins,100)
+fano_RFa, fano_SR2, mean_RFa, mean_SR2, fano_boot_RFa, fano_boot_SR2,bmeans_RFa, bmeans_SR2, N_RFa, N_SR2 = dalib.PSTH_meanmatch_twopopulations(mn_RFa, 
+                                                                                                                                  mn_SR2, 
+                                                                                                                                  vr_RFa, 
+                                                                                                                                  vr_SR2, 
+                                                                                                                                  count_bins,
+                                                                                                                                  1000)
+
+fano_RFa_new, fano_SR3, mean_RFa_new, mean_SR3, fano_boot_RFa_new, fano_boot_SR3,bmeans_RFa_new, bmeans_SR3, N_RFa_new, N_SR3 = dalib.PSTH_meanmatch_twopopulations(mn_RFa, 
+                                                                                                                                                  mn_SR3, 
+                                                                                                                                                  vr_RFa, 
+                                                                                                                                                  vr_SR3, 
+                                                                                                                                                  count_bins,
+                                                                                                                                                  1000)
 
 # RUNS UP TO HERE, NOW PLOTTING!
 
@@ -188,10 +212,9 @@ axes[this_row,this_col].fill_between(t,(fano_SR3) - np.nanstd(fano_boot_SR3,axis
 axes[this_row,this_col].set_ylim([0.5,2])
 
 if save_figures:
-    plt.savefig(fig_dir+'IG-mean-matched-PSTHs-nearSURROUND.svg')
+    plt.savefig(fig_dir+'Figure2-Suppl-2-IG-mean-matched-PSTHs-nearSURROUND.svg')
 
 plt.figure(2)
-
 ax = plt.subplot(2,2,1)
 
 SE_mean_boot_RFa = np.nanmean(bmeans_RFa,axis=1)
@@ -288,14 +311,29 @@ ax.set_xticks([1,2])
 ax.set_xticklabels(['RF','3RF'])
 
 if save_figures:
-    plt.savefig(fig_dir+'IG-mean-matched-averages-nearSURROUND.svg')
+    plt.savefig(fig_dir+'Figure2-Suppl-2-IG-mean-matched-nearSURROUND.svg')
 
 FF_RF  = np.nanmean(vr_RFa / mn_RFa, axis=1)
 FF_RF2 = np.nanmean(vr_SR2 / mn_SR2, axis=1)
-print('Fano factor for RF: ' + str(np.mean(fano_RFa))+ ' +/- ' + str(np.std(fano_RFa)))
-print('Fano factor for 2RF: ' + str(np.mean(fano_SR2))+ ' +/- ' + str(np.std(fano_SR2)))
-print('p :', sts.ttest_ind(FF_RF,FF_RF2))
+
+RFvs2RF_diff = SE_fano_boot_RFa - SE_fano_boot_SR2
+N_RFa = int(np.mean(N_RFa).round())
+p_value_RFvs2RF = bootstrapped_p_for_sampled(SE_fano_boot_RFa,
+                                              SE_fano_boot_SR2,
+                                              np.mean(SE_fano_boot_RFa), 
+                                              np.mean(SE_fano_boot_SR2),N_RFa)
+
+RFvs3RF_diff = SE_fano_boot_RFa_new - SE_fano_boot_SR3
+N_RFa_new = int(np.mean(N_RFa_new).round())
+p_value_RFvs3RF = bootstrapped_p_for_sampled(SE_fano_boot_RFa_new,
+                                             SE_fano_boot_SR3,
+                                             np.mean(SE_fano_boot_RFa_new),
+                                             np.mean(SE_fano_boot_SR3),N_RFa_new)
+
+print('Fano factor for RF: ' + str(np.mean(SE_fano_boot_RFa))+ ' +/- ' + str(RFa_error[0]) + ' ' + str(RFa_error[1]))
+print('Fano factor for 2RF: ' + str(np.mean(SE_fano_boot_SR2))+ ' +/- ' + str(SR2_error[0]) + ' ' + str(SR2_error[1]))
+print('p :', str(p_value_RFvs2RF))
 print('####################')
-print('Fano factor for RF: ' + str(np.mean(fano_RFa_new))+ ' +/- ' + str(np.std(fano_RFa_new)))
-print('Fano factor for 3RF: ' + str(np.mean(fano_SR3))+ ' +/- ' + str(np.std(fano_SR3)))
-print('p :', sts.ttest_ind(fano_RFa_new,fano_SR3))
+print('Fano factor for RF: ' + str(np.mean(SE_fano_boot_RFa_new))+ ' +/- ' + str(RFa_new_error[0]) + ' ' + str(RFa_new_error[1]))
+print('Fano factor for 3RF: ' + str(np.mean(SE_fano_boot_SR3))+ ' +/- ' + str(SR3_error[0]) + ' ' + str(SR3_error[1]))
+print('p :', str(p_value_RFvs3RF))
