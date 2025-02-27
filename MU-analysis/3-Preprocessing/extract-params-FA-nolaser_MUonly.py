@@ -6,7 +6,6 @@ import pandas as pd
 import seaborn as sns
 #import pdb
 import statsmodels.api as sm
-
 import sys
 sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
@@ -49,6 +48,7 @@ def cost_fano(params,xdata,ydata):
     err  = np.sum(np.power(Rhat - ydata,2))
     return err
 
+
 # this dataframe holds params for each unit
 params_df = pd.DataFrame(columns=['layer',
                                 'anipe',
@@ -57,17 +57,23 @@ params_df = pd.DataFrame(columns=['layer',
                                 'fit_FA_SML',
                                 'fit_FA_RF',
                                 'fit_FA_SUR',
-                                'fit_FA_NEAR_SUR',
+                                'fit_FA_SUR_200',
+                                'fit_FA_SUR_400',
+                                'fit_FA_SUR_800',
                                 'fit_FA_LAR',
                                 'fit_FA_BSL',
                                 'fit_FA_MIN',
                                 'fit_FA_MAX',
                                 'fit_FA_MAX_diam',
-                                'fit_FA_MIN_diam'])
+                                'fit_FA_MIN_diam',
+                                'sur_MAX_diam',
+                                'fit_RF'])
 
 
 # loop
 indx = 0
+# SG
+#----------------------------------------------------------
 for u in range(SG_netvariance.shape[0]):
     print('Now analysing unit ',u)
 
@@ -100,7 +106,15 @@ for u in range(SG_netvariance.shape[0]):
     FAhat = dalib.doubleROG(diams_tight,*FA_popt)
     RF2_i   = 2*diams_tight[np.argmax(Rhat)]
     RF2_i   = np.argmin(np.abs(RF2_i - diams_tight))
-
+    RF4_i   = 4*diams_tight[np.argmax(Rhat)]
+    RF4_i   = np.argmin(np.abs(RF4_i - diams_tight))
+    RF8_i   = 8*diams_tight[np.argmax(Rhat)]
+    RF8_i   = np.argmin(np.abs(RF8_i - diams_tight))
+    
+    FAhat_temp = FAhat[np.argmax(Rhat):]
+    diams_tight_temp = diams_tight[np.argmax(Rhat):]                    #     
+    sur_MAX_diam = diams_tight_temp[np.argmax(FAhat_temp)]
+    
     # compute gradient for surround size detection
     GG = np.gradient(Rhat,diams_tight)
     GG_min_ind = np.argmin(GG)
@@ -120,19 +134,26 @@ for u in range(SG_netvariance.shape[0]):
                 'animal':'MK'+str(SG_unit_animals[u]),                                                               
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
-                'fit_FA_NEAR_SUR':FAhat[RF2_i],
+                'fit_FA_SUR_200':FAhat[RF2_i],
+                'fit_FA_SUR_400':FAhat[RF4_i],
+                'fit_FA_SUR_800':FAhat[RF8_i],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
                 'fit_FA_LAR':FAhat[-1],                
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
                 'fit_FA_MAX':np.max(FAhat),
                 'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
                 'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)],
-                'fit_FA_BSL':BSL}
+                'fit_FA_BSL':BSL,
+                'fit_RF':diams_tight[np.argmax(Rhat)],
+                'sur_MAX_diam':sur_MAX_diam}
 
     tmp_df = pd.DataFrame(para_tmp, index=[indx])
     params_df = params_df.append(tmp_df,sort=True)
     indx = indx + 1
 
+
+# G
+#----------------------------------------------------------
 for u in range(G_netvariance.shape[0]):
     if np.isnan(G_netvariance[u,0]):
         diams = np.array([0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
@@ -164,6 +185,14 @@ for u in range(G_netvariance.shape[0]):
     FAhat = dalib.doubleROG(diams_tight,*FA_popt)
     RF2_i   = 2*diams_tight[np.argmax(Rhat)]
     RF2_i   = np.argmin(np.abs(RF2_i - diams_tight))
+    RF4_i   = 4*diams_tight[np.argmax(Rhat)]
+    RF4_i   = np.argmin(np.abs(RF4_i - diams_tight))
+    RF8_i   = 8*diams_tight[np.argmax(Rhat)]
+    RF8_i   = np.argmin(np.abs(RF8_i - diams_tight))
+
+    FAhat_temp = FAhat[np.argmax(Rhat):]
+    diams_tight_temp = diams_tight[np.argmax(Rhat):]                    #     
+    sur_MAX_diam = diams_tight_temp[np.argmax(FAhat_temp)]
 
     # compute gradient for surround size detection
     GG = np.gradient(Rhat,diams_tight)
@@ -183,19 +212,25 @@ for u in range(G_netvariance.shape[0]):
                 'animal':'MK'+str(G_unit_animals[u]),
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
-                'fit_FA_NEAR_SUR':FAhat[RF2_i],
+                'fit_FA_SUR_200':FAhat[RF2_i],
+                'fit_FA_SUR_400':FAhat[RF4_i],
+                'fit_FA_SUR_800':FAhat[RF8_i],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
                 'fit_FA_LAR':FAhat[-1],                
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
                 'fit_FA_MAX':np.max(FAhat),
                 'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
                 'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)],
-                'fit_FA_BSL':BSL}
+                'fit_FA_BSL':BSL,
+                'fit_RF':diams_tight[np.argmax(Rhat)],
+                'sur_MAX_diam':sur_MAX_diam}
 
     tmp_df = pd.DataFrame(para_tmp, index=[indx])
     params_df = params_df.append(tmp_df,sort=True)
     indx = indx + 1
 
+# IG
+#----------------------------------------------------------
 for u in range(IG_netvariance.shape[0]):
     if np.isnan(IG_netvariance[u,0]):
         diams = np.array([0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 1.5, 1.8, 2, 2.4, 3, 3.5, 5, 10, 15, 20, 26])
@@ -227,6 +262,14 @@ for u in range(IG_netvariance.shape[0]):
     FAhat = dalib.doubleROG(diams_tight,*FA_popt)
     RF2_i   = 2*diams_tight[np.argmax(Rhat)]
     RF2_i   = np.argmin(np.abs(RF2_i - diams_tight))
+    RF4_i   = 4*diams_tight[np.argmax(Rhat)]
+    RF4_i   = np.argmin(np.abs(RF4_i - diams_tight))
+    RF8_i   = 8*diams_tight[np.argmax(Rhat)]
+    RF8_i   = np.argmin(np.abs(RF8_i - diams_tight))
+
+    FAhat_temp = FAhat[np.argmax(Rhat):]
+    diams_tight_temp = diams_tight[np.argmax(Rhat):]                    #     
+    sur_MAX_diam = diams_tight_temp[np.argmax(FAhat_temp)]
 
     # compute gradient for surround size detection
     GG = np.gradient(Rhat,diams_tight)
@@ -247,13 +290,17 @@ for u in range(IG_netvariance.shape[0]):
                 'fit_FA_SML':FAhat[0],
                 'fit_FA_RF':FAhat[np.argmax(Rhat)],
                 'fit_FA_SUR':FAhat[surr_ind_narrow_new],
-                'fit_FA_NEAR_SUR':FAhat[RF2_i],
+                'fit_FA_SUR_200':FAhat[RF2_i],
+                'fit_FA_SUR_400':FAhat[RF4_i],
+                'fit_FA_SUR_800':FAhat[RF8_i],
                 'fit_FA_LAR':FAhat[-1],                
                 'fit_FA_MIN':np.max((np.min(FAhat),0)), # in case of negative values resulting from bad fits,
                 'fit_FA_MAX':np.max(FAhat),
                 'fit_FA_MAX_diam':diams_tight[np.argmax(FAhat)],
                 'fit_FA_MIN_diam':diams_tight[np.argmin(FAhat)],
-                'fit_FA_BSL':BSL}
+                'fit_FA_BSL':BSL,
+                'fit_RF':diams_tight[np.argmax(Rhat)],
+                'sur_MAX_diam':sur_MAX_diam}
 
     tmp_df = pd.DataFrame(para_tmp, index=[indx])
     params_df = params_df.append(tmp_df,sort=True)

@@ -44,11 +44,11 @@ nboots = 3000
 t = np.arange(-150,600,1)
 
 # comment/uncomment to plot different units
-units = [29]
-stims = np.array([1]) 
+#units = [29]
+#stims = np.array([1]) 
 
-#units = [103]
-#stims = np.array([1])
+units = [103]
+stims = np.array([1])
 
 #units = [100]
 #stims = np.array([4])
@@ -101,7 +101,7 @@ def process(data,mean_data,bsl_begin,t):
             ax2[0,count].set_xticks([0,250,500])
             # fano PSTH
             ax2[1,count].fill_between(t[st_plot:],fano_PSTH[st_plot:]-fano_SE[st_plot:],fano_PSTH[st_plot:]+fano_SE[st_plot:],color='red')
-            ax2[1,count].plot([t[st_plot],t[-1]], [np.mean(fano_PSTH[st_plot:151]),np.mean(fano_PSTH[st_plot:151])],'r--')
+            ax2[1,count].plot([t[st_plot],t[-1]], [np.mean(fano_PSTH[st_plot:115]),np.mean(fano_PSTH[st_plot:115])],'r--')
             ax2[1,count].plot(t[st_plot:],fano_PSTH[st_plot:],color=[0.5, 0, 0])
             #ax2[1,count].set_ylim(0,5) 
             ax2[1,count].set_xticks([0,250,500])

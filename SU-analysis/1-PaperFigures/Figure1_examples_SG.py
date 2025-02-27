@@ -10,7 +10,7 @@ from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
 import scipy.io as scio
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'

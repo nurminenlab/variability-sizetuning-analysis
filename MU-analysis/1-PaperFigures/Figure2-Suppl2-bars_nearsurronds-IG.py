@@ -15,7 +15,7 @@ import scipy.stats as sts
 # This is the analysis that compares 0.2 to 0.4 deg diameter stimuli
 # TODO compare RF to 2RF
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'

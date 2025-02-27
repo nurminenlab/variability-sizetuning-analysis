@@ -18,8 +18,9 @@ fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 
 MUdatfile = 'selectedData_macaque_Jun2023.pkl'
 
-unit = 79
-layer = 'SG'
+# example units SG: 44, 9, IG: 5, 82
+unit = 82
+layer = 'IG'
  
 with open(S_dir + MUdatfile,'rb') as f:
     data = pkl.load(f)
@@ -84,10 +85,10 @@ a = 0
 
 for stim in range(mn_mtrx.shape[0]):
 
-    fano[stim] = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
-    
+    fano[stim] = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / (eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))    
     FR[stim]   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)/(count_window/1000)
-    
+    fano_bsl[stim] = np.mean(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window] / (eps + mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]))   
+    FR_bsl[stim]   = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)/(count_window/1000)
 
     if mn_mtrx.shape[0] == 18:
         diam = diams[stim+1]
@@ -191,4 +192,8 @@ axb.spines['top'].set_visible(False)
 plt.figure(2)
 if save_figures:
     plt.savefig(fig_dir + 'SU-F1_'+layer+'_ASFs-unit-'+str(unit)+'.svg',bbox_inches='tight',pad_inches=0)
+
+print('RF size: ', RFsize)
+print('RF surround size: ', RFsurr)
+print('SI: ', SI)
 
