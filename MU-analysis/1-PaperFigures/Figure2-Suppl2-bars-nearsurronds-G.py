@@ -15,11 +15,11 @@ import scipy.stats as sts
 # This is the analysis that compares 0.2 to 0.4 deg diameter stimuli
 # TODO compare RF to 2RF
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
-fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
+fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
 mat_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/PSTHmats/'
 
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
@@ -172,7 +172,7 @@ this_row = 0
 this_col = 0
 axes[this_row,this_col].plot(t,mean_RFa/0.1,'-',color='grey',label='RF')
 axes[this_row,this_col].plot(t,mean_SR2/0.1,'-',color='orange',label='2RF')
-axes[this_row,this_col].set_ylim([50,160])
+axes[this_row,this_col].set_ylim([35,170])
 axes[this_row,this_col].set_ylabel('Firing rate (Hz)')
 
 this_row = 1
@@ -181,13 +181,13 @@ axes[this_row,this_col].fill_between(t,(mean_RFa/0.1) - np.nanstd(bmeans_RFa/0.1
 axes[this_row,this_col].fill_between(t,(mean_SR2/0.1) - np.nanstd(bmeans_SR2/0.1,axis=0),(mean_SR2/0.1) + np.nanstd(bmeans_SR2/0.1,axis=0),color='orange',alpha=0.5)
 axes[this_row,this_col].plot(t,mean_RFa/0.1,'-',color='grey') # mean response 
 axes[this_row,this_col].plot(t,mean_SR2/0.1,'-',color='orange') # mean response
-axes[this_row,this_col].set_ylim([50,160])
+axes[this_row,this_col].set_ylim([35,170])
 
 this_row = 2
 this_col = 0
 axes[this_row,this_col].plot(t,fano_RFa,'-',color='grey',label='RF')
 axes[this_row,this_col].plot(t,fano_SR2,'-',color='orange',label='2RF')
-axes[this_row,this_col].set_ylim([0,2])
+axes[this_row,this_col].set_ylim([0,3])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
@@ -196,7 +196,7 @@ axes[this_row,this_col].fill_between(t,(fano_RFa) - np.nanstd(fano_boot_RFa,axis
 axes[this_row,this_col].fill_between(t,(fano_SR2) - np.nanstd(fano_boot_SR2,axis=0),(fano_SR2) + np.nanstd(fano_boot_SR2,axis=0),color='orange',alpha=0.5)
 axes[this_row,this_col].plot(t,fano_RFa,'-',color='grey',label='RF')
 axes[this_row,this_col].plot(t,fano_SR2,'-',color='orange',label='2RF')
-axes[this_row,this_col].set_ylim([0,2])
+axes[this_row,this_col].set_ylim([0,3])
 
 # RF vs 3RF
 #--------------------------
@@ -204,7 +204,7 @@ this_row = 0
 this_col = 1
 axes[this_row,this_col].plot(t,mean_RFa_new/0.1,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,mean_SR3/0.1,'-',color='blue',label='2RF')
-axes[this_row,this_col].set_ylim([50,160])
+axes[this_row,this_col].set_ylim([35,170])
 axes[this_row,this_col].set_ylabel('Firing rate (Hz)')
 
 this_row = 1
@@ -213,13 +213,13 @@ axes[this_row,this_col].fill_between(t,(mean_RFa_new/0.1) - np.nanstd(bmeans_RFa
 axes[this_row,this_col].fill_between(t,(mean_SR3/0.1) - np.nanstd(bmeans_SR3/0.1,axis=0),(mean_SR3/0.1) + np.nanstd(bmeans_SR3/0.1,axis=0),color='blue',alpha=0.5)
 axes[this_row,this_col].plot(t,mean_RFa_new/0.1,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,mean_SR3/0.1,'-',color='blue',label='2RF')
-axes[this_row,this_col].set_ylim([50,160])
+axes[this_row,this_col].set_ylim([35,170])
 
 this_row = 2
 this_col = 1
 axes[this_row,this_col].plot(t,fano_RFa_new,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,fano_SR3,'-',color='blue',label='3RF')
-axes[this_row,this_col].set_ylim([0,2])
+axes[this_row,this_col].set_ylim([0,3])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
@@ -228,7 +228,7 @@ axes[this_row,this_col].fill_between(t,(fano_RFa_new) - np.nanstd(fano_boot_RFa_
 axes[this_row,this_col].fill_between(t,(fano_SR3) - np.nanstd(fano_boot_SR3,axis=0),(fano_SR3) + np.nanstd(fano_boot_SR3,axis=0),color='blue',alpha=0.5)
 axes[this_row,this_col].plot(t,fano_RFa_new,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,fano_SR3,'-',color='blue',label='3RF')
-axes[this_row,this_col].set_ylim([0,2])
+axes[this_row,this_col].set_ylim([0,3])
 
 # RF vs 26
 #--------------------------
@@ -236,7 +236,7 @@ this_row = 0
 this_col = 2
 axes[this_row,this_col].plot(t,mean_RFa_LAR/0.1,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,mean_LAR/0.1,'-',color='blue',label='2RF')
-axes[this_row,this_col].set_ylim([50,160])
+axes[this_row,this_col].set_ylim([35,170])
 axes[this_row,this_col].set_ylabel('Firing rate (Hz)')
 
 this_row = 1
@@ -245,13 +245,13 @@ axes[this_row,this_col].fill_between(t,(mean_RFa_LAR/0.1) - np.nanstd(bmeans_RFa
 axes[this_row,this_col].fill_between(t,(mean_LAR/0.1) - np.nanstd(bmeans_LAR/0.1,axis=0),(mean_LAR/0.1) + np.nanstd(bmeans_LAR/0.1,axis=0),color='blue',alpha=0.5)
 axes[this_row,this_col].plot(t,mean_RFa_LAR/0.1,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,mean_LAR/0.1,'-',color='blue',label='2RF')
-axes[this_row,this_col].set_ylim([50,160])
+axes[this_row,this_col].set_ylim([35,170])
 
 this_row = 2
 this_col = 2
 axes[this_row,this_col].plot(t,fano_RFa_LAR,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,fano_LAR,'-',color='blue',label='3RF')
-axes[this_row,this_col].set_ylim([0,2])
+axes[this_row,this_col].set_ylim([0,3])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
@@ -260,7 +260,7 @@ axes[this_row,this_col].fill_between(t,(fano_RFa_LAR) - np.nanstd(fano_boot_RFa_
 axes[this_row,this_col].fill_between(t,(fano_LAR) - np.nanstd(fano_boot_LAR,axis=0),(fano_LAR) + np.nanstd(fano_boot_LAR,axis=0),color='blue',alpha=0.5)
 axes[this_row,this_col].plot(t,fano_RFa_LAR,'-',color='orange',label='RF')
 axes[this_row,this_col].plot(t,fano_LAR,'-',color='blue',label='3RF')
-axes[this_row,this_col].set_ylim([0,2])
+axes[this_row,this_col].set_ylim([0,3])
 
 
 if save_figures:
