@@ -135,6 +135,7 @@ for data_table in tables_list:
             # fano factor
             # the responses are multiplied to get rid of the scaling to spikes/s done in the preprocessing step,
             # as this would scale variance and mean differently and thus impact FANO
+            # but please note this parameter is never used in the analysis
             fano_NoL = (np.var(spkC_NoL[neuron,:,contrast==contr].T,axis=1)) / (np.mean(spkC_NoL[neuron,:,contrast==contr].T,axis=1) + eps)
             fano_bsl = (np.var(baseline[neuron,:,contrast==contr].T,axis=1)) / (np.mean(baseline[neuron,:,contrast==contr].T,axis=1) + eps)
 

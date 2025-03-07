@@ -15,7 +15,7 @@ import scipy.stats as sts
 # This is the analysis that compares 0.2 to 0.4 deg diameter stimuli
 # TODO compare RF to 2RF
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
@@ -151,7 +151,7 @@ this_row = 2
 this_col = 0
 axes[this_row,this_col].plot(t,fano_SML,'-',color='grey',label='RF')
 axes[this_row,this_col].plot(t,fano_RF,'-',color='orange',label='2RF')
-axes[this_row,this_col].set_ylim([0,5])
+axes[this_row,this_col].set_ylim([0,3])
 axes[this_row,this_col].set_ylabel('Fano factor')
 
 this_row = 3
@@ -160,7 +160,7 @@ axes[this_row,this_col].fill_between(t,(fano_SML) - np.nanstd(fano_boot_SML,axis
 axes[this_row,this_col].fill_between(t,(fano_RF) - np.nanstd(fano_boot_RF,axis=0),(fano_RF) + np.nanstd(fano_boot_RF,axis=0),color='orange',alpha=0.5)
 axes[this_row,this_col].plot(t,fano_SML,'-',color='grey',label='RF')
 axes[this_row,this_col].plot(t,fano_RF,'-',color='orange',label='2RF')
-axes[this_row,this_col].set_ylim([0,5])
+axes[this_row,this_col].set_ylim([0,3])
 
 if save_figures:
     plt.savefig(fig_dir+'Figure2-Suppl-2-G-mean-matched-PSTHs-SMLvsRF.svg')

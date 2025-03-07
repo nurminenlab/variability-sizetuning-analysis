@@ -15,7 +15,7 @@ F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
-save_figures = True
+save_figures = False
 
 # analysis done between these timepoints
 bsl_begin = 250

@@ -48,6 +48,23 @@ if save_figures:
 print('RF_normed_maxFacilDiam medians')
 print(params.groupby('layer')['RFnormed_maxFacilDiam'].median())
 
-print('RF_normed_maxQuenchDiam bootstrapper errors for medians')
+print('RF_normed_maxQuenchDiam bootstrapped CI for medians')
 print('Low: G, IG, SG ', [G_median.low,IG_median.low,SG_median.low])
 print('High: G, IG, SG ', [G_median.high,IG_median.high,SG_median.high])
+
+G_df['RFnormed_maxFacilDiam_median_one'] = G_df['RFnormed_maxFacilDiam'] - G_df['RFnormed_maxFacilDiam'].median() + 1
+IG_df['RFnormed_maxFacilDiam_median_one'] = IG_df['RFnormed_maxFacilDiam'] - IG_df['RFnormed_maxFacilDiam'].median() + 1
+SG_df['RFnormed_maxFacilDiam_median_one'] = SG_df['RFnormed_maxFacilDiam'] - SG_df['RFnormed_maxFacilDiam'].median() + 1
+
+G_median  = sts.bootstrap((G_df['RFnormed_maxFacilDiam_median_one'].values,),np.nanmedian).bootstrap_distribution
+IG_median = sts.bootstrap((IG_df['RFnormed_maxFacilDiam_median_one'].values,),np.nanmedian).bootstrap_distribution
+SG_median = sts.bootstrap((SG_df['RFnormed_maxFacilDiam_median_one'].values,),np.nanmedian).bootstrap_distribution
+
+print('p_value RF_normed_maxFacilDiam median, assuming true median is 1')
+print('SG p-value: ', np.sum(SG_median > SG_df['RFnormed_maxFacilDiam'].median()) / len(SG_median))
+print('G p-value: ', np.sum(G_median > G_df['RFnormed_maxFacilDiam'].median()) / len(G_median))
+print('IG p-value: ', np.sum(IG_median > IG_df['RFnormed_maxFacilDiam'].median()) / len(IG_median))
+
+
+
+

@@ -28,11 +28,12 @@ def bootstrap_median_test(sample, num_bootstrap=10000, alpha=0.05):
     float: The p-value of the test.
     """
     n = len(sample)
-    medians = np.zeros(num_bootstrap)
+    sample_zero_median = sample - np.median(sample)
+    medians = np.zeros(num_bootstrap)    
 
     # Generate bootstrap samples and compute medians
     for i in range(num_bootstrap):
-        bootstrap_sample = np.random.choice(sample, size=n, replace=True)
+        bootstrap_sample = np.random.choice(sample_zero_median, size=n, replace=True)
         medians[i] = np.median(bootstrap_sample)
 
     # Compute the confidence interval
@@ -43,7 +44,7 @@ def bootstrap_median_test(sample, num_bootstrap=10000, alpha=0.05):
     differs_from_zero = not (lower_bound <= 0 <= upper_bound)
 
     # Compute the p-value
-    p_value = np.mean(medians <= 0) if np.median(sample) > 0 else np.mean(medians >= 0)
+    p_value = sum(medians < np.median(sample)) / num_bootstrap
 
     return differs_from_zero, p_value
 

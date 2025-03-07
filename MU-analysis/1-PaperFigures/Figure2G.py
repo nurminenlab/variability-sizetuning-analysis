@@ -6,7 +6,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -22,12 +22,13 @@ G_median = sts.bootstrap((G_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian,c
 IG_median = sts.bootstrap((IG_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian,confidence_level=0.99).confidence_interval
 SG_median = sts.bootstrap((SG_df['RFnormed_maxQuenchDiam'].values,),np.nanmedian,confidence_level=0.99).confidence_interval
 
+CIs = np.nan * np.ones((2,3))
 medians = np.nan * np.ones((2,3))
-medians[0,:] = np.array([G_median.low,IG_median.low,SG_median.low])
-medians[1,:] = np.array([G_median.high,IG_median.high,SG_median.high])
+CIs[0,:] = np.array([G_median.low,IG_median.low,SG_median.low])
+CIs[1,:] = np.array([G_median.high,IG_median.high,SG_median.high])
 
 for i in range(medians.shape[0]):
-    medians[i,:] = np.abs(medians[i,:]- np.array([G_df['RFnormed_maxQuenchDiam'].median(),
+    medians[i,:] = np.abs(CIs[i,:]- np.array([G_df['RFnormed_maxQuenchDiam'].median(),
                                                   IG_df['RFnormed_maxQuenchDiam'].median(),
                                                   SG_df['RFnormed_maxQuenchDiam'].median()]))
 
@@ -44,17 +45,14 @@ ax.set_ylim(0.01,100)
 if save_figures:
     plt.savefig(fig_dir + 'F2G.svg')
 
-
-params_FANO = pd.read_csv(F_dir + 'extracted_params-nearsurrounds-Jul2023.csv')
-params['RFdiam'] = params_FANO['RFdiam']
-
 print('RF_normed_maxQuenchDiam medians')
-params.groupby('layer')['RFnormed_maxQuenchDiam'].median()
+print(params.groupby('layer')['RFnormed_maxQuenchDiam'].median())
 
-print('RF_normed_maxQuenchDiam bootstrapper errors for medians')
-print('SG: ', medians[2])
-print('G: ',medians[0])
-print('IG: ',medians[1])
+print('\nRF_normed_maxQuenchDiam bootstrapper errors for medians')
+print('RF_normed_maxQuenchDiam bootstrapped CI for medians')
+print('Low: G, IG, SG ', [G_median.low,IG_median.low,SG_median.low])
+print('High: G, IG, SG ', [G_median.high,IG_median.high,SG_median.high])
+
 
 # set the same median for each layer
 SG_df['RFnormed_maxQuenched_zeroed'] = SG_df['RFnormed_maxQuenchDiam'] - SG_df['RFnormed_maxQuenchDiam'].median()
@@ -69,11 +67,14 @@ SG_G  = np.abs(SG_distr - G_distr)
 SG_IG = np.abs(SG_distr - IG_distr)
 G_IG  = np.abs(G_distr - IG_distr)
 
-print('FFsuppression SG vs L4C: p-value')
+""" print('\nFFsuppression SG vs L4C: p-value')
 print(np.sum(SG_G > np.abs(SG_df['RFnormed_maxQuenchDiam'].median() - G_df['RFnormed_maxQuenchDiam'].median())) / len(SG_G))
 
 print('FFsuppression SG vs IG: p-value')
 print(np.sum(SG_IG > np.abs(SG_df['RFnormed_maxQuenchDiam'].median() - IG_df['RFnormed_maxQuenchDiam'].median())) / len(SG_IG))
 
 print('FFsuppression IG vs L4C: p-value')  
-print(np.sum(SG_IG > np.abs(IG_df['RFnormed_maxQuenchDiam'].median() - G_df['RFnormed_maxQuenchDiam'].median())) / len(G_IG))
+print(np.sum(SG_IG > np.abs(IG_df['RFnormed_maxQuenchDiam'].median() - G_df['RFnormed_maxQuenchDiam'].median())) / len(G_IG)) """
+
+
+
