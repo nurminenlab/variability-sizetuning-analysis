@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore')
 save_figures = False
 
 fig_dir  = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/IntermediateFigures/'
-dada_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/'
+dada_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/2-PrecomputedAnalysis/'
 
 amplification_DF = pd.read_csv(dada_dir + 'amplification_DF_division.csv')
 n_boots = 3000

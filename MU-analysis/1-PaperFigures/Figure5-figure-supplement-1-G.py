@@ -14,9 +14,8 @@ from scipy.optimize import basinhopping, curve_fit
 
 import scipy.stats as sts
 
-
 # this way of computing the mean firing-rate functions is cumbersome but we do it this way for consistency with the other scripts
-save_figures = True
+save_figures = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -54,10 +53,10 @@ def fit_mean_response(meanR,diam):
     Rhat = dalib.ROG(diams_tight,*popt)
     RF_diam = diams_tight[np.argmax(Rhat)]
     nearSUR2_idx = np.argmin(np.abs(2*RF_diam - diam))
-    nearSUR3_idx = np.argmin(np.abs(3*RF_diam - diam))
+    nearSUR4_idx = np.argmin(np.abs(4*RF_diam - diam))
     RFdiam_idx   = np.argmin(np.abs(RF_diam - diam))
     
-    return SMLidx+addone, RFdiam_idx+addone, nearSUR2_idx+addone, nearSUR3_idx+addone
+    return SMLidx+addone, RFdiam_idx+addone, nearSUR2_idx+addone, nearSUR4_idx+addone
 
 
 # SG
@@ -286,7 +285,7 @@ ax.bar([1,2],
 
 ax.set_ylim(0, 1)
 ax.set_xticks([1,2])
-ax.set_xticklabels(['RF','3 * RF'])
+ax.set_xticklabels(['RF','4 * RF'])
 
 p_SUR3 = dalib.bootstrapped_p_for_sampled(FA_noboot_RF3,
                                           FA_noboot_SUR3,
@@ -294,9 +293,9 @@ p_SUR3 = dalib.bootstrapped_p_for_sampled(FA_noboot_RF3,
                                           np.mean(FA_noboot_SUR3),
                                           FA_noboot_RF3.shape[0])
 
-print('\nRF vs 3*RF')
+print('\nRF vs 4*RF')
 print('G: RF'+ ' mean: ' + str(np.mean(FA_RF3)) + ' se: ' + str(RF3_error))
-print('G: 3*RF'+ ' mean: ' + str(np.mean(FA_SUR3)) + ' se: ' + str(SUR3_error)) 
+print('G: 4*RF'+ ' mean: ' + str(np.mean(FA_SUR3)) + ' se: ' + str(SUR3_error)) 
 print('p-value: ', p_SUR3)
 
 # RF vs 26

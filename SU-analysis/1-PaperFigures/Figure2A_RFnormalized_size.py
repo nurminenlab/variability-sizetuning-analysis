@@ -144,35 +144,6 @@ for unit in list(SG_mn_data.keys()):
         indx += 1
         q_indx += 1
     
-""" # loop G units
-q_indx = 0
-for unit in list(G_mn_data.keys()):
-    # loop diams
-    mn_mtrx = G_mn_data[unit]
-    vr_mtrx = G_vr_data[unit]
-
-    for stim in range(mn_mtrx.shape[0]):
-        fano = np.mean(vr_mtrx[stim,first_tp:last_tp][0:-1:count_window] / ( eps + mn_mtrx[stim,first_tp:last_tp][0:-1:count_window]))
-        FR   = np.mean(mn_mtrx[stim,first_tp:last_tp],axis=0)    
-        bsl_FF = np.mean(vr_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window] / (eps  + mn_mtrx[stim,bsl_begin:bsl_end][0:-1:count_window]))
-        bsl_FR = np.mean(mn_mtrx[stim,bsl_begin:bsl_end],axis=0)
-                
-        if mn_mtrx.shape[0] == 18:
-            diam = diams[stim+1]
-        else:
-            diam = diams[stim]
-
-        
-        para_tmp  = {'fano':fano,'bsl':bsl_FF,'bsl_FR':bsl_FR,'diam':diam,'layer':'G','FR':FR,'unit':unit}
-        tmp_df    = pd.DataFrame(para_tmp, index=[indx])
-        params    = pd.concat([params,tmp_df],sort=True)
-        
-        G_tmp_df  = pd.DataFrame(para_tmp, index=[q_indx])
-        G_params  = pd.concat([G_params,G_tmp_df],sort=True)
-
-        indx += 1
-        q_indx += 1 """
-
 # loop IG units
 q_indx = 0
 for unit in list(IG_mn_data.keys()):

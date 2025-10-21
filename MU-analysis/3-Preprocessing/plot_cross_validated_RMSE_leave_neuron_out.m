@@ -16,10 +16,11 @@ IG_RMSEs = squeeze(nanmean(IG_RMSEs,1)); %#ok<NANMEAN>
 
 figure('Name','SG')
 SG_stats = ones(1,19);
+SG_p = ones(1,19);
 for i = 1:19
     subplot(4,5,i)
     errorbar(SG_RMSEs(i,:),SG_SE(i,:),'ko-');
-    SG_stats(i) = ttest2(SG_all(:,i,1),SG_all(:,i,2));
+    [SG_stats(i),SG_p(i)] = ttest2(SG_all(:,i,1),SG_all(:,i,2));
 end
 
 figure('Name','G')

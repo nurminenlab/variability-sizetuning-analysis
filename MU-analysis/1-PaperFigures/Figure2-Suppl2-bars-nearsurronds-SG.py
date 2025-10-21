@@ -15,7 +15,7 @@ import scipy.stats as sts
 # This is the analysis that compares 0.2 to 0.4 deg diameter stimuli
 # TODO compare RF to 2RF
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
@@ -57,10 +57,10 @@ def fit_mean_response(meanR,diam):
     Rhat = dalib.ROG(diams_tight,*popt)
     RF_diam = diams_tight[np.argmax(Rhat)]
     nearSUR2_idx = np.argmin(np.abs(2*RF_diam - diam))
-    nearSUR3_idx = np.argmin(np.abs(3*RF_diam - diam))
+    nearSUR4_idx = np.argmin(np.abs(4*RF_diam - diam))
     RFdiam_idx   = np.argmin(np.abs(RF_diam - diam))
     
-    return RFdiam_idx, nearSUR2_idx, nearSUR3_idx
+    return RFdiam_idx, nearSUR2_idx, nearSUR4_idx
 
 
 def bootstrapped_p_for_sampled(sample1, sample2, mean1, mean2, n, n_boots = 1000):
@@ -311,7 +311,7 @@ ax.bar([1,2],
     yerr=[RFa_new_error/0.1,SR3_new_error/0.1],
     color=['orange','blue'])
 ax.set_xticks([1,2])
-ax.set_xticklabels(['RF','3RF'])
+ax.set_xticklabels(['RF','4RF'])
 #ax.set_ylabel('Firing rate (Hz)')
 
 ax = plt.subplot(2,2,3)
@@ -361,7 +361,7 @@ ax.bar([1,2],
     color=['orange','blue'])
 
 ax.set_xticks([1,2])
-ax.set_xticklabels(['RF','3RF'])
+ax.set_xticklabels(['RF','4RF'])
 
 if save_figures:
     plt.savefig(fig_dir+'Figure2-Suppl-2-SG-mean-matched-nearSURROUND.svg')
@@ -446,7 +446,7 @@ print('Fano factor for 2RF: ' + str(np.mean(SE_fano_boot_SR2))+ ' +/- ' + str(SR
 print('p :', str(p_value_RFvs2RF))
 print('####################')
 print('Fano factor for RF: ' + str(np.mean(SE_fano_boot_RFa_new))+ ' +/- ' + str(RFa_new_error[0]) + ' ' + str(RFa_new_error[1]))
-print('Fano factor for 3RF: ' + str(np.mean(SE_fano_boot_SR3))+ ' +/- ' + str(SR3_error[0]) + ' ' + str(SR3_error[1]))
+print('Fano factor for 4RF: ' + str(np.mean(SE_fano_boot_SR3))+ ' +/- ' + str(SR3_error[0]) + ' ' + str(SR3_error[1]))
 print('p :', str(p_value_RFvs3RF))
 print('####################')
 print('Fano factor for RF: ' + str(np.mean(SE_fano_boot_RFa_LAR))+ ' +/- ' + str(RFa_LAR_error[0]) + ' ' + str(RFa_LAR_error[1]))

@@ -10,7 +10,7 @@ from statsmodels.formula.api import ols
 from scipy.optimize import basinhopping, curve_fit
 import scipy.io as scio
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
@@ -19,8 +19,9 @@ fig_dir = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
 MUdatfile = 'selectedData_macaque_Jun2023.pkl'
 
 # example units SG: 44, 9, IG: 5, 82
-unit = 82
-layer = 'IG'
+# example units for FI talk: 22, 79
+unit = 79
+layer = 'SG'
  
 with open(S_dir + MUdatfile,'rb') as f:
     data = pkl.load(f)
@@ -106,7 +107,9 @@ for stim in range(mn_mtrx.shape[0]):
                                 (eps + mean_PSTH_booted[:,fano_PSTH_first_tp:last_tp])),axis=1)
     FR_boot[:,stim] = np.mean(mean_PSTH_booted[:,first_tp:last_tp],axis=1)/(count_window/1000)
 
-    if stim == 0 or stim == 5 or stim == 18:        
+    if stim == 5 or stim == 13:
+
+        #print(stim)
 
         plt.figure(1,figsize=(1.335, 1.487))
         # plot rasters
@@ -136,15 +139,15 @@ fano_E = 2 * np.std(fano_boot,axis=0)
 FR_E   = 2 * np.std(FR_boot,axis=0)
 
 # ROG fit spike-count data 
-args = (diamsa,FR)
+args = (diamsa[1:],FR[1:])
 bnds = np.array([[0.0001,0.0001,0,0,0],[30,30,100,100,None]]).T
 res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
 popt = res.x
 
-args = (diamsa,fano)
+args = (diamsa[1:],fano[1:])
 bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
 res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
-diams_tight = np.logspace(np.log10(diamsa[0]),np.log10(diamsa[-1]),1000)
+diams_tight = np.logspace(np.log10(diamsa[1]),np.log10(diamsa[-1]),1000)
 Rhat = dalib.ROG(diams_tight,*popt)
 Fhat = dalib.doubleROG(diams_tight,*res.x)
 
@@ -167,15 +170,18 @@ SI = (np.max(Rhat) - Rhat[-1]) / np.max(Rhat)
 plt.figure(2,figsize=(1.335, 1.115))
 ax = plt.subplot(1,1,1)
 axb = ax.twinx()
-ax.errorbar(diamsa, fano, yerr=fano_E,fmt='ro',markersize=4,mfc='None',lw=1)
-axb.errorbar(diamsa, FR, yerr=FR_E,fmt='ko',markersize=4,mfc='None',lw=1)
-ax.plot([diams[0],diams[-1]],[np.nanmean(fano_bsl),np.nanmean(fano_bsl)],'r--')
-axb.plot([diams[0],diams[-1]],[np.nanmean(FR_bsl),np.nanmean(FR_bsl)],'k--')
+ax.errorbar(diamsa[1:], fano[1:], yerr=fano_E[1:],fmt='ro',markersize=4,mfc='None',lw=1)
+axb.errorbar(diamsa[1:], FR[1:], yerr=FR_E[1:],fmt='ko',markersize=4,mfc='None',lw=1)
+#ax.plot([diams[0],diams[-1]],[np.nanmean(fano_bsl),np.nanmean(fano_bsl)],'r--')
+#axb.plot([diams[0],diams[-1]],[np.nanmean(FR_bsl),np.nanmean(FR_bsl)],'k--')
+ax.plot([diams[0],diams[-1]],[4.2,4.2],'r--')
+axb.plot([diams[0],diams[-1]],[10,10],'k--')
 # fits
 ax.plot(diams_tight, Fhat, 'r-',lw=1)
 axb.plot(diams_tight, Rhat, 'k-',lw=1)
 ax.set_xscale('log')
 axb.set_xscale('log')
+ax.set_xlim([0.1, 30])
 
 ax.spines['left'].set_color('red')
 axb.spines['left'].set_color('red')

@@ -15,7 +15,7 @@ from scipy.optimize import basinhopping, curve_fit
 import scipy.stats as sts
 
 # this way of computing the mean firing-rate functions is cumbersome but we do it this way for consistency with the other scripts
-save_figures = False
+save_figures = True
 geo_mean = False
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
@@ -193,6 +193,39 @@ for unit in list(IG_mn_data.keys()):
         indx += 1
         q_indx += 1
 
+# baselines for FF and FR
+# SG
+SG_groups = SG_params.groupby('unit')
+SG_groups = dict(list(SG_groups))
+SG_bsl_FR = []
+for i in SG_groups.keys():
+    A = SG_groups[i]        
+    SG_bsl_FR.append(A['bsl_FR'].mean() / A['FR'].max())
+
+SG_bsl_FR = np.array(SG_bsl_FR).mean()
+
+# G
+G_groups = G_params.groupby('unit')
+G_groups = dict(list(G_groups))
+G_bsl_FR = []
+for i in G_groups.keys():
+    A = G_groups[i]        
+    G_bsl_FR.append(A['bsl_FR'].mean() / A['FR'].max())
+
+
+G_bsl_FR = np.array(G_bsl_FR).mean()
+
+# IG
+IG_groups = IG_params.groupby('unit')
+IG_groups = dict(list(IG_groups))
+IG_bsl_FR = []
+for i in IG_groups.keys():
+    A = IG_groups[i]    
+    IG_bsl_FR.append(A['bsl_FR'].mean() / A['FR'].max())
+
+IG_bsl_FR = np.array(IG_bsl_FR).mean()
+
+
 SG_params['FR'] = SG_params['FR'].apply(lambda x: x/(count_window/1000))
 G_params['FR']  = G_params['FR'].apply(lambda x: x/(count_window/1000))
 IG_params['FR'] = IG_params['FR'].apply(lambda x: x/(count_window/1000))
@@ -232,7 +265,7 @@ except:
     res  = basinhopping(cost_response,np.ones(5),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234)
     G_FR_popt = res.x
 
-# fit SG netvariance data
+# fit G netvariance data
 args = (G_size_tune['diam'].values,G_netshare_tune)
 bnds = np.array([[0.0001,1,0.0001,0.0001,0.0001,0,0,0,0,0],[1,30,30,30,100,100,100,100,None,None]]).T
 res = basinhopping(cost_fano,np.ones(10),minimizer_kwargs={'method': 'L-BFGS-B', 'args':args,'bounds':bnds},seed=1234,niter=1000)
@@ -349,6 +382,8 @@ my_sizes = np.array([0.25, 0.5, 0.75,
 
 
 units = SG_params['unit'].unique()
+RFnormed_bsl = np.nan * np.ones((len(units),))
+RFnormed_bsl_NV = np.nan * np.ones((len(units),))
 RFnormed_FR = np.nan * np.ones((len(units),len(my_sizes)+1))
 RFnormed_NV = np.nan * np.ones((len(units),len(my_sizes)+1))
 diams_tight = np.logspace(np.log10(SG_params['diam'].values[0]),np.log10(SG_params['diam'].values[-1]),1000)
@@ -374,12 +409,15 @@ for ui, unit in enumerate(units):
     NV       = SG_netvariance[ui,:]
     RFi = np.argmin(np.abs(RFnormed-1))
     normed_FR = FR/np.max(FR)
-    NV = NV#/NV[RFi]
+    BSL = unit_params['bsl_FR'].mean()
+    RFnormed_bsl[ui] = BSL/np.max(FR)
+    RFnormed_bsl_NV[ui] = np.mean(bsl_SG_netvariance[ui,:]) / NV[RFi]    
+    NV = NV/NV[RFi]
     RFnormed_FR[ui,3] = 1
-    RFnormed_NV[ui,3] = NV[RFi]
-    RFnormed = np.delete(RFnormed,RFi)
+    RFnormed_NV[ui,3] = NV[RFi] # = 1
+    RFnormed = np.delete(RFnormed,RFi)    
     FR = np.delete(FR,RFi)
-    NV = np.delete(NV,RFi)
+    NV = np.delete(NV,RFi) 
 
     for s in range(len(RFnormed)):
         si = np.argmin(np.abs(my_sizes - RFnormed[s]))
@@ -388,7 +426,6 @@ for ui, unit in enumerate(units):
       
         RFnormed_FR[ui,si] = normed_FR[s]
         RFnormed_NV[ui,si] = NV[s]
-        
 
 
 my_sizes = np.insert(my_sizes,3,1)
@@ -433,9 +470,9 @@ ax2 = ax.twinx()
 ax.set_title('SG')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,SG_normed_FR,yerr=YERR,fmt='ko', markersize=4,mfc='None',lw=1)
+ax2.plot([my_sizes.min(), my_sizes.max()],[SG_bsl_FR,SG_bsl_FR],'k--',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
-
 
 if geo_mean:
     YERR = np.nan * np.ones((RFnormed_NV.shape[1],))
@@ -450,6 +487,7 @@ else:
     YERR = np.nanstd(RFnormed_NV,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_NV),axis=0))
 
 ax.errorbar(my_sizes, SG_normed_NV,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
+ax.plot([my_sizes.min(), my_sizes.max()],[np.nanmean(RFnormed_bsl_NV),np.nanmean(RFnormed_bsl_NV)],'r--',lw=1)
 ax.set_xscale('log')
 ax.set_ylabel('Network variance (au)')
 ax.yaxis.label.set_color('red')
@@ -473,6 +511,8 @@ my_sizes = np.array([0.25, 0.5, 0.75,
 
 
 units = G_params['unit'].unique()
+RFnormed_bsl = np.nan * np.ones((len(units),))
+RFnormed_bsl_NV = np.nan * np.ones((len(units),))
 RFnormed_FR = np.nan * np.ones((len(units),len(my_sizes)+1))
 RFnormed_NV = np.nan * np.ones((len(units),len(my_sizes)+1))
 diams_tight = np.logspace(np.log10(G_params['diam'].values[0]),np.log10(G_params['diam'].values[-1]),1000)
@@ -498,10 +538,14 @@ for ui, unit in enumerate(units):
     NV       = G_netvariance[ui,:]
     RFi = np.argmin(np.abs(RFnormed-1))
     normed_FR = FR/np.max(FR)
-    NV = NV#/NV[RFi]
+    BSL = unit_params['bsl_FR'].mean()
+    RFnormed_bsl[ui] = BSL/np.max(FR)
+    RFnormed_bsl_NV[ui] = np.mean(bsl_G_netvariance[ui,:]) / NV[RFi]
+    NV = NV/NV[RFi]
     RFnormed_FR[ui,3] = 1
     RFnormed_NV[ui,3] = NV[RFi]
     RFnormed = np.delete(RFnormed,RFi)
+    
     FR = np.delete(FR,RFi)
     NV = np.delete(NV,RFi)
 
@@ -513,7 +557,8 @@ for ui, unit in enumerate(units):
         RFnormed_FR[ui,si] = normed_FR[s]
         RFnormed_NV[ui,si] = NV[s]
         
-
+RFnormed_NV = np.delete(RFnormed_NV,6,axis=0)
+RFnormed_bsl_NV = np.delete(RFnormed_bsl_NV,6)
 
 my_sizes = np.insert(my_sizes,3,1)
 
@@ -558,6 +603,7 @@ ax2 = ax.twinx()
 ax.set_title('G')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,G_normed_FR,yerr=YERR,fmt='ko', markersize=4,mfc='None',lw=1)
+ax2.plot([my_sizes.min(), my_sizes.max()],[G_bsl_FR,G_bsl_FR],'k--',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -574,6 +620,7 @@ else:
     YERR = np.nanstd(RFnormed_NV,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_NV),axis=0))
 
 ax.errorbar(my_sizes, G_normed_NV,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
+ax.plot([my_sizes.min(), my_sizes.max()],[np.nanmean(RFnormed_bsl_NV),np.nanmean(RFnormed_bsl_NV)],'r--',lw=1)
 ax.set_xscale('log')
 ax.set_ylabel('Network variance (au)')
 ax.yaxis.label.set_color('red')
@@ -598,6 +645,8 @@ my_sizes = np.array([0.25, 0.5, 0.75,
 
 
 units = IG_params['unit'].unique()
+RFnormed_bsl = np.nan * np.ones((len(units),))
+RFnormed_bsl_NV = np.nan * np.ones((len(units),))
 RFnormed_FR = np.nan * np.ones((len(units),len(my_sizes)+1))
 RFnormed_NV = np.nan * np.ones((len(units),len(my_sizes)+1))
 diams_tight = np.logspace(np.log10(IG_params['diam'].values[0]),np.log10(IG_params['diam'].values[-1]),1000)
@@ -623,10 +672,14 @@ for ui, unit in enumerate(units):
     NV       = IG_netvariance[ui,:]
     RFi = np.argmin(np.abs(RFnormed-1))
     normed_FR = FR/np.max(FR)
-    NV = NV#/NV[RFi]
+    BSL = unit_params['bsl_FR'].mean()
+    RFnormed_bsl[ui] = BSL/np.max(FR)
+    RFnormed_bsl_NV[ui] = np.mean(bsl_IG_netvariance[ui,:]) / NV[RFi]    
+    NV = NV/NV[RFi]
     RFnormed_FR[ui,3] = 1
     RFnormed_NV[ui,3] = NV[RFi]
     RFnormed = np.delete(RFnormed,RFi)
+    
     FR = np.delete(FR,RFi)
     NV = np.delete(NV,RFi)
 
@@ -637,7 +690,6 @@ for ui, unit in enumerate(units):
       
         RFnormed_FR[ui,si] = normed_FR[s]
         RFnormed_NV[ui,si] = NV[s]
-        
 
 
 my_sizes = np.insert(my_sizes,3,1)
@@ -683,6 +735,7 @@ ax2 = ax.twinx()
 ax.set_title('IG')
 YERR = np.nanstd(RFnormed_FR,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_FR),axis=0))
 ax2.errorbar(my_sizes,IG_normed_FR,yerr=YERR,fmt='ko', markersize=4,mfc='None',lw=1)
+ax2.plot([my_sizes.min(), my_sizes.max()],[IG_bsl_FR,IG_bsl_FR],'k--',lw=1)
 ax2.set_xscale('log')
 ax2.set_ylabel('Normalized firing rate')
 
@@ -699,6 +752,7 @@ else:
     YERR = np.nanstd(RFnormed_NV,axis=0)/np.sqrt(np.sum(~np.isnan(RFnormed_NV),axis=0))
 
 ax.errorbar(my_sizes, IG_normed_NV,yerr=YERR,fmt='ro',markersize=4,mfc='None',lw=1)
+ax.plot([my_sizes.min(), my_sizes.max()],[np.nanmean(RFnormed_bsl_NV),np.nanmean(RFnormed_bsl_NV)],'r--',lw=1)
 ax.set_xscale('log')
 ax.set_ylabel('Network variance (au)')
 ax.yaxis.label.set_color('red')

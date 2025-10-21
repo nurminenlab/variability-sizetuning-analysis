@@ -99,7 +99,7 @@ if save_figures:
     plt.savefig(fig_dir + 'F2C-left.svg',bbox_inches='tight',pad_inches=0)
 
 
-# computer significance of fano suppression in RF
+# compute significance of fano suppression in RF
 SG_differs_from_zero, SG_p_value = bootstrap_median_test(SG['FFsuppression'].values)
 G_differs_from_zero, G_p_value = bootstrap_median_test(G['FFsuppression'].values)
 IG_differs_from_zero, IG_p_value = bootstrap_median_test(IG['FFsuppression'].values)

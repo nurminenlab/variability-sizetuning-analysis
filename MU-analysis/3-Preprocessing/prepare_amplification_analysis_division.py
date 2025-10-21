@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pickle as pkl
 import pandas as pd
 import seaborn as sns
-sys.path.append('C:/Users/lonurmin/Desktop/code/DataAnalysis/')
+sys.path.append('C:/Users/lonurmin/Desktop/code/Analysis/')
 import data_analysislib as dalib
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
@@ -13,7 +13,7 @@ import pdb
 
 S_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/paper_v9/MK-MU/'
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/'
-save_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/'
+save_dir = 'C:/Users/lonurmin/Desktop/AnalysisScripts/VariabilitySizeTuning/variability-sizetuning-analysis/MU-analysis/2-PrecomputedAnalysis/'
 
 MUdatfile = 'selectedData_MUA_lenient_400ms_macaque_July-2020.pkl'
 
@@ -92,7 +92,8 @@ quencher_DF = pd.DataFrame(columns=['qtype_signi',
                                     'maxquench_perc',
                                     'maxamplif_perc',
                                     'RFdiam',
-                                    'unit'])
+                                    'unit',
+                                    'penetration'])
 
 # loop SG units
 indx  = 0
@@ -154,9 +155,15 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
                 signi = 'NS'
 
         signi_all[stim] = signi
-        para_tmp  = {'fano':fano,'bsl':bsl[stim],'delta_fano':delta_fano[stim],'diam':diam,'unit':unit,'layer':'SG','signi':signi}
+        para_tmp  = {'fano':fano,
+                     'bsl':bsl[stim],
+                     'delta_fano':delta_fano[stim],
+                     'diam':diam,
+                     'unit':unit,
+                     'layer':'SG',
+                     'signi':signi}
         tmp_df    = pd.DataFrame(para_tmp, index=[indx])
-        SG_params = SG_params.append(tmp_df,sort=True)
+        SG_params = pd.concat([SG_params,tmp_df],sort=True)
 
         indx += 1
 
@@ -218,6 +225,8 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
     else:
         qtype_signi = 'mixer'
 
+    penetration = data[unit]['info']['penetr'].decode('utf-8')
+    animal = data[unit]['info']['animal'].decode('utf-8')
     para_tmp = {'bsl':np.mean(bsl),
                 'bsl_FR':np.mean(bsl_FR),
                 'layer':'SG',                
@@ -229,10 +238,11 @@ for unit_indx, unit in enumerate(list(SG_mn_data.keys())):
                 'maxquench_perc':maxquench_perc,
                 'maxamplif_perc':maxamplif_perc,
                 'RFdiam':RFdiam,
-                'unit':unit}
+                'unit':unit,
+                'penetration':animal+'-'+penetration}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
-    quencher_DF = quencher_DF.append(tmp_df,sort=True)
+    quencher_DF = pd.concat([quencher_DF,tmp_df],sort=True,ignore_index=True)
     qindx =+ 1
 
 
@@ -281,7 +291,7 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
         signi_all[stim] = signi
         para_tmp = {'fano':fano,'bsl':bsl[stim],'delta_fano':delta_fano[stim],'diam':diam,'unit':unit,'layer':'G','signi':signi}
         tmp_df   = pd.DataFrame(para_tmp, index=[indx])
-        G_params = G_params.append(tmp_df,sort=True)
+        G_params = pd.concat([G_params,tmp_df],sort=True)
 
         indx += 1
 
@@ -341,7 +351,8 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
     else:
         qtype_signi = 'mixer'
 
-
+    penetration = data[unit]['info']['penetr'].decode('utf-8')
+    animal = data[unit]['info']['animal'].decode('utf-8')
     para_tmp = {'bsl':np.mean(bsl),
                 'bsl_FR':np.mean(bsl_FR),
                 'layer':'G',                
@@ -353,10 +364,11 @@ for unit_indx, unit in enumerate(list(G_mn_data.keys())):
                 'maxquench_perc':maxquench_perc,
                 'maxamplif_perc':maxamplif_perc,
                 'RFdiam':RFdiam,
-                'unit':unit}
+                'unit':unit,
+                'penetration':animal+'-'+penetration}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
-    quencher_DF = quencher_DF.append(tmp_df,sort=True)
+    quencher_DF = pd.concat([quencher_DF,tmp_df],sort=True,ignore_index=True)
     qindx =+ 1
         
 
@@ -405,7 +417,7 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
         signi_all[stim] = signi
         para_tmp = {'fano':fano,'bsl':bsl[stim],'delta_fano':delta_fano[stim],'diam':diam,'unit':unit,'layer':'IG','signi':signi}
         tmp_df   = pd.DataFrame(para_tmp, index=[indx])
-        IG_params = IG_params.append(tmp_df,sort=True)
+        IG_params = pd.concat([IG_params,tmp_df],sort=True)        
 
         indx += 1
 
@@ -466,7 +478,8 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
     else:
         qtype_signi = 'mixer'
 
-
+    penetration = data[unit]['info']['penetr'].decode('utf-8')
+    animal = data[unit]['info']['animal'].decode('utf-8')
     para_tmp = {'bsl':np.mean(bsl),
                 'bsl_FR':np.mean(bsl_FR),
                 'layer':'IG',                
@@ -478,10 +491,11 @@ for unit_indx, unit in enumerate(list(IG_mn_data.keys())):
                 'maxquench_perc':maxquench_perc,
                 'maxamplif_perc':maxamplif_perc,
                 'RFdiam':RFdiam,
-                'unit':unit}
+                'unit':unit,
+                'penetration':animal+'-'+penetration}
     
     tmp_df = pd.DataFrame(para_tmp, index=[qindx])
-    quencher_DF = quencher_DF.append(tmp_df,sort=True)
+    quencher_DF = pd.concat([quencher_DF,tmp_df],sort=True,ignore_index=True)
     qindx =+ 1
 
 
