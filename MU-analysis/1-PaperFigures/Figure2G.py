@@ -6,7 +6,7 @@ from statsmodels.formula.api import ols
 import statsmodels.api as sm
 import scipy.stats as sts
 
-save_figures = False
+save_figures = True
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/MU-figures/'
@@ -38,7 +38,7 @@ ax.set_yscale('log')
 ax.set_ylim(0.01,100)
 
 ax = plt.subplot(122)
-sns.swarmplot(x='layer',y='RFnormed_maxQuenchDiam',hue='animal',data=params,ax=ax,size=3,color='red')
+sns.swarmplot(x='layer',y='RFnormed_maxQuenchDiam',hue='anipe',data=params,ax=ax,size=3)
 ax.set_yscale('log')
 ax.set_ylim(0.01,100)
 

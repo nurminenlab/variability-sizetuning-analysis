@@ -6,7 +6,7 @@ import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import numpy as np
 
-save_figures = True
+save_figures = False
 
 F_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-preprocessed/'
 fig_dir   = 'C:/Users/lonurmin/Desktop/CorrelatedVariability/results/SU-figures/'
@@ -18,7 +18,6 @@ var_dict =['0.1/0.2 deg','RF','2RF','4RF','8RF','26 deg']
 # we clean up units without much fano factor tuning
 SG_units_to_remove = [1,7,14,51,53,58,80]
 IG_units_to_remove = [20,31,32,34,46,77,81]
-
 
 idx_to_remove = []
 for unit in SG_units_to_remove:
